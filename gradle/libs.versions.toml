@@ -14,7 +14,7 @@ micronaut-http-server-netty = { module = "io.micronaut:micronaut-http-server-net
 micronaut-http-client = { module = "io.micronaut:micronaut-http-client" }
 micronaut-serde-jackson = { module = "io.micronaut.serde:micronaut-serde-jackson" }
 micronaut-views-thymeleaf = { module = "io.micronaut.views:micronaut-views-thymeleaf" }
-micronaut-data-hibernate-jpa = { module = "io.micronaut.data:micronaut-data-hibernate-jpa" }
+micronaut-data-jdbc = { module = "io.micronaut.data:micronaut-data-jdbc" }
 micronaut-jdbc-hikari = { module = "io.micronaut.sql:micronaut-jdbc-hikari" }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation" }
 micronaut-cache-caffeine = { module = "io.micronaut.cache:micronaut-cache-caffeine" }
