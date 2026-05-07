@@ -1,6 +1,7 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.uri.UriBuilder;
@@ -10,6 +11,7 @@ import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.PetType;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 import java.net.URI;
@@ -26,6 +28,48 @@ public class PetController {
 
     public PetController(ClinicService clinicService) {
         this.clinicService = clinicService;
+    }
+
+    @io.micronaut.http.annotation.Error(exception = ConstraintViolationException.class)
+    @View("pets/createOrUpdatePetForm")
+    public Map<String, Object> onConstraintViolation(HttpRequest<?> request,
+                                                     ConstraintViolationException e) {
+        Map<String, Object> model = new HashMap<>();
+
+        Integer ownerId = request.getParameters().get("ownerId", Integer.class).orElse(null);
+        Integer petId = request.getParameters().get("petId", Integer.class).orElse(null);
+
+        Owner owner = ownerId != null ? getOwner(ownerId).orElse(null) : null;
+        model.put("owner", owner);
+        model.put("types", clinicService.findPetTypes());
+        model.put("isNew", petId == null);
+
+        Map<String, String> validationErrors = new HashMap<>();
+        for (var violation : e.getConstraintViolations()) {
+            String field = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : "";
+            int lastDot = field.lastIndexOf('.');
+            if (lastDot >= 0) {
+                field = field.substring(lastDot + 1);
+            }
+            if (!field.isBlank()) {
+                validationErrors.put(field, violation.getMessage());
+            }
+        }
+        model.put("validationErrors", validationErrors);
+
+        // Re-populate the form fields from submitted values where possible.
+        PetForm form = new PetForm();
+        request.getBody(PetForm.class).ifPresent(submitted -> {
+            form.setName(submitted.getName());
+            form.setBirthDate(submitted.getBirthDate());
+            form.setTypeId(submitted.getTypeId());
+        });
+        model.put("pet", form);
+        if (petId != null) {
+            model.put("petId", petId);
+        }
+
+        return model;
     }
 
     /**
@@ -55,6 +99,7 @@ public class PetController {
             model.put("owner", owner.get());
             model.put("types", clinicService.findPetTypes());
             model.put("isNew", true);
+            model.put("validationErrors", Map.of());
         } else {
             model.put("error", "Owner not found");
         }
@@ -113,6 +158,7 @@ public class PetController {
             model.put("owner", pet.get().getOwner());
             model.put("types", clinicService.findPetTypes());
             model.put("isNew", false);
+            model.put("validationErrors", Map.of());
         } else {
             model.put("error", "Pet not found");
         }

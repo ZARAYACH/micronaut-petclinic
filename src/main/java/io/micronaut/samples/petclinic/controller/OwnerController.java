@@ -1,6 +1,7 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.uri.UriBuilder;
@@ -9,6 +10,8 @@ import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
 import jakarta.validation.Valid;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 import java.net.URI;
 import java.util.*;
@@ -127,6 +130,7 @@ public class OwnerController {
         Map<String, Object> model = new HashMap<>();
         model.put("owner", new OwnerForm());
         model.put("isNew", true);
+        model.put("validationErrors", Map.of());
         return model;
     }
 
@@ -144,6 +148,32 @@ public class OwnerController {
         return HttpResponse.redirect(uri);
     }
 
+    @io.micronaut.http.annotation.Error(exception = ConstraintViolationException.class)
+    @View("owners/createOrUpdateOwnerForm")
+    public Map<String, Object> onCreateOwnerValidationError(HttpRequest<?> request,
+                                                            ConstraintViolationException e) {
+        // For form posts, render the form again instead of sending users to the generic 500 page.
+        Map<String, Object> model = new HashMap<>();
+        model.put("owner", new OwnerForm());
+        model.put("isNew", true);
+        // Keep user input if available.
+        request.getBody(OwnerForm.class).ifPresent(f -> model.put("owner", f));
+
+        Map<String, String> errors = new LinkedHashMap<>();
+        for (ConstraintViolation<?> v : e.getConstraintViolations()) {
+            String field = v.getPropertyPath() != null ? v.getPropertyPath().toString() : "";
+            // For form binding, Micronaut prefixes with method + param, e.g. "processCreationForm.form.telephone".
+            // We only need the leaf field name to show inline messages.
+            int lastDot = field.lastIndexOf('.');
+            if (lastDot >= 0 && lastDot < field.length() - 1) {
+                field = field.substring(lastDot + 1);
+            }
+            errors.put(field, v.getMessage());
+        }
+        model.put("validationErrors", errors);
+        return model;
+    }
+
     /**
      * Display the form to edit an existing owner.
      *
@@ -159,9 +189,11 @@ public class OwnerController {
             model.put("owner", OwnerForm.fromOwner(owner.get()));
             model.put("ownerId", ownerId);
             model.put("isNew", false);
+            model.put("validationErrors", Map.of());
         } else {
             model.put("error", "Owner not found");
             model.put("isNew", false);
+            model.put("validationErrors", Map.of());
         }
         return model;
     }

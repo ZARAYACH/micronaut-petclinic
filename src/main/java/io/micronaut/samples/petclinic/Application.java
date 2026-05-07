@@ -7,7 +7,7 @@ import io.micronaut.runtime.Micronaut;
  * 
  * This is a sample application demonstrating Micronaut features including:
  * - Micronaut Data JPA for database access
- * - Thymeleaf for server-side rendering
+ * - JTE for server-side rendering
  * - Caffeine for caching
  * - Bean validation
  * - Internationalization (i18n)
