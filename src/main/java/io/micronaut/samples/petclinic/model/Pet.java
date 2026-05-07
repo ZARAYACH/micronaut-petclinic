@@ -18,21 +18,21 @@ import java.util.List;
  * Entity representing a pet.
  * A pet belongs to an owner and has a type.
  */
-@MappedEntity("pets")
+@MappedEntity("PETS")
 @Serdeable
 public class Pet extends NamedEntity {
 
-    @MappedProperty("birth_date")
+    @MappedProperty("BIRTH_DATE")
     @NotNull
     private LocalDate birthDate;
 
     @Relation(MANY_TO_ONE)
-    @MappedProperty("type_id")
+    @MappedProperty("TYPE_ID")
     @NotNull
     private PetType type;
 
     @Relation(MANY_TO_ONE)
-    @MappedProperty("owner_id")
+    @MappedProperty("OWNER_ID")
     private Owner owner;
 
     @Relation(value = ONE_TO_MANY, mappedBy = "pet")

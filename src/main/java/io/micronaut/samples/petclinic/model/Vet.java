@@ -8,7 +8,7 @@ import java.util.*;
  * Entity representing a veterinarian.
  * A vet can have multiple specialties.
  */
-@MappedEntity("vets")
+@MappedEntity("VETS")
 @Serdeable
 public class Vet extends Person {
 

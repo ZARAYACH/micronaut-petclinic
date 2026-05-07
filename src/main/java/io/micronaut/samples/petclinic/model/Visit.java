@@ -14,20 +14,20 @@ import java.time.LocalDate;
  * Entity representing a visit to the pet clinic.
  * A visit is associated with a pet and has a date and description.
  */
-@MappedEntity("visits")
+@MappedEntity("VISITS")
 @Serdeable
 public class Visit extends BaseEntity {
 
-    @MappedProperty("visit_date")
+    @MappedProperty("VISIT_DATE")
     @NotNull
     private LocalDate date;
 
-    @MappedProperty("description")
+    @MappedProperty("DESCRIPTION")
     @NotBlank
     private String description;
 
     @Relation(MANY_TO_ONE)
-    @MappedProperty("pet_id")
+    @MappedProperty("PET_ID")
     private Pet pet;
 
     public Visit() {

@@ -6,7 +6,7 @@ import io.micronaut.data.annotation.MappedEntity;
 /**
  * Entity representing a veterinarian specialty (e.g., surgery, dentistry).
  */
-@MappedEntity("specialties")
+@MappedEntity("SPECIALTIES")
 @Serdeable
 public class Specialty extends NamedEntity {
 

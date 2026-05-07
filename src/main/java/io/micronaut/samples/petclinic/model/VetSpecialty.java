@@ -8,13 +8,13 @@ import io.micronaut.data.annotation.MappedProperty;
  *
  * The Petclinic schema models this as a pure join table without its own id.
  */
-@MappedEntity("vet_specialties")
+@MappedEntity("VET_SPECIALTIES")
 public class VetSpecialty {
 
-    @MappedProperty("vet_id")
+    @MappedProperty("VET_ID")
     private Integer vetId;
 
-    @MappedProperty("specialty_id")
+    @MappedProperty("SPECIALTY_ID")
     private Integer specialtyId;
 
     public Integer getVetId() {

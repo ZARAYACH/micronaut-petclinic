@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 @Serdeable
 public abstract class NamedEntity extends BaseEntity {
 
-    @MappedProperty("name")
+    @MappedProperty("NAME")
     @NotBlank
     private String name;
 

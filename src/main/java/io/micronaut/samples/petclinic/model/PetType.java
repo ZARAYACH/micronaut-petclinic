@@ -6,7 +6,7 @@ import io.micronaut.data.annotation.MappedEntity;
 /**
  * Entity representing a type of pet (e.g., dog, cat, bird).
  */
-@MappedEntity("types")
+@MappedEntity("TYPES")
 @Serdeable
 public class PetType extends NamedEntity {
 

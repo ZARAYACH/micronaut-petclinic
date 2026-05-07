@@ -13,11 +13,11 @@ import jakarta.validation.constraints.NotBlank;
 @Serdeable
 public abstract class Person extends BaseEntity {
 
-    @MappedProperty("first_name")
+    @MappedProperty("FIRST_NAME")
     @NotBlank
     private String firstName;
 
-    @MappedProperty("last_name")
+    @MappedProperty("LAST_NAME")
     @NotBlank
     private String lastName;
 

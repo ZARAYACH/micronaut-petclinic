@@ -13,19 +13,19 @@ import java.util.*;
  * Entity representing a pet owner.
  * An owner can have multiple pets.
  */
-@MappedEntity("owners")
+@MappedEntity("OWNERS")
 @Serdeable
 public class Owner extends Person {
 
-    @MappedProperty("address")
+    @MappedProperty("ADDRESS")
     @NotBlank
     private String address;
 
-    @MappedProperty("city")
+    @MappedProperty("CITY")
     @NotBlank
     private String city;
 
-    @MappedProperty("telephone")
+    @MappedProperty("TELEPHONE")
     @NotBlank
     @Digits(fraction = 0, integer = 10)
     private String telephone;

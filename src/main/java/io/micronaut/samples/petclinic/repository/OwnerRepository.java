@@ -2,8 +2,6 @@ package io.micronaut.samples.petclinic.repository;
 
 import io.micronaut.data.annotation.Join;
 import static io.micronaut.data.annotation.Join.Type.LEFT_FETCH;
-import io.micronaut.data.jdbc.annotation.JdbcRepository;
-import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
 import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.data.model.Sort;
@@ -15,7 +13,7 @@ import java.util.Optional;
  * Repository for {@link Owner} entities.
  * Uses Micronaut Data JPA for compile-time query generation.
  */
-@JdbcRepository(dialect = Dialect.ANSI)
+// Dialect-specific @JdbcRepository beans extend this interface.
 public interface OwnerRepository extends CrudRepository<Owner, Integer> {
 
     /**
