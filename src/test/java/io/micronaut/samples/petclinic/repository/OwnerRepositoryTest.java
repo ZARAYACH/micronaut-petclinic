@@ -64,7 +64,7 @@ class OwnerRepositoryTest {
 
         Owner saved = ownerRepository.save(owner);
         
-        assertThat(saved.getId()).isNotNull();
+        assertThat(saved.id()).isNotNull();
         assertThat(saved.getFirstName()).isEqualTo("Test");
     }
 

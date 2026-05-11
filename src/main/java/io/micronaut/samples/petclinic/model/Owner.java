@@ -136,7 +136,7 @@ public record Owner(
     @Transient
     public List<Pet> getPetsSorted() {
         List<Pet> sortedPets = new ArrayList<>(pets);
-        sortedPets.sort(Comparator.comparing(Pet::getName));
+        sortedPets.sort(Comparator.comparing(Pet::name));
         return Collections.unmodifiableList(sortedPets);
     }
 
@@ -191,7 +191,7 @@ public record Owner(
         String lowerCaseName = name.toLowerCase();
         for (Pet pet : pets) {
             if (!ignoreNew || !pet.isNew()) {
-                if (pet.getName().toLowerCase().equals(lowerCaseName)) {
+                if (pet.name().toLowerCase().equals(lowerCaseName)) {
                     return pet;
                 }
             }
@@ -207,7 +207,7 @@ public record Owner(
      */
     public Pet getPet(Integer id) {
         for (Pet pet : pets) {
-            if (pet.getId().equals(id)) {
+            if (pet.id().equals(id)) {
                 return pet;
             }
         }

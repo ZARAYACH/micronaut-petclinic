@@ -56,10 +56,10 @@
                         </div>
 
                         <div class="d-flex gap-2 mt-4">
-                            <a href="/owners/${owner.getId()}/edit" class="btn btn-primary flex-grow-1">
+                            <a href="/owners/${owner.id()}/edit" class="btn btn-primary flex-grow-1">
                                 <i class="fas fa-edit me-2"></i>${msg.text("button.edit")}
                             </a>
-                            <a href="/owners/${owner.getId()}/pets/new" class="btn btn-success flex-grow-1">
+                            <a href="/owners/${owner.id()}/pets/new" class="btn btn-success flex-grow-1">
                                 <i class="fas fa-plus me-2"></i>${msg.text("button.addPet")}
                             </a>
                         </div>
@@ -82,7 +82,7 @@
                                 </div>
                                 <h5>${msg.text("owner.noPetsYet")}</h5>
                                 <p class="text-muted">${msg.text("owner.noPetsMessage")}</p>
-                                <a href="/owners/${owner.getId()}/pets/new" class="btn btn-success">
+                                <a href="/owners/${owner.id()}/pets/new" class="btn btn-success">
                                     <i class="fas fa-plus me-2"></i>${msg.text("owner.addFirstPet")}
                                 </a>
                             </div>
@@ -93,10 +93,10 @@
                                         <div class="col-md-4">
                                             <div class="d-flex align-items-center">
                                                 <div class="pet-icon me-3 ${
-                                                    ((pet.getType() != null && pet.getType().getName() != null) ? pet.getType().getName().trim().toLowerCase(Locale.ROOT) : "dog")
+                                                    ((pet.getType() != null && pet.getType().name() != null) ? pet.getType().name().trim().toLowerCase(Locale.ROOT) : "dog")
                                                 }">
                                                     <i class="fas ${
-                                                        switch (((pet.getType() != null && pet.getType().getName() != null) ? pet.getType().getName().trim().toLowerCase(Locale.ROOT) : "")) {
+                                                        switch (((pet.getType() != null && pet.getType().name() != null) ? pet.getType().name().trim().toLowerCase(Locale.ROOT) : "")) {
                                                             case "cat" -> "fa-cat";
                                                             case "bird" -> "fa-dove";
                                                             case "hamster" -> "fa-hippo";
@@ -106,8 +106,8 @@
                                                     }"></i>
                                                 </div>
                                                 <div>
-                                                    <h6 class="mb-0">${pet.getName()}</h6>
-                                                    <small class="text-muted">${pet.getType() != null ? pet.getType().getName() : msg.text("visit.unknown")}</small>
+                                                    <h6 class="mb-0">${pet.name()}</h6>
+                                                    <small class="text-muted">${pet.getType() != null ? pet.getType().name() : msg.text("visit.unknown")}</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -116,10 +116,10 @@
                                             <span>${pet.getBirthDate() != null ? pet.getBirthDate().toString() : ""}</span>
                                         </div>
                                         <div class="col-md-5 text-md-end mt-3 mt-md-0">
-                                            <a href="/owners/${owner.getId()}/pets/${pet.getId()}/edit" class="btn btn-sm btn-outline-primary me-2">
+                                            <a href="/owners/${owner.id()}/pets/${pet.id()}/edit" class="btn btn-sm btn-outline-primary me-2">
                                                 <i class="fas fa-edit"></i> ${msg.text("button.edit")}
                                             </a>
-                                            <a href="/owners/${owner.getId()}/pets/${pet.getId()}/visits/new" class="btn btn-sm btn-primary">
+                                            <a href="/owners/${owner.id()}/pets/${pet.id()}/visits/new" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-plus"></i> ${msg.text("button.addVisit")}
                                             </a>
                                         </div>
@@ -131,8 +131,8 @@
                                             <div class="visit-timeline">
                                                 @for(Visit visit : pet.getVisits())
                                                     <div class="visit-item">
-                                                        <div class="visit-date">${visit.getDate() != null ? visit.getDate().toString() : ""}</div>
-                                                        <div class="visit-description">${visit.getDescription()}</div>
+                                                        <div class="visit-date">${visit.date() != null ? visit.date().toString() : ""}</div>
+                                                        <div class="visit-description">${visit.description()}</div>
                                                     </div>
                                                 @endfor
                                             </div>

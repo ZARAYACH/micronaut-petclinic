@@ -19,22 +19,4 @@ public record VetSpecialty(
         @MappedProperty("SPECIALTY_ID")
         Integer specialtyId
 ) {
-
-    /**
-     * Returns the vet identifier.
-     *
-     * @return the vet id
-     */
-    public Integer getVetId() {
-        return vetId;
-    }
-
-    /**
-     * Returns the specialty identifier.
-     *
-     * @return the specialty id
-     */
-    public Integer getSpecialtyId() {
-        return specialtyId;
-    }
 }

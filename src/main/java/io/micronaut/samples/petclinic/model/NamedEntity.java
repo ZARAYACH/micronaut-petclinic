@@ -12,12 +12,4 @@ public sealed interface NamedEntity extends BaseEntity permits Pet, PetType, Spe
      */
     String name();
 
-    /**
-     * JavaBean-style alias for {@link #name()} used by views and framework code.
-     *
-     * @return the entity name
-     */
-    default String getName() {
-        return name();
-    }
 }

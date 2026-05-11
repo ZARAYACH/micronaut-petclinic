@@ -5,7 +5,6 @@ import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.data.annotation.Relation;
-import io.micronaut.data.annotation.Transient;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.Builder;
@@ -82,43 +81,6 @@ public record Visit(
     }
 
     /**
-     * Returns the visit date.
-     *
-     * @return the visit date
-     */
-    public LocalDate getDate() {
-        return date;
-    }
-
-    /**
-     * Returns the visit description.
-     *
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Returns the pet that received the visit.
-     *
-     * @return the visit pet
-     */
-    public Pet getPet() {
-        return pet;
-    }
-
-    /**
-     * Returns the identifier of the pet that received the visit.
-     *
-     * @return the pet id, or {@code null} when no pet is assigned
-     */
-    @Transient
-    public Integer getPetId() {
-        return pet != null ? pet.getId() : null;
-    }
-
-    /**
      * Compares visits by entity identity.
      *
      * @param other the object being compared
@@ -150,7 +112,7 @@ public record Visit(
                 "id=" + id +
                 ", date=" + date +
                 ", description='" + description + '\'' +
-                ", petId=" + getPetId() +
+                ", petId=" + (pet != null ? pet.id() : null) +
                 '}';
     }
 }

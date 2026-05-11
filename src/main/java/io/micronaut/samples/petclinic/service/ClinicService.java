@@ -220,7 +220,7 @@ public class ClinicService {
     public Collection<Vet> findAllVets() {
         var vets = vetRepository.findAllWithSpecialties();
         return vets.stream()
-                .map(vet -> vet.withSpecialties(Set.copyOf(vetSpecialtyRepository.findSpecialtiesByVetId(vet.getId()))))
+                .map(vet -> vet.withSpecialties(Set.copyOf(vetSpecialtyRepository.findSpecialtiesByVetId(vet.id()))))
                 .collect(Collectors.toList());
     }
 

@@ -131,7 +131,7 @@ public record Pet(
      */
     @Transient
     public Integer getTypeId() {
-        return type != null ? type.getId() : null;
+        return type != null ? type.id() : null;
     }
 
     /**
@@ -150,7 +150,7 @@ public record Pet(
      */
     @Transient
     public Integer getOwnerId() {
-        return owner != null ? owner.getId() : null;
+        return owner != null ? owner.id() : null;
     }
 
     /**
@@ -160,7 +160,7 @@ public record Pet(
      */
     public List<Visit> getVisits() {
         List<Visit> sortedVisits = new ArrayList<>(visits);
-        sortedVisits.sort(Comparator.comparing(Visit::getDate));
+        sortedVisits.sort(Comparator.comparing(Visit::date));
         return Collections.unmodifiableList(sortedVisits);
     }
 
@@ -208,7 +208,7 @@ public record Pet(
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", birthDate=" + birthDate +
-                ", type=" + (type != null ? type.getName() : null) +
+                ", type=" + (type != null ? type.name() : null) +
                 '}';
     }
 }

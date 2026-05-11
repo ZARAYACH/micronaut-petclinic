@@ -52,7 +52,7 @@ class ClinicServiceTest {
         
         Owner savedOwner = clinicService.saveOwner(owner);
         
-        assertThat(savedOwner.getId()).isNotNull();
+        assertThat(savedOwner.id()).isNotNull();
         assertThat(savedOwner.getFirstName()).isEqualTo("John");
     }
 
@@ -87,7 +87,7 @@ class ClinicServiceTest {
     void shouldFindPetById() {
         Optional<Pet> pet = clinicService.findPetById(1);
         assertThat(pet).isPresent();
-        assertThat(pet.get().getName()).isEqualTo("Leo");
+        assertThat(pet.get().name()).isEqualTo("Leo");
     }
 
     @Test
@@ -96,7 +96,7 @@ class ClinicServiceTest {
         assertThat(owner).isPresent();
         
         PetType catType = clinicService.findPetTypes().stream()
-                .filter(t -> t.getName().equals("cat"))
+                .filter(t -> t.name().equals("cat"))
                 .findFirst()
                 .orElseThrow();
         
@@ -104,8 +104,8 @@ class ClinicServiceTest {
         
         Pet savedPet = clinicService.savePet(pet);
         
-        assertThat(savedPet.getId()).isNotNull();
-        assertThat(savedPet.getName()).isEqualTo("Whiskers");
+        assertThat(savedPet.id()).isNotNull();
+        assertThat(savedPet.name()).isEqualTo("Whiskers");
     }
 
     @Test
@@ -117,8 +117,8 @@ class ClinicServiceTest {
         
         Visit savedVisit = clinicService.saveVisit(visit);
         
-        assertThat(savedVisit.getId()).isNotNull();
-        assertThat(savedVisit.getDescription()).isEqualTo("Annual checkup");
+        assertThat(savedVisit.id()).isNotNull();
+        assertThat(savedVisit.description()).isEqualTo("Annual checkup");
     }
 
     @Test

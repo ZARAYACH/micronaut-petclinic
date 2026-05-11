@@ -21,15 +21,6 @@ public sealed interface BaseEntity permits NamedEntity, Person, Visit {
     Integer id();
 
     /**
-     * JavaBean-style alias for {@link #id()} used by views and framework code.
-     *
-     * @return the entity id, or {@code null} before the entity has been saved
-     */
-    default Integer getId() {
-        return id();
-    }
-
-    /**
      * Determines whether this entity has not yet been persisted.
      *
      * @return {@code true} when the entity has no id

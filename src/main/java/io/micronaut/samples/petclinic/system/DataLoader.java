@@ -142,7 +142,7 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
         Vet vet = new Vet(firstName, lastName).withSpecialties(Set.copyOf(Arrays.asList(specialties)));
         Vet saved = vetRepository.save(vet);
         for (Specialty specialty : specialties) {
-            vetSpecialtyRepository.save(new VetSpecialty(saved.getId(), specialty.getId()));
+            vetSpecialtyRepository.save(new VetSpecialty(saved.id(), specialty.id()));
         }
         return saved;
     }

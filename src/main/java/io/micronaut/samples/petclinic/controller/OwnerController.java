@@ -79,7 +79,7 @@ public class OwnerController {
         } else if (results.size() == 1) {
             // Single owner found - redirect to owner details
             Owner owner = results.iterator().next();
-            URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", owner.getId()));
+            URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", owner.id()));
             return HttpResponse.redirect(uri);
         } else {
             // Multiple owners found - show list
@@ -153,7 +153,7 @@ public class OwnerController {
     public HttpResponse<?> processCreationForm(@Valid @Body OwnerForm form) {
         Owner owner = formMapper.toOwner(form);
         Owner savedOwner = clinicService.saveOwner(owner);
-        URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", savedOwner.getId()));
+        URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", savedOwner.id()));
         return HttpResponse.redirect(uri);
     }
 

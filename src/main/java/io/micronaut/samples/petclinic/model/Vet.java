@@ -102,7 +102,7 @@ public record Vet(
     @Transient
     public Set<Specialty> getSpecialties() {
         List<Specialty> sortedSpecialties = new ArrayList<>(specialties());
-        sortedSpecialties.sort(Comparator.comparing(Specialty::getName));
+        sortedSpecialties.sort(Comparator.comparing(Specialty::name));
         return Collections.unmodifiableSet(new LinkedHashSet<>(sortedSpecialties));
     }
 
@@ -167,7 +167,7 @@ public record Vet(
      * @return a vet copy containing the specialty
      */
     public Vet withSpecialtyAdded(Specialty specialty) {
-        Set<Specialty> updatedSpecialties = new TreeSet<>(Comparator.comparing(Specialty::getName));
+        Set<Specialty> updatedSpecialties = new TreeSet<>(Comparator.comparing(Specialty::name));
         updatedSpecialties.addAll(specialties);
         updatedSpecialties.add(specialty);
         return withSpecialties(updatedSpecialties);
@@ -180,7 +180,7 @@ public record Vet(
      * @return a vet copy without the specialty
      */
     public Vet withoutSpecialty(Specialty specialty) {
-        Set<Specialty> updatedSpecialties = new TreeSet<>(Comparator.comparing(Specialty::getName));
+        Set<Specialty> updatedSpecialties = new TreeSet<>(Comparator.comparing(Specialty::name));
         updatedSpecialties.addAll(specialties);
         updatedSpecialties.remove(specialty);
         return withSpecialties(updatedSpecialties);
@@ -198,7 +198,7 @@ public record Vet(
         }
         List<String> names = new ArrayList<>();
         for (Specialty specialty : getSpecialties()) {
-            names.add(specialty.getName());
+            names.add(specialty.name());
         }
         return String.join(", ", names);
     }
