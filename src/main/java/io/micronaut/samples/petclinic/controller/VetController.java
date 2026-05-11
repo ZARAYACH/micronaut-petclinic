@@ -61,36 +61,10 @@ public class VetController {
     }
 
     /**
-     * A wrapper class to hold the list of vets for XML/JSON serialization.
+     * Wrapper for a list of vets for XML/JSON serialization.
+     *
+     * @param vetList the vets to expose
      */
-    public static class Vets {
-        private Collection<Vet> vetList;
-
-        /**
-         * Creates a wrapper for a collection of vets.
-         *
-         * @param vets the vets to expose
-         */
-        public Vets(Collection<Vet> vets) {
-            this.vetList = vets;
-        }
-
-        /**
-         * Returns the wrapped vet list.
-         *
-         * @return the vet list
-         */
-        public Collection<Vet> getVetList() {
-            return vetList;
-        }
-
-        /**
-         * Replaces the wrapped vet list.
-         *
-         * @param vetList the replacement vet list
-         */
-        public void setVetList(Collection<Vet> vetList) {
-            this.vetList = vetList;
-        }
+    public record Vets(Collection<Vet> vetList) {
     }
 }
