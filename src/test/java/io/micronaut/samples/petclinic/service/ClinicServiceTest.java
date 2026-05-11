@@ -48,12 +48,7 @@ class ClinicServiceTest {
 
     @Test
     void shouldSaveNewOwner() {
-        Owner owner = new Owner();
-        owner.setFirstName("John");
-        owner.setLastName("Doe");
-        owner.setAddress("123 Main St");
-        owner.setCity("Springfield");
-        owner.setTelephone("1234567890");
+        Owner owner = new Owner("John", "Doe", "123 Main St", "Springfield", "1234567890");
         
         Owner savedOwner = clinicService.saveOwner(owner);
         
@@ -105,11 +100,7 @@ class ClinicServiceTest {
                 .findFirst()
                 .orElseThrow();
         
-        Pet pet = new Pet();
-        pet.setName("Whiskers");
-        pet.setBirthDate(LocalDate.of(2023, 1, 1));
-        pet.setType(catType);
-        pet.setOwner(owner.get());
+        Pet pet = new Pet("Whiskers", LocalDate.of(2023, 1, 1), catType, owner.get());
         
         Pet savedPet = clinicService.savePet(pet);
         
@@ -122,10 +113,7 @@ class ClinicServiceTest {
         Optional<Pet> pet = clinicService.findPetById(1);
         assertThat(pet).isPresent();
         
-        Visit visit = new Visit();
-        visit.setDate(LocalDate.now());
-        visit.setDescription("Annual checkup");
-        visit.setPet(pet.get());
+        Visit visit = new Visit(LocalDate.now(), "Annual checkup", pet.get());
         
         Visit savedVisit = clinicService.saveVisit(visit);
         

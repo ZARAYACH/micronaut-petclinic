@@ -112,8 +112,7 @@ public class VisitController {
             return HttpResponse.notFound();
         }
 
-        Visit visit = formMapper.toVisit(form);
-        pet.get().addVisit(visit);
+        Visit visit = formMapper.toVisit(form).withPet(pet.get());
         clinicService.saveVisit(visit);
 
         URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", ownerId));

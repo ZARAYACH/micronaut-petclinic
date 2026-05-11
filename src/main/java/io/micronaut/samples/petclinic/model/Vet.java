@@ -1,8 +1,22 @@
 package io.micronaut.samples.petclinic.model;
 
-import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.data.annotation.GeneratedValue;
+import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
-import java.util.*;
+import io.micronaut.data.annotation.MappedProperty;
+import io.micronaut.data.annotation.Transient;
+import io.micronaut.core.annotation.Creator;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.NotBlank;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Entity representing a veterinarian.
@@ -10,59 +24,85 @@ import java.util.*;
  */
 @MappedEntity("VETS")
 @Serdeable
-public class Vet extends Person {
+public record Vet(
+        @Id
+        @GeneratedValue
+        Integer id,
 
-    // Loaded explicitly via repository queries.
-    private Set<Specialty> specialties = new LinkedHashSet<>();
+        @MappedProperty("FIRST_NAME")
+        @NotBlank
+        String firstName,
 
-    /**
-     * Get the vet's specialties, sorted by name.
-     * @return unmodifiable list of specialties
-     */
-    @io.micronaut.data.annotation.Transient
-    public List<Specialty> getSpecialties() {
-        List<Specialty> sortedSpecialties = new ArrayList<>(this.specialties);
+        @MappedProperty("LAST_NAME")
+        @NotBlank
+        String lastName,
+
+        @Transient
+        Set<Specialty> specialties
+) implements Person {
+
+    public Vet {
+        specialties = specialties != null ? Set.copyOf(specialties) : Set.of();
+    }
+
+    public Vet() {
+        this(null, null, null, Set.of());
+    }
+
+    @Creator
+    public Vet(Integer id, String firstName, String lastName) {
+        this(id, firstName, lastName, Set.of());
+    }
+
+    public Vet(String firstName, String lastName) {
+        this(null, firstName, lastName, Set.of());
+    }
+
+    @Transient
+    public Set<Specialty> getSpecialties() {
+        List<Specialty> sortedSpecialties = new ArrayList<>(specialties);
         sortedSpecialties.sort(Comparator.comparing(Specialty::getName));
-        return Collections.unmodifiableList(sortedSpecialties);
+        return Collections.unmodifiableSet(new LinkedHashSet<>(sortedSpecialties));
     }
 
-    @io.micronaut.data.annotation.Transient
-    public Set<Specialty> getSpecialtiesInternal() {
-        return this.specialties;
-    }
-
-    /**
-     * Get the number of specialties for this vet.
-     * @return the number of specialties
-     */
-    @io.micronaut.data.annotation.Transient
+    @Transient
     public int getNrOfSpecialties() {
-        return this.specialties.size();
+        return specialties.size();
     }
 
-    /**
-     * Add a specialty to this vet.
-     * @param specialty the specialty to add
-     */
-    public void addSpecialty(Specialty specialty) {
-        this.specialties.add(specialty);
+    public Vet withId(Integer id) {
+        return new Vet(id, firstName, lastName, specialties);
     }
 
-    /**
-     * Remove a specialty from this vet.
-     * @param specialty the specialty to remove
-     */
-    public void removeSpecialty(Specialty specialty) {
-        this.specialties.remove(specialty);
+    public Vet withFirstName(String firstName) {
+        return new Vet(id, firstName, lastName, specialties);
     }
 
-    /**
-     * Get a comma-separated list of specialty names.
-     * @return specialty names, or "none" if no specialties
-     */
-    @io.micronaut.data.annotation.Transient
+    public Vet withLastName(String lastName) {
+        return new Vet(id, firstName, lastName, specialties);
+    }
+
+    public Vet withSpecialties(Collection<Specialty> specialties) {
+        return new Vet(id, firstName, lastName, Set.copyOf(specialties));
+    }
+
+    public Vet withSpecialtyAdded(Specialty specialty) {
+        Set<Specialty> updatedSpecialties = new TreeSet<>(Comparator.comparing(Specialty::getName));
+        updatedSpecialties.addAll(specialties);
+        updatedSpecialties.add(specialty);
+        return withSpecialties(updatedSpecialties);
+    }
+
+    public Vet withoutSpecialty(Specialty specialty) {
+        Set<Specialty> updatedSpecialties = new TreeSet<>(Comparator.comparing(Specialty::getName));
+        updatedSpecialties.addAll(specialties);
+        updatedSpecialties.remove(specialty);
+        return withSpecialties(updatedSpecialties);
+    }
+
+    @Transient
     public String getSpecialtiesAsString() {
-        if (this.specialties.isEmpty()) {
+        if (specialties.isEmpty()) {
             return "none";
         }
         List<String> names = new ArrayList<>();
@@ -73,11 +113,21 @@ public class Vet extends Person {
     }
 
     @Override
+    public boolean equals(Object other) {
+        return BaseEntity.entityEquals(this, other);
+    }
+
+    @Override
+    public int hashCode() {
+        return BaseEntity.entityHashCode(this);
+    }
+
+    @Override
     public String toString() {
         return "Vet{" +
-                "id=" + getId() +
-                ", firstName='" + getFirstName() + '\'' +
-                ", lastName='" + getLastName() + '\'' +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", specialties=" + getSpecialtiesAsString() +
                 '}';
     }

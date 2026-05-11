@@ -1,48 +1,26 @@
 package io.micronaut.samples.petclinic.model;
 
-import io.micronaut.serde.annotation.Serdeable;
-import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.annotation.MappedProperty;
-import jakarta.validation.constraints.NotBlank;
+import io.micronaut.data.annotation.Transient;
 
 /**
- * Base entity class representing a person.
- * Provides first name and last name properties.
+ * Shared contract for people in the domain model.
  */
-@MappedEntity
-@Serdeable
-public abstract class Person extends BaseEntity {
+public sealed interface Person extends BaseEntity permits Owner, Vet {
 
-    @MappedProperty("FIRST_NAME")
-    @NotBlank
-    private String firstName;
+    String firstName();
 
-    @MappedProperty("LAST_NAME")
-    @NotBlank
-    private String lastName;
+    String lastName();
 
-    public String getFirstName() {
-        return this.firstName;
+    default String getFirstName() {
+        return firstName();
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    default String getLastName() {
+        return lastName();
     }
 
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    /**
-     * Get the full name (first name + last name).
-     * @return the person's full name
-     */
-    @io.micronaut.data.annotation.Transient
-    public String getFullName() {
-        return this.firstName + " " + this.lastName;
+    @Transient
+    default String getFullName() {
+        return firstName() + " " + lastName();
     }
 }

@@ -119,7 +119,7 @@ public class PetController {
             return HttpResponse.notFound();
         }
 
-        Pet pet = formMapper.toPet(form);
+        Pet pet = formMapper.toPet(form).withOwner(owner.get());
 
         // Set pet type - validation ensures typeId is not null
         if (form.typeId() != null) {
@@ -127,10 +127,9 @@ public class PetController {
             if (petType.isEmpty()) {
                 return HttpResponse.badRequest("Invalid pet type");
             }
-            pet.setType(petType.get());
+            pet = pet.withType(petType.get());
         }
 
-        owner.get().addPet(pet);
         clinicService.savePet(pet);
 
         URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", ownerId));
@@ -184,7 +183,7 @@ public class PetController {
             return HttpResponse.notFound();
         }
 
-        Pet pet = formMapper.updatePet(existingPet.get(), form);
+        Pet pet = formMapper.updatePet(existingPet.get(), form).withOwner(owner.get());
 
         // Set pet type - validation ensures typeId is not null
         if (form.typeId() != null) {
@@ -192,7 +191,7 @@ public class PetController {
             if (petType.isEmpty()) {
                 return HttpResponse.badRequest("Invalid pet type");
             }
-            pet.setType(petType.get());
+            pet = pet.withType(petType.get());
         }
 
         clinicService.savePet(pet);

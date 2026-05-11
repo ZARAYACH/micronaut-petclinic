@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import io.micronaut.data.model.Sort;
 
 /**
@@ -203,11 +204,9 @@ public class ClinicService {
     @Cacheable("vets")
     public Collection<Vet> findAllVets() {
         var vets = vetRepository.findAllWithSpecialties();
-        for (var vet : vets) {
-            vet.getSpecialtiesInternal().clear();
-            vet.getSpecialtiesInternal().addAll(vetSpecialtyRepository.findSpecialtiesByVetId(vet.getId()));
-        }
-        return vets;
+        return vets.stream()
+                .map(vet -> vet.withSpecialties(vetSpecialtyRepository.findSpecialtiesByVetId(vet.getId())))
+                .collect(Collectors.toList());
     }
 
     /**
