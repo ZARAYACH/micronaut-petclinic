@@ -20,6 +20,11 @@ import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE;
 /**
  * Entity representing a visit to the pet clinic.
  * A visit is associated with a pet and has a date and description.
+ *
+ * @param id the database identifier, or {@code null} for a new visit
+ * @param date the visit date
+ * @param description the visit description
+ * @param pet the pet that received the visit
  */
 @MappedEntity("VISITS")
 @Serdeable
@@ -43,6 +48,14 @@ public record Visit(
         Pet pet
 ) implements BaseEntity, VisitWither {
 
+    /**
+     * Creates a visit.
+     *
+     * @param id the database identifier, or {@code null} for a new visit
+     * @param date the visit date
+     * @param description the visit description
+     * @param pet the pet that received the visit
+     */
     public Visit(Integer id, LocalDate date, String description, @Nullable Pet pet) {
         this.id = id;
         this.date = date;
@@ -50,41 +63,87 @@ public record Visit(
         this.pet = pet;
     }
 
+    /**
+     * Creates an empty visit for framework binding.
+     */
     public Visit() {
         this(null, LocalDate.now(), null, null);
     }
 
+    /**
+     * Creates a new visit without an id.
+     *
+     * @param date the visit date
+     * @param description the visit description
+     * @param pet the pet that received the visit
+     */
     public Visit(LocalDate date, String description, Pet pet) {
         this(null, date, description, pet);
     }
 
+    /**
+     * Returns the visit date.
+     *
+     * @return the visit date
+     */
     public LocalDate getDate() {
         return date;
     }
 
+    /**
+     * Returns the visit description.
+     *
+     * @return the description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns the pet that received the visit.
+     *
+     * @return the visit pet
+     */
     public Pet getPet() {
         return pet;
     }
 
+    /**
+     * Returns the identifier of the pet that received the visit.
+     *
+     * @return the pet id, or {@code null} when no pet is assigned
+     */
     @Transient
     public Integer getPetId() {
         return pet != null ? pet.getId() : null;
     }
 
+    /**
+     * Compares visits by entity identity.
+     *
+     * @param other the object being compared
+     * @return {@code true} when the other object represents the same visit
+     */
     @Override
     public boolean equals(Object other) {
         return BaseEntity.entityEquals(this, other);
     }
 
+    /**
+     * Returns the entity-identity hash code.
+     *
+     * @return the hash code based on the visit id
+     */
     @Override
     public int hashCode() {
         return BaseEntity.entityHashCode(this);
     }
 
+    /**
+     * Returns a diagnostic representation of the visit.
+     *
+     * @return a string containing the visit fields
+     */
     @Override
     public String toString() {
         return "Visit{" +

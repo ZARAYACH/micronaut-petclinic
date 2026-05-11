@@ -10,6 +10,11 @@ import java.time.LocalDate;
 
 /**
  * Data Transfer Object for Pet form submissions.
+ *
+ * @param id the pet id for update submissions, or {@code null} for new pets
+ * @param name the submitted pet name
+ * @param birthDate the submitted birth date
+ * @param typeId the submitted pet type id
  */
 @Introspected
 @Serdeable
@@ -27,6 +32,9 @@ public record PetForm(
         Integer typeId
 ) {
 
+    /**
+     * Creates an empty pet form for framework binding.
+     */
     public PetForm() {
         this(null, null, null, null);
     }

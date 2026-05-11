@@ -30,6 +30,17 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
     private final VisitRepository visitRepository;
     private final VetSpecialtyRepository vetSpecialtyRepository;
 
+    /**
+     * Creates the data loader with the repositories used to seed sample data.
+     *
+     * @param vetRepository repository for vets
+     * @param specialtyRepository repository for specialties
+     * @param petTypeRepository repository for pet types
+     * @param ownerRepository repository for owners
+     * @param petRepository repository for pets
+     * @param visitRepository repository for visits
+     * @param vetSpecialtyRepository repository for vet-specialty join rows
+     */
     public DataLoader(VetRepository vetRepository,
                       SpecialtyRepository specialtyRepository,
                       PetTypeRepository petTypeRepository,
@@ -46,6 +57,11 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
         this.vetSpecialtyRepository = vetSpecialtyRepository;
     }
 
+    /**
+     * Seeds the database when the application starts.
+     *
+     * @param event the startup event
+     */
     @Override
     @Transactional
     public void onApplicationEvent(StartupEvent event) {

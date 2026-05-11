@@ -10,6 +10,9 @@ import java.time.LocalDate;
 
 /**
  * Data Transfer Object for Visit form submissions.
+ *
+ * @param date the submitted visit date
+ * @param description the submitted visit description
  */
 @Introspected
 @Serdeable
@@ -22,6 +25,9 @@ public record VisitForm(
         String description
 ) {
 
+    /**
+     * Creates an empty visit form for framework binding.
+     */
     public VisitForm() {
         this(null, null);
     }

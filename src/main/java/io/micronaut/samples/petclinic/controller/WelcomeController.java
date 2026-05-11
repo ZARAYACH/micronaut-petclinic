@@ -12,6 +12,12 @@ import java.util.Map;
 public class WelcomeController {
 
     /**
+     * Creates the welcome controller.
+     */
+    public WelcomeController() {
+    }
+
+    /**
      * Display the welcome/home page.
      * @return the welcome view
      */

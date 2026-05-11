@@ -30,6 +30,12 @@ public class OwnerController {
     private final ClinicService clinicService;
     private final FormMapper formMapper;
 
+    /**
+     * Creates the controller with its service and mapper dependencies.
+     *
+     * @param clinicService the facade used for owner operations
+     * @param formMapper the mapper used to convert owner forms
+     */
     public OwnerController(ClinicService clinicService, FormMapper formMapper) {
         this.clinicService = clinicService;
         this.formMapper = formMapper;
@@ -151,6 +157,13 @@ public class OwnerController {
         return HttpResponse.redirect(uri);
     }
 
+    /**
+     * Renders the owner creation form when validation fails.
+     *
+     * @param request the request containing the submitted form
+     * @param e the validation exception
+     * @return a form model containing submitted values and field errors
+     */
     @io.micronaut.http.annotation.Error(exception = ConstraintViolationException.class)
     @View("owners/createOrUpdateOwnerForm")
     public Map<String, Object> onCreateOwnerValidationError(HttpRequest<?> request,

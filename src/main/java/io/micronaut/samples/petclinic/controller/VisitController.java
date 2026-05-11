@@ -30,11 +30,24 @@ public class VisitController {
     private final ClinicService clinicService;
     private final FormMapper formMapper;
 
+    /**
+     * Creates the controller with its service and mapper dependencies.
+     *
+     * @param clinicService the facade used for visit operations
+     * @param formMapper the mapper used to convert visit forms
+     */
     public VisitController(ClinicService clinicService, FormMapper formMapper) {
         this.clinicService = clinicService;
         this.formMapper = formMapper;
     }
 
+    /**
+     * Renders the visit form when validation fails.
+     *
+     * @param request the request containing the submitted form
+     * @param e the validation exception
+     * @return a form model containing submitted values and field errors
+     */
     @io.micronaut.http.annotation.Error(exception = ConstraintViolationException.class)
     @View("pets/createOrUpdateVisitForm")
     public Map<String, Object> onConstraintViolation(HttpRequest<?> request,

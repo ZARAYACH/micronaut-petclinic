@@ -16,6 +16,12 @@ import java.util.Objects;
 public class ErrorController {
 
     /**
+     * Creates the error controller.
+     */
+    public ErrorController() {
+    }
+
+    /**
      * Handle 404 Not Found errors.
      * @param request the original request
      * @return the error view
