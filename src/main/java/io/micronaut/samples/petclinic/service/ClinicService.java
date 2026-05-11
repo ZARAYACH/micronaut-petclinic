@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import io.micronaut.data.model.Sort;
 
@@ -205,7 +206,7 @@ public class ClinicService {
     public Collection<Vet> findAllVets() {
         var vets = vetRepository.findAllWithSpecialties();
         return vets.stream()
-                .map(vet -> vet.withSpecialties(vetSpecialtyRepository.findSpecialtiesByVetId(vet.getId())))
+                .map(vet -> vet.withSpecialties(Set.copyOf(vetSpecialtyRepository.findSpecialtiesByVetId(vet.getId()))))
                 .collect(Collectors.toList());
     }
 

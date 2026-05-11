@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Populates the database with sample data on application startup.
@@ -122,7 +123,7 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
     }
 
     private Vet createVet(String firstName, String lastName, Specialty... specialties) {
-        Vet vet = new Vet(firstName, lastName).withSpecialties(Arrays.asList(specialties));
+        Vet vet = new Vet(firstName, lastName).withSpecialties(Set.copyOf(Arrays.asList(specialties)));
         Vet saved = vetRepository.save(vet);
         for (Specialty specialty : specialties) {
             vetSpecialtyRepository.save(new VetSpecialty(saved.getId(), specialty.getId()));

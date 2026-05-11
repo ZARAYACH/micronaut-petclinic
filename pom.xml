@@ -23,6 +23,7 @@
         <jdk.version>21</jdk.version>
         <release.version>21</release.version>
         <micronaut.version>4.10.2</micronaut.version>
+        <micronaut.sourcegen.version>1.8.4</micronaut.sourcegen.version>
         <micronaut.runtime>netty</micronaut.runtime>
         <micronaut.aot.enabled>false</micronaut.aot.enabled>
         <exec.mainClass>io.micronaut.samples.petclinic.Application</exec.mainClass>
@@ -108,6 +109,12 @@
             <artifactId>micronaut-cache-caffeine</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.micronaut.sourcegen</groupId>
+            <artifactId>micronaut-sourcegen-annotations</artifactId>
+            <version>${micronaut.sourcegen.version}</version>
+            <scope>compile</scope>
+        </dependency>
         
         <!-- Logging -->
         <dependency>
@@ -190,6 +197,11 @@
                             <groupId>io.micronaut.serde</groupId>
                             <artifactId>micronaut-serde-processor</artifactId>
                             <version>${micronaut.serialization.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut.sourcegen</groupId>
+                            <artifactId>micronaut-sourcegen-generator-java</artifactId>
+                            <version>${micronaut.sourcegen.version}</version>
                         </path>
                     </annotationProcessorPaths>
                     <compilerArgs>

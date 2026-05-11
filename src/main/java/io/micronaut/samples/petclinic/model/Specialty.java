@@ -5,6 +5,7 @@ import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.sourcegen.annotations.Wither;
 import jakarta.validation.constraints.NotBlank;
 
 /**
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 @MappedEntity("SPECIALTIES")
 @Serdeable
+@Wither
 public record Specialty(
         @Id
         @GeneratedValue
@@ -20,7 +22,7 @@ public record Specialty(
         @MappedProperty("NAME")
         @NotBlank
         String name
-) implements NamedEntity {
+) implements NamedEntity, SpecialtyWither {
 
     public Specialty() {
         this(null, null);
@@ -28,14 +30,6 @@ public record Specialty(
 
     public Specialty(String name) {
         this(null, name);
-    }
-
-    public Specialty withId(Integer id) {
-        return new Specialty(id, name);
-    }
-
-    public Specialty withName(String name) {
-        return new Specialty(id, name);
     }
 
     @Override

@@ -30,10 +30,10 @@ public class I18nViewModelProcessor implements ViewModelProcessor<Object> {
     public void process(@NonNull HttpRequest<?> request, @NonNull ModelAndView<Object> modelAndView) {
         Locale locale = httpLocaleResolver.resolveOrDefault(request);
 
-        Map<String, Object> model = modelAndView.getModel()
+        Map<String, Object> model = new HashMap<>(modelAndView.getModel()
                 .filter(Map.class::isInstance)
                 .map(m -> (Map<String, Object>) m)
-                .orElseGet(HashMap::new);
+                .orElseGet(Map::of));
 
         model.putIfAbsent("locale", locale);
         model.putIfAbsent("msg", new Msg(messageSource, locale));

@@ -7,11 +7,12 @@ import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.data.annotation.Relation;
 import io.micronaut.data.annotation.Transient;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.sourcegen.annotations.Builder;
+import io.micronaut.sourcegen.annotations.Wither;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +25,8 @@ import static io.micronaut.data.annotation.Relation.Kind.ONE_TO_MANY;
  */
 @MappedEntity("OWNERS")
 @Serdeable
+@Builder
+@Wither
 public record Owner(
         @Id
         @GeneratedValue
@@ -52,7 +55,7 @@ public record Owner(
 
         @Relation(value = ONE_TO_MANY, mappedBy = "owner", cascade = Relation.Cascade.ALL)
         List<Pet> pets
-) implements Person {
+) implements Person, OwnerWither {
 
     public Owner {
         pets = pets != null ? List.copyOf(pets) : List.of();
@@ -87,34 +90,6 @@ public record Owner(
         List<Pet> sortedPets = new ArrayList<>(pets);
         sortedPets.sort(Comparator.comparing(Pet::getName));
         return Collections.unmodifiableList(sortedPets);
-    }
-
-    public Owner withId(Integer id) {
-        return new Owner(id, firstName, lastName, address, city, telephone, pets);
-    }
-
-    public Owner withFirstName(String firstName) {
-        return new Owner(id, firstName, lastName, address, city, telephone, pets);
-    }
-
-    public Owner withLastName(String lastName) {
-        return new Owner(id, firstName, lastName, address, city, telephone, pets);
-    }
-
-    public Owner withAddress(String address) {
-        return new Owner(id, firstName, lastName, address, city, telephone, pets);
-    }
-
-    public Owner withCity(String city) {
-        return new Owner(id, firstName, lastName, address, city, telephone, pets);
-    }
-
-    public Owner withTelephone(String telephone) {
-        return new Owner(id, firstName, lastName, address, city, telephone, pets);
-    }
-
-    public Owner withPets(Collection<Pet> pets) {
-        return new Owner(id, firstName, lastName, address, city, telephone, List.copyOf(pets));
     }
 
     public Owner withPetAdded(Pet pet) {

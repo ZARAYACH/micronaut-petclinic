@@ -8,6 +8,8 @@ import io.micronaut.data.annotation.Relation;
 import io.micronaut.data.annotation.Transient;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.sourcegen.annotations.Builder;
+import io.micronaut.sourcegen.annotations.Wither;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -21,6 +23,8 @@ import static io.micronaut.data.annotation.Relation.Kind.MANY_TO_ONE;
  */
 @MappedEntity("VISITS")
 @Serdeable
+@Builder
+@Wither
 public record Visit(
         @Id
         @GeneratedValue
@@ -37,7 +41,7 @@ public record Visit(
         @Relation(MANY_TO_ONE)
         @MappedProperty("PET_ID")
         Pet pet
-) implements BaseEntity {
+) implements BaseEntity, VisitWither {
 
     public Visit(Integer id, LocalDate date, String description, @Nullable Pet pet) {
         this.id = id;
@@ -69,22 +73,6 @@ public record Visit(
     @Transient
     public Integer getPetId() {
         return pet != null ? pet.getId() : null;
-    }
-
-    public Visit withId(Integer id) {
-        return new Visit(id, date, description, pet);
-    }
-
-    public Visit withDate(LocalDate date) {
-        return new Visit(id, date, description, pet);
-    }
-
-    public Visit withDescription(String description) {
-        return new Visit(id, date, description, pet);
-    }
-
-    public Visit withPet(Pet pet) {
-        return new Visit(id, date, description, pet);
     }
 
     @Override

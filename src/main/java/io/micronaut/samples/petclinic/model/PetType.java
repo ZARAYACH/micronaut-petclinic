@@ -5,6 +5,7 @@ import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.sourcegen.annotations.Wither;
 import jakarta.validation.constraints.NotBlank;
 
 /**
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 @MappedEntity("TYPES")
 @Serdeable
+@Wither
 public record PetType(
         @Id
         @GeneratedValue
@@ -20,7 +22,7 @@ public record PetType(
         @MappedProperty("NAME")
         @NotBlank
         String name
-) implements NamedEntity {
+) implements NamedEntity, PetTypeWither {
 
     public PetType() {
         this(null, null);
@@ -28,14 +30,6 @@ public record PetType(
 
     public PetType(String name) {
         this(null, name);
-    }
-
-    public PetType withId(Integer id) {
-        return new PetType(id, name);
-    }
-
-    public PetType withName(String name) {
-        return new PetType(id, name);
     }
 
     @Override

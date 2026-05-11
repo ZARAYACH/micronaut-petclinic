@@ -8,12 +8,13 @@ import io.micronaut.data.annotation.Relation;
 import io.micronaut.data.annotation.Transient;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.sourcegen.annotations.Builder;
+import io.micronaut.sourcegen.annotations.Wither;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +28,8 @@ import static io.micronaut.data.annotation.Relation.Kind.ONE_TO_MANY;
  */
 @MappedEntity("PETS")
 @Serdeable
+@Builder
+@Wither
 public record Pet(
         @Id
         @GeneratedValue
@@ -51,7 +54,7 @@ public record Pet(
 
         @Relation(value = ONE_TO_MANY, mappedBy = "pet")
         List<Visit> visits
-) implements NamedEntity {
+) implements NamedEntity, PetWither {
 
     public Pet(Integer id,
                String name,
@@ -101,30 +104,6 @@ public record Pet(
         List<Visit> sortedVisits = new ArrayList<>(visits);
         sortedVisits.sort(Comparator.comparing(Visit::getDate));
         return Collections.unmodifiableList(sortedVisits);
-    }
-
-    public Pet withId(Integer id) {
-        return new Pet(id, name, birthDate, type, owner, visits);
-    }
-
-    public Pet withName(String name) {
-        return new Pet(id, name, birthDate, type, owner, visits);
-    }
-
-    public Pet withBirthDate(LocalDate birthDate) {
-        return new Pet(id, name, birthDate, type, owner, visits);
-    }
-
-    public Pet withType(PetType type) {
-        return new Pet(id, name, birthDate, type, owner, visits);
-    }
-
-    public Pet withOwner(Owner owner) {
-        return new Pet(id, name, birthDate, type, owner, visits);
-    }
-
-    public Pet withVisits(Collection<Visit> visits) {
-        return new Pet(id, name, birthDate, type, owner, List.copyOf(visits));
     }
 
     public Pet withVisitAdded(Visit visit) {
