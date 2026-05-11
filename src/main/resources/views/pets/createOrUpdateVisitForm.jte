@@ -18,7 +18,7 @@
             <h1><i class="fas fa-calendar-plus me-3"></i>${msg.text("visit.new")}</h1>
             @if(pet != null)
                 <p>
-                    <i class="fas fa-paw me-2"></i>${msg.text("pet.name")}: ${pet.getName()}
+                    <i class="fas fa-paw me-2"></i>${msg.text("pet.name")}: ${pet.name()}
                 </p>
             @endif
         </div>
@@ -27,7 +27,7 @@
     <main class="container flex-grow-1 py-4">
         <div class="row">
             <div class="col-12 mb-4">
-                <a href="/owners/${owner.getId()}" class="btn btn-secondary">
+                <a href="/owners/${owner.id()}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-2"></i>${msg.text("pet.backToOwner")}
                 </a>
             </div>
@@ -41,8 +41,8 @@
                         <div class="detail-body">
                             <div class="text-center mb-4">
                                 @{
-                                    String typeKey = (pet.getType() != null && pet.getType().getName() != null)
-                                        ? pet.getType().getName().trim().toLowerCase(Locale.ROOT)
+                                    String typeKey = (pet.getType() != null && pet.getType().name() != null)
+                                        ? pet.getType().name().trim().toLowerCase(Locale.ROOT)
                                         : "";
                                     String iconClass = switch (typeKey) {
                                         case "cat" -> "fa-cat";
@@ -55,11 +55,11 @@
                                 <div class="pet-icon mx-auto mb-3 ${typeKey.isBlank() ? "dog" : typeKey}" style="width: 80px; height: 80px; font-size: 2rem;">
                                     <i class="fas ${iconClass}"></i>
                                 </div>
-                                <h5>${pet.getName()}</h5>
+                                <h5>${pet.name()}</h5>
                             </div>
                             <div class="info-row">
                                 <div class="info-label">${msg.text("pet.type")}</div>
-                                <div class="info-value">${pet.getType() != null ? pet.getType().getName() : msg.text("visit.unknown")}</div>
+                                <div class="info-value">${pet.getType() != null ? pet.getType().name() : msg.text("visit.unknown")}</div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label">${msg.text("pet.birthDate")}</div>
@@ -81,8 +81,8 @@
                                 <div class="visit-timeline">
                                     @for(Visit previousVisit : pet.getVisits())
                                         <div class="visit-item">
-                                            <div class="visit-date">${previousVisit.getDate() != null ? previousVisit.getDate().toString() : ""}</div>
-                                            <div class="visit-description">${previousVisit.getDescription()}</div>
+                                            <div class="visit-date">${previousVisit.date() != null ? previousVisit.date().toString() : ""}</div>
+                                            <div class="visit-description">${previousVisit.description()}</div>
                                         </div>
                                     @endfor
                                 </div>
@@ -99,7 +99,7 @@
                             <i class="fas fa-stethoscope"></i>
                         </div>
                         <h4>${msg.text("visit.scheduleNew")}</h4>
-                        <p class="text-muted">${msg.text("visit.recordFor")} ${pet.getName()}</p>
+                        <p class="text-muted">${msg.text("visit.recordFor")} ${pet.name()}</p>
                     </div>
 
                     @if(validationErrors != null && !validationErrors.isEmpty())
@@ -108,13 +108,13 @@
                         </div>
                     @endif
  
-                    <form action="/owners/${owner.getId()}/pets/${pet.getId()}/visits/new" method="post" class="needs-validation" novalidate>
+                    <form action="/owners/${owner.id()}/pets/${pet.id()}/visits/new" method="post" class="needs-validation" novalidate>
                         <div class="mb-4">
                             <label for="date" class="form-label">
                                 <i class="fas fa-calendar me-2 text-primary"></i>${msg.text("visit.visitDate")}
                             </label>
                             <input type="date" class="form-control ${validationErrors != null && validationErrors.containsKey("date") ? "is-invalid" : ""}" id="date" name="date"
-                                   value="${visit != null && visit.getDate() != null ? visit.getDate().toString() : ""}" required>
+                                   value="${visit != null && visit.date() != null ? visit.date().toString() : ""}" required>
                             @if(validationErrors != null && validationErrors.containsKey("date"))
                                 <div class="invalid-feedback">${validationErrors.get("date")}</div>
                             @else
@@ -126,7 +126,7 @@
                             <label for="description" class="form-label">
                                 <i class="fas fa-notes-medical me-2 text-primary"></i>${msg.text("visit.description")}
                             </label>
-                            <textarea class="form-control ${validationErrors != null && validationErrors.containsKey("description") ? "is-invalid" : ""}" id="description" name="description" rows="4" required>${visit != null && visit.getDescription() != null ? visit.getDescription() : ""}</textarea>
+                            <textarea class="form-control ${validationErrors != null && validationErrors.containsKey("description") ? "is-invalid" : ""}" id="description" name="description" rows="4" required>${visit != null && visit.description() != null ? visit.description() : ""}</textarea>
                             @if(validationErrors != null && validationErrors.containsKey("description"))
                                 <div class="invalid-feedback">${validationErrors.get("description")}</div>
                             @else
@@ -140,7 +140,7 @@
                             <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
                                 <i class="fas fa-plus me-2"></i>${msg.text("button.addVisit")}
                             </button>
-                            <a href="/owners/${owner.getId()}" class="btn btn-secondary btn-lg">
+                            <a href="/owners/${owner.id()}" class="btn btn-secondary btn-lg">
                                 <i class="fas fa-times me-2"></i>${msg.text("button.cancel")}
                             </a>
                         </div>

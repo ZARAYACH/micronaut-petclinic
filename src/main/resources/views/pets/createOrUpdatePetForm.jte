@@ -30,7 +30,7 @@
     <main class="container flex-grow-1 py-4">
         <div class="row justify-content-center">
             <div class="col-lg-6">
-                <a href="/owners/${owner.getId()}" class="btn btn-secondary mb-4">
+                <a href="/owners/${owner.id()}" class="btn btn-secondary mb-4">
                     <i class="fas fa-arrow-left me-2"></i>${msg.text("pet.backToOwner")}
                 </a>
 
@@ -48,13 +48,13 @@
                         </div>
                     @endif
  
-                    <form action="${isNew ? ("/owners/" + owner.getId() + "/pets/new") : ("/owners/" + owner.getId() + "/pets/" + pet.getId() + "/edit")}" method="post" class="needs-validation" novalidate>
+                    <form action="${isNew ? ("/owners/" + owner.id() + "/pets/new") : ("/owners/" + owner.id() + "/pets/" + pet.id() + "/edit")}" method="post" class="needs-validation" novalidate>
                         <div class="mb-4">
                             <label for="name" class="form-label">
                                 <i class="fas fa-tag me-2 text-primary"></i>${msg.text("pet.name")}
                             </label>
                             <input type="text" class="form-control ${validationErrors != null && validationErrors.containsKey("name") ? "is-invalid" : ""}" id="name" name="name"
-                                   value="${pet != null && pet.getName() != null ? pet.getName() : ""}" required>
+                                   value="${pet != null && pet.name() != null ? pet.name() : ""}" required>
                             @if(validationErrors != null && validationErrors.containsKey("name"))
                                 <div class="invalid-feedback">${validationErrors.get("name")}</div>
                             @else
@@ -67,7 +67,7 @@
                                 <i class="fas fa-birthday-cake me-2 text-primary"></i>${msg.text("pet.birthDate")}
                             </label>
                             <input type="date" class="form-control ${validationErrors != null && validationErrors.containsKey("birthDate") ? "is-invalid" : ""}" id="birthDate" name="birthDate"
-                                   value="${pet != null && pet.getBirthDate() != null ? pet.getBirthDate().toString() : ""}" required>
+                                   value="${pet != null && pet.birthDate() != null ? pet.birthDate().toString() : ""}" required>
                             @if(validationErrors != null && validationErrors.containsKey("birthDate"))
                                 <div class="invalid-feedback">${validationErrors.get("birthDate")}</div>
                             @else
@@ -82,10 +82,10 @@
                             <select class="form-select ${validationErrors != null && validationErrors.containsKey("typeId") ? "is-invalid" : ""}" id="typeId" name="typeId" required>
                                 <option value="">${msg.text("pet.selectType")}</option>
                                 @for(PetType type : types)
-                                    @if(pet != null && pet.getTypeId() != null && pet.getTypeId().equals(type.getId()))
-                                        <option value="${type.getId()}" selected>${type.getName()}</option>
+                                    @if(pet != null && pet.typeId() != null && pet.typeId().equals(type.id()))
+                                        <option value="${type.id()}" selected>${type.name()}</option>
                                     @else
-                                        <option value="${type.getId()}">${type.getName()}</option>
+                                        <option value="${type.id()}">${type.name()}</option>
                                     @endif
                                 @endfor
                             </select>
@@ -103,7 +103,7 @@
                                 <i class="${isNew ? "fas fa-plus me-2" : "fas fa-save me-2"}"></i>
                                 ${isNew ? msg.text("button.addPet") : msg.text("button.update")}
                             </button>
-                            <a href="/owners/${owner.getId()}" class="btn btn-secondary btn-lg">
+                            <a href="/owners/${owner.id()}" class="btn btn-secondary btn-lg">
                                 <i class="fas fa-times me-2"></i>${msg.text("button.cancel")}
                             </a>
                         </div>

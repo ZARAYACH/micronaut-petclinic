@@ -51,7 +51,7 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <h5 class="mb-1">
-                                        <a href="/owners/${owner.getId()}" class="text-decoration-none text-dark">
+                                        <a href="/owners/${owner.id()}" class="text-decoration-none text-dark">
                                             ${owner.getFirstName()} ${owner.getLastName()}
                                         </a>
                                     </h5>
@@ -76,7 +76,7 @@
                                         @for(Pet pet : owner.getPets())
                                             <span class="pet-badge">
                                                 <i class="fas fa-paw"></i>
-                                                ${pet.getName()}
+                                                ${pet.name()}
                                             </span>
                                         @endfor
                                     </div>
@@ -87,7 +87,7 @@
                                 </div>
                             @endif
 
-                            <a href="/owners/${owner.getId()}" class="btn btn-primary btn-sm w-100">
+                            <a href="/owners/${owner.id()}" class="btn btn-primary btn-sm w-100">
                                 <i class="fas fa-eye me-2"></i>${msg.text("owner.viewDetails")}
                             </a>
                         </div>

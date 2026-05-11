@@ -9,8 +9,8 @@ import java.util.Optional;
 /**
  * Repository for {@link Specialty} entities.
  * Uses Micronaut Data JPA for compile-time query generation.
+ * Dialect-specific {@code @JdbcRepository} beans extend this interface.
  */
-// Dialect-specific @JdbcRepository beans extend this interface.
 public interface SpecialtyRepository extends CrudRepository<Specialty, Integer> {
 
     /**

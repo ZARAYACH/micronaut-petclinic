@@ -6,6 +6,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.OwnerForm;
+import io.micronaut.samples.petclinic.mapper.FormMapper;
 import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
@@ -14,7 +15,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Controller for owner-related operations.
@@ -24,9 +28,17 @@ import java.util.*;
 public class OwnerController {
 
     private final ClinicService clinicService;
+    private final FormMapper formMapper;
 
-    public OwnerController(ClinicService clinicService) {
+    /**
+     * Creates the controller with its service and mapper dependencies.
+     *
+     * @param clinicService the facade used for owner operations
+     * @param formMapper the mapper used to convert owner forms
+     */
+    public OwnerController(ClinicService clinicService, FormMapper formMapper) {
         this.clinicService = clinicService;
+        this.formMapper = formMapper;
     }
 
     /**
@@ -38,10 +50,10 @@ public class OwnerController {
     @Get("/find")
     @View("owners/findOwners")
     public Map<String, Object> initFindForm(@QueryValue(defaultValue = "false") Boolean notFound) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("owner", new Owner());
-        model.put("notFound", notFound);
-        return model;
+        return Map.of(
+                "owner", new Owner(),
+                "notFound", notFound
+        );
     }
 
     /**
@@ -67,14 +79,14 @@ public class OwnerController {
         } else if (results.size() == 1) {
             // Single owner found - redirect to owner details
             Owner owner = results.iterator().next();
-            URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", owner.getId()));
+            URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", owner.id()));
             return HttpResponse.redirect(uri);
         } else {
             // Multiple owners found - show list
-            Map<String, Object> model = new HashMap<>();
-            model.put("owners", results);
-            model.put("lastName", lastName);
-            return HttpResponse.ok(model);
+            return HttpResponse.ok(Map.of(
+                    "owners", results,
+                    "lastName", lastName
+            ));
         }
     }
 
@@ -94,10 +106,10 @@ public class OwnerController {
             owners = clinicService.findOwnerByLastName(lastName);
         }
 
-        Map<String, Object> model = new HashMap<>();
-        model.put("owners", owners);
-        model.put("lastName", lastName);
-        return model;
+        return Map.of(
+                "owners", owners,
+                "lastName", lastName
+        );
     }
 
     /**
@@ -109,14 +121,11 @@ public class OwnerController {
     @Get("/{ownerId}")
     @View("owners/ownerDetails")
     public Map<String, Object> showOwner(@PathVariable Integer ownerId) {
-        Map<String, Object> model = new HashMap<>();
         Optional<Owner> owner = clinicService.findOwnerById(ownerId);
         if (owner.isPresent()) {
-            model.put("owner", owner.get());
-        } else {
-            model.put("error", "Owner not found");
+            return Map.of("owner", owner.get());
         }
-        return model;
+        return Map.of("error", "Owner not found");
     }
 
     /**
@@ -127,11 +136,11 @@ public class OwnerController {
     @Get("/new")
     @View("owners/createOrUpdateOwnerForm")
     public Map<String, Object> initCreationForm() {
-        Map<String, Object> model = new HashMap<>();
-        model.put("owner", new OwnerForm());
-        model.put("isNew", true);
-        model.put("validationErrors", Map.of());
-        return model;
+        return Map.of(
+                "owner", new OwnerForm(),
+                "isNew", true,
+                "validationErrors", Map.of()
+        );
     }
 
     /**
@@ -142,22 +151,25 @@ public class OwnerController {
      */
     @Post(value = "/new", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> processCreationForm(@Valid @Body OwnerForm form) {
-        Owner owner = form.toOwner();
+        Owner owner = formMapper.toOwner(form);
         Owner savedOwner = clinicService.saveOwner(owner);
-        URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", savedOwner.getId()));
+        URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", savedOwner.id()));
         return HttpResponse.redirect(uri);
     }
 
+    /**
+     * Renders the owner creation form when validation fails.
+     *
+     * @param request the request containing the submitted form
+     * @param e the validation exception
+     * @return a form model containing submitted values and field errors
+     */
     @io.micronaut.http.annotation.Error(exception = ConstraintViolationException.class)
     @View("owners/createOrUpdateOwnerForm")
     public Map<String, Object> onCreateOwnerValidationError(HttpRequest<?> request,
                                                             ConstraintViolationException e) {
         // For form posts, render the form again instead of sending users to the generic 500 page.
-        Map<String, Object> model = new HashMap<>();
-        model.put("owner", new OwnerForm());
-        model.put("isNew", true);
-        // Keep user input if available.
-        request.getBody(OwnerForm.class).ifPresent(f -> model.put("owner", f));
+        OwnerForm owner = request.getBody(OwnerForm.class).orElseGet(OwnerForm::new);
 
         Map<String, String> errors = new LinkedHashMap<>();
         for (ConstraintViolation<?> v : e.getConstraintViolations()) {
@@ -170,8 +182,11 @@ public class OwnerController {
             }
             errors.put(field, v.getMessage());
         }
-        model.put("validationErrors", errors);
-        return model;
+        return Map.of(
+                "owner", owner,
+                "isNew", true,
+                "validationErrors", errors
+        );
     }
 
     /**
@@ -183,19 +198,20 @@ public class OwnerController {
     @Get("/{ownerId}/edit")
     @View("owners/createOrUpdateOwnerForm")
     public Map<String, Object> initUpdateOwnerForm(@PathVariable Integer ownerId) {
-        Map<String, Object> model = new HashMap<>();
         Optional<Owner> owner = clinicService.findOwnerById(ownerId);
         if (owner.isPresent()) {
-            model.put("owner", OwnerForm.fromOwner(owner.get()));
-            model.put("ownerId", ownerId);
-            model.put("isNew", false);
-            model.put("validationErrors", Map.of());
-        } else {
-            model.put("error", "Owner not found");
-            model.put("isNew", false);
-            model.put("validationErrors", Map.of());
+            return Map.of(
+                    "owner", formMapper.toOwnerForm(owner.get()),
+                    "ownerId", ownerId,
+                    "isNew", false,
+                    "validationErrors", Map.of()
+            );
         }
-        return model;
+        return Map.of(
+                "error", "Owner not found",
+                "isNew", false,
+                "validationErrors", Map.of()
+        );
     }
 
     /**
@@ -212,7 +228,7 @@ public class OwnerController {
             return HttpResponse.notFound();
         }
 
-        Owner owner = form.updateOwner(existingOwner.get());
+        Owner owner = formMapper.updateOwner(existingOwner.get(), form);
         clinicService.saveOwner(owner);
 
         URI uri = UriBuilder.of("/owners/{ownerId}").expand(Map.of("ownerId", ownerId));

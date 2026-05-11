@@ -22,6 +22,12 @@ public class LocaleController {
     private static final Duration COOKIE_MAX_AGE = Duration.ofDays(365);
 
     /**
+     * Creates the locale controller.
+     */
+    public LocaleController() {
+    }
+
+    /**
      * Switch the application locale.
      *
      * @param lang the language code (en, es, de)

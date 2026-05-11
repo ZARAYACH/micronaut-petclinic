@@ -17,7 +17,18 @@ import io.micronaut.runtime.Micronaut;
  * Migrated from the Spring Pet Clinic sample application.
  */
 public class Application {
-    
+
+    /**
+     * Creates the application bootstrap type.
+     */
+    public Application() {
+    }
+
+    /**
+     * Starts the Micronaut Pet Clinic application.
+     *
+     * @param args command-line arguments passed to Micronaut
+     */
     public static void main(String[] args) {
         Micronaut.run(Application.class, args);
     }

@@ -78,7 +78,7 @@
                                 @if (vet.getSpecialties() != null && !vet.getSpecialties().isEmpty())
                                     <div class="mt-3">
                                         @for (io.micronaut.samples.petclinic.model.Specialty s : vet.getSpecialties())
-                                            <span class="specialty-badge">${s.getName()}</span>
+                                            <span class="specialty-badge">${s.name()}</span>
                                         @endfor
                                     </div>
                                 @else
