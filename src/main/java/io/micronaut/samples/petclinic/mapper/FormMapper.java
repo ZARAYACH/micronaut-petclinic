@@ -9,6 +9,14 @@ import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.Visit;
 import jakarta.inject.Singleton;
 
+/**
+ * Maps web form DTOs to and from the domain model.
+ * <p>
+ * The form types represent URL-encoded request data, while the model types are
+ * immutable records used by the repository and service layers. Micronaut
+ * generates the implementations for these methods from the {@link Mapper}
+ * annotations, keeping controllers free of manual field-copying logic.
+ */
 @Singleton
 public interface FormMapper {
 
