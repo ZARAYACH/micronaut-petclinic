@@ -114,7 +114,7 @@
                                 <i class="fas fa-calendar me-2 text-primary"></i>${msg.text("visit.visitDate")}
                             </label>
                             <input type="date" class="form-control ${validationErrors != null && validationErrors.containsKey("date") ? "is-invalid" : ""}" id="date" name="date"
-                                   value="${visit != null && visit.getDate() != null ? visit.getDate().toString() : ""}" required>
+                                   value="${visit != null && visit.date() != null ? visit.date().toString() : ""}" required>
                             @if(validationErrors != null && validationErrors.containsKey("date"))
                                 <div class="invalid-feedback">${validationErrors.get("date")}</div>
                             @else
@@ -126,7 +126,7 @@
                             <label for="description" class="form-label">
                                 <i class="fas fa-notes-medical me-2 text-primary"></i>${msg.text("visit.description")}
                             </label>
-                            <textarea class="form-control ${validationErrors != null && validationErrors.containsKey("description") ? "is-invalid" : ""}" id="description" name="description" rows="4" required>${visit != null && visit.getDescription() != null ? visit.getDescription() : ""}</textarea>
+                            <textarea class="form-control ${validationErrors != null && validationErrors.containsKey("description") ? "is-invalid" : ""}" id="description" name="description" rows="4" required>${visit != null && visit.description() != null ? visit.description() : ""}</textarea>
                             @if(validationErrors != null && validationErrors.containsKey("description"))
                                 <div class="invalid-feedback">${validationErrors.get("description")}</div>
                             @else

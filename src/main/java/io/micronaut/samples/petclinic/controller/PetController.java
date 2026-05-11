@@ -6,6 +6,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.PetForm;
+import io.micronaut.samples.petclinic.mapper.FormMapper;
 import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.PetType;
@@ -15,7 +16,9 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 import java.net.URI;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Controller for pet-related operations.
@@ -25,26 +28,23 @@ import java.util.*;
 public class PetController {
 
     private final ClinicService clinicService;
+    private final FormMapper formMapper;
 
-    public PetController(ClinicService clinicService) {
+    public PetController(ClinicService clinicService, FormMapper formMapper) {
         this.clinicService = clinicService;
+        this.formMapper = formMapper;
     }
 
     @io.micronaut.http.annotation.Error(exception = ConstraintViolationException.class)
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> onConstraintViolation(HttpRequest<?> request,
                                                      ConstraintViolationException e) {
-        Map<String, Object> model = new HashMap<>();
-
         Integer ownerId = request.getParameters().get("ownerId", Integer.class).orElse(null);
         Integer petId = request.getParameters().get("petId", Integer.class).orElse(null);
 
         Owner owner = ownerId != null ? getOwner(ownerId).orElse(null) : null;
-        model.put("owner", owner);
-        model.put("types", clinicService.findPetTypes());
-        model.put("isNew", petId == null);
 
-        Map<String, String> validationErrors = new HashMap<>();
+        Map<String, String> validationErrors = new LinkedHashMap<>();
         for (var violation : e.getConstraintViolations()) {
             String field = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : "";
             int lastDot = field.lastIndexOf('.');
@@ -55,15 +55,14 @@ public class PetController {
                 validationErrors.put(field, violation.getMessage());
             }
         }
-        model.put("validationErrors", validationErrors);
 
         // Re-populate the form fields from submitted values where possible.
-        PetForm form = new PetForm();
-        request.getBody(PetForm.class).ifPresent(submitted -> {
-            form.setName(submitted.getName());
-            form.setBirthDate(submitted.getBirthDate());
-            form.setTypeId(submitted.getTypeId());
-        });
+        PetForm form = request.getBody(PetForm.class).orElseGet(PetForm::new);
+        Map<String, Object> model = new LinkedHashMap<>();
+        model.put("owner", owner);
+        model.put("types", clinicService.findPetTypes());
+        model.put("isNew", petId == null);
+        model.put("validationErrors", validationErrors);
         model.put("pet", form);
         if (petId != null) {
             model.put("petId", petId);
@@ -91,19 +90,18 @@ public class PetController {
     @Get("/new")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initCreationForm(@PathVariable Integer ownerId) {
-        Map<String, Object> model = new HashMap<>();
         Optional<Owner> owner = getOwner(ownerId);
 
         if (owner.isPresent()) {
-            model.put("pet", new PetForm());
-            model.put("owner", owner.get());
-            model.put("types", clinicService.findPetTypes());
-            model.put("isNew", true);
-            model.put("validationErrors", Map.of());
-        } else {
-            model.put("error", "Owner not found");
+            return Map.of(
+                    "pet", new PetForm(),
+                    "owner", owner.get(),
+                    "types", clinicService.findPetTypes(),
+                    "isNew", true,
+                    "validationErrors", Map.of()
+            );
         }
-        return model;
+        return Map.of("error", "Owner not found");
     }
 
     /**
@@ -121,11 +119,11 @@ public class PetController {
             return HttpResponse.notFound();
         }
 
-        Pet pet = form.toPet();
+        Pet pet = formMapper.toPet(form);
 
         // Set pet type - validation ensures typeId is not null
-        if (form.getTypeId() != null) {
-            Optional<PetType> petType = clinicService.findPetTypeById(form.getTypeId());
+        if (form.typeId() != null) {
+            Optional<PetType> petType = clinicService.findPetTypeById(form.typeId());
             if (petType.isEmpty()) {
                 return HttpResponse.badRequest("Invalid pet type");
             }
@@ -149,20 +147,19 @@ public class PetController {
     @Get("/{petId}/edit")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initUpdateForm(@PathVariable Integer ownerId, @PathVariable Integer petId) {
-        Map<String, Object> model = new HashMap<>();
         Optional<Pet> pet = clinicService.findPetById(petId);
 
         if (pet.isPresent()) {
-            model.put("pet", PetForm.fromPet(pet.get()));
-            model.put("petId", petId);
-            model.put("owner", pet.get().getOwner());
-            model.put("types", clinicService.findPetTypes());
-            model.put("isNew", false);
-            model.put("validationErrors", Map.of());
-        } else {
-            model.put("error", "Pet not found");
+            return Map.of(
+                    "pet", formMapper.toPetForm(pet.get()),
+                    "petId", petId,
+                    "owner", pet.get().getOwner(),
+                    "types", clinicService.findPetTypes(),
+                    "isNew", false,
+                    "validationErrors", Map.of()
+            );
         }
-        return model;
+        return Map.of("error", "Pet not found");
     }
 
     /**
@@ -187,11 +184,11 @@ public class PetController {
             return HttpResponse.notFound();
         }
 
-        Pet pet = form.updatePet(existingPet.get());
+        Pet pet = formMapper.updatePet(existingPet.get(), form);
 
         // Set pet type - validation ensures typeId is not null
-        if (form.getTypeId() != null) {
-            Optional<PetType> petType = clinicService.findPetTypeById(form.getTypeId());
+        if (form.typeId() != null) {
+            Optional<PetType> petType = clinicService.findPetTypeById(form.typeId());
             if (petType.isEmpty()) {
                 return HttpResponse.badRequest("Invalid pet type");
             }

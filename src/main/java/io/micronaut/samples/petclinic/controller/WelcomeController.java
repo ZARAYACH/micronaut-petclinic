@@ -3,7 +3,6 @@ package io.micronaut.samples.petclinic.controller;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.views.View;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,8 +18,6 @@ public class WelcomeController {
     @Get("/")
     @View("welcome")
     public Map<String, Object> welcome() {
-        Map<String, Object> model = new HashMap<>();
-        model.put("title", "Welcome to Micronaut Pet Clinic");
-        return model;
+        return Map.of("title", "Welcome to Micronaut Pet Clinic");
     }
 }

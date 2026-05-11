@@ -48,13 +48,13 @@
                         </div>
                     @endif
  
-                    <form action="${isNew ? ("/owners/" + owner.getId() + "/pets/new") : ("/owners/" + owner.getId() + "/pets/" + pet.getId() + "/edit")}" method="post" class="needs-validation" novalidate>
+                    <form action="${isNew ? ("/owners/" + owner.getId() + "/pets/new") : ("/owners/" + owner.getId() + "/pets/" + pet.id() + "/edit")}" method="post" class="needs-validation" novalidate>
                         <div class="mb-4">
                             <label for="name" class="form-label">
                                 <i class="fas fa-tag me-2 text-primary"></i>${msg.text("pet.name")}
                             </label>
                             <input type="text" class="form-control ${validationErrors != null && validationErrors.containsKey("name") ? "is-invalid" : ""}" id="name" name="name"
-                                   value="${pet != null && pet.getName() != null ? pet.getName() : ""}" required>
+                                   value="${pet != null && pet.name() != null ? pet.name() : ""}" required>
                             @if(validationErrors != null && validationErrors.containsKey("name"))
                                 <div class="invalid-feedback">${validationErrors.get("name")}</div>
                             @else
@@ -67,7 +67,7 @@
                                 <i class="fas fa-birthday-cake me-2 text-primary"></i>${msg.text("pet.birthDate")}
                             </label>
                             <input type="date" class="form-control ${validationErrors != null && validationErrors.containsKey("birthDate") ? "is-invalid" : ""}" id="birthDate" name="birthDate"
-                                   value="${pet != null && pet.getBirthDate() != null ? pet.getBirthDate().toString() : ""}" required>
+                                   value="${pet != null && pet.birthDate() != null ? pet.birthDate().toString() : ""}" required>
                             @if(validationErrors != null && validationErrors.containsKey("birthDate"))
                                 <div class="invalid-feedback">${validationErrors.get("birthDate")}</div>
                             @else
@@ -82,7 +82,7 @@
                             <select class="form-select ${validationErrors != null && validationErrors.containsKey("typeId") ? "is-invalid" : ""}" id="typeId" name="typeId" required>
                                 <option value="">${msg.text("pet.selectType")}</option>
                                 @for(PetType type : types)
-                                    @if(pet != null && pet.getTypeId() != null && pet.getTypeId().equals(type.getId()))
+                                    @if(pet != null && pet.typeId() != null && pet.typeId().equals(type.getId()))
                                         <option value="${type.getId()}" selected>${type.getName()}</option>
                                     @else
                                         <option value="${type.getId()}">${type.getName()}</option>

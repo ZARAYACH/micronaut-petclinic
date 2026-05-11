@@ -6,6 +6,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.VisitForm;
+import io.micronaut.samples.petclinic.mapper.FormMapper;
 import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.Visit;
@@ -15,7 +16,9 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 import java.net.URI;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Controller for visit-related operations.
@@ -25,30 +28,28 @@ import java.util.*;
 public class VisitController {
 
     private final ClinicService clinicService;
+    private final FormMapper formMapper;
 
-    public VisitController(ClinicService clinicService) {
+    public VisitController(ClinicService clinicService, FormMapper formMapper) {
         this.clinicService = clinicService;
+        this.formMapper = formMapper;
     }
 
     @io.micronaut.http.annotation.Error(exception = ConstraintViolationException.class)
     @View("pets/createOrUpdateVisitForm")
     public Map<String, Object> onConstraintViolation(HttpRequest<?> request,
                                                      ConstraintViolationException e) {
-        Map<String, Object> model = new HashMap<>();
-
         Integer ownerId = request.getParameters().get("ownerId", Integer.class).orElse(null);
         Integer petId = request.getParameters().get("petId", Integer.class).orElse(null);
 
         Optional<Pet> pet = petId != null ? clinicService.findPetById(petId) : Optional.empty();
-        model.put("pet", pet.orElse(null));
 
         Owner owner = null;
         if (pet.isPresent() && pet.get().getOwner() != null) {
             owner = pet.get().getOwner();
         }
-        model.put("owner", owner);
 
-        Map<String, String> validationErrors = new HashMap<>();
+        Map<String, String> validationErrors = new LinkedHashMap<>();
         for (var violation : e.getConstraintViolations()) {
             String field = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : "";
             int lastDot = field.lastIndexOf('.');
@@ -59,13 +60,12 @@ public class VisitController {
                 validationErrors.put(field, violation.getMessage());
             }
         }
-        model.put("validationErrors", validationErrors);
 
-        VisitForm form = new VisitForm();
-        request.getBody(VisitForm.class).ifPresent(submitted -> {
-            form.setDate(submitted.getDate());
-            form.setDescription(submitted.getDescription());
-        });
+        VisitForm form = request.getBody(VisitForm.class).orElseGet(VisitForm::new);
+        Map<String, Object> model = new LinkedHashMap<>();
+        model.put("pet", pet.orElse(null));
+        model.put("owner", owner);
+        model.put("validationErrors", validationErrors);
         model.put("visit", form);
 
         return model;
@@ -81,18 +81,17 @@ public class VisitController {
     @Get("/new")
     @View("pets/createOrUpdateVisitForm")
     public Map<String, Object> initNewVisitForm(@PathVariable Integer ownerId, @PathVariable Integer petId) {
-        Map<String, Object> model = new HashMap<>();
         Optional<Pet> pet = clinicService.findPetById(petId);
 
         if (pet.isPresent()) {
-            model.put("visit", new VisitForm());
-            model.put("pet", pet.get());
-            model.put("owner", pet.get().getOwner());
-            model.put("validationErrors", Map.of());
-        } else {
-            model.put("error", "Pet not found");
+            return Map.of(
+                    "visit", new VisitForm(),
+                    "pet", pet.get(),
+                    "owner", pet.get().getOwner(),
+                    "validationErrors", Map.of()
+            );
         }
-        return model;
+        return Map.of("error", "Pet not found");
     }
 
     /**
@@ -113,7 +112,7 @@ public class VisitController {
             return HttpResponse.notFound();
         }
 
-        Visit visit = form.toVisit();
+        Visit visit = formMapper.toVisit(form);
         pet.get().addVisit(visit);
         clinicService.saveVisit(visit);
 

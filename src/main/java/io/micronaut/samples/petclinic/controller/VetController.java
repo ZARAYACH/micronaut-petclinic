@@ -7,7 +7,8 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.samples.petclinic.model.Vet;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Controller for veterinarian-related operations.
@@ -29,10 +30,8 @@ public class VetController {
     @Get
     @View("vets/vetList")
     public Map<String, Object> showVetList() {
-        Map<String, Object> model = new HashMap<>();
         Collection<Vet> vets = clinicService.findAllVets();
-        model.put("vets", vets);
-        return model;
+        return Map.of("vets", vets);
     }
 
     /**
