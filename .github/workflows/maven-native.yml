@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [25']
+        java-version: ['25']
 
     env:
       GRAALVM_QUICK_BUILD: true
