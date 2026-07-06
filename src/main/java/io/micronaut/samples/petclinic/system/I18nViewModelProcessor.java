@@ -15,7 +15,7 @@ import java.util.Map;
  * Enrich every view model with i18n helpers.
  */
 @Singleton
-public class I18nViewModelProcessor implements ViewModelProcessor<Object> {
+public class I18nViewModelProcessor implements ViewModelProcessor<Object, HttpRequest<?>> {
 
     private final MessageSource messageSource;
     private final io.micronaut.http.server.util.locale.HttpLocaleResolver httpLocaleResolver;
@@ -32,6 +32,7 @@ public class I18nViewModelProcessor implements ViewModelProcessor<Object> {
         this.httpLocaleResolver = httpLocaleResolver;
     }
 
+
     /**
      * Adds locale, message, and request helpers to the view model.
      *
@@ -39,7 +40,7 @@ public class I18nViewModelProcessor implements ViewModelProcessor<Object> {
      * @param modelAndView the model and view being rendered
      */
     @Override
-    public void process(@NonNull HttpRequest<?> request, @NonNull ModelAndView<Object> modelAndView) {
+    public void process(@NonNull @org.jspecify.annotations.NonNull HttpRequest<?> request, @NonNull ModelAndView<Object> modelAndView) {
         Locale locale = httpLocaleResolver.resolveOrDefault(request);
 
         Map<String, Object> model = new HashMap<>(modelAndView.getModel()
