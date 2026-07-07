@@ -1,11 +1,11 @@
 package io.micronaut.samples.petclinic.system;
 
 import io.micronaut.context.MessageSource;
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.views.ModelAndView;
 import io.micronaut.views.model.ViewModelProcessor;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -40,7 +40,7 @@ public class I18nViewModelProcessor implements ViewModelProcessor<Object, HttpRe
      * @param modelAndView the model and view being rendered
      */
     @Override
-    public void process(@NonNull @org.jspecify.annotations.NonNull HttpRequest<?> request, @NonNull ModelAndView<Object> modelAndView) {
+    public void process(@NonNull HttpRequest<?> request, @NonNull ModelAndView<Object> modelAndView) {
         Locale locale = httpLocaleResolver.resolveOrDefault(request);
 
         Map<String, Object> model = new HashMap<>(modelAndView.getModel()
