@@ -1,9 +1,13 @@
 package io.micronaut.samples.petclinic.controller;
 
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.VisitForm;
 import io.micronaut.samples.petclinic.mapper.FormMapper;
@@ -11,6 +15,8 @@ import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.Visit;
 import io.micronaut.samples.petclinic.service.ClinicService;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -93,6 +99,7 @@ public class VisitController {
      */
     @Get("/new")
     @View("pets/createOrUpdateVisitForm")
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public Map<String, Object> initNewVisitForm(@PathVariable Integer ownerId, @PathVariable Integer petId) {
         Optional<Pet> pet = clinicService.findPetById(petId);
 
@@ -116,6 +123,7 @@ public class VisitController {
      * @return redirect to owner details
      */
     @Post(value = "/new", consumes = MediaType.APPLICATION_FORM_URLENCODED)
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     public HttpResponse<?> processNewVisitForm(@PathVariable Integer ownerId,
                                                 @PathVariable Integer petId,
                                                 @Valid @Body VisitForm form) {

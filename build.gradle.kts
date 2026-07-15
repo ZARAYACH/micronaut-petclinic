@@ -37,6 +37,11 @@ dependencies {
     implementation(libs.jakarta.validation.api)
     implementation(libs.micronaut.cache.caffeine)
     implementation(libs.micronaut.sourcegen.annotations)
+    implementation(libs.micronaut.security)
+    implementation(libs.micronaut.security.session)
+    implementation(libs.spring.security.crypto)
+    implementation(libs.slf4j.jcl.over)
+    implementation(libs.micronaut.reactor)
 
     runtimeOnly(libs.h2)
     runtimeOnly(libs.ojdbc11)

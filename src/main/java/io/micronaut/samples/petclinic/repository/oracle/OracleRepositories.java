@@ -4,8 +4,21 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
-import io.micronaut.samples.petclinic.model.*;
-import io.micronaut.samples.petclinic.repository.*;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.Speciality;
+import io.micronaut.samples.petclinic.model.VetWithSpecialities;
+import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.repository.OwnerRepository;
+import io.micronaut.samples.petclinic.repository.PetRepository;
+import io.micronaut.samples.petclinic.repository.PetTypeRepository;
+import io.micronaut.samples.petclinic.repository.RoleJdbcRepository;
+import io.micronaut.samples.petclinic.repository.SpecialityRepository;
+import io.micronaut.samples.petclinic.repository.UserJdbcRepository;
+import io.micronaut.samples.petclinic.repository.UserRoleJdbcRepository;
+import io.micronaut.samples.petclinic.repository.VetRepository;
+import io.micronaut.samples.petclinic.repository.VetSpecialityRepository;
+import io.micronaut.samples.petclinic.repository.VisitRepository;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -129,5 +142,43 @@ public final class OracleRepositories {
         @Override
         @Query(value = "SELECT s.* FROM SPECIALTIES s JOIN VET_SPECIALTIES vs ON vs.SPECIALTY_ID = s.id WHERE vs.VET_ID = :vetId ORDER BY s.NAME", nativeQuery = true)
         List<Speciality> findSpecialitiesByVetId(Integer vetId);
+    }
+
+    /**
+     * Oracle user repository bean.
+     */
+    @Requires(env = {"oracle"})
+    @JdbcRepository(dialect = Dialect.ORACLE)
+    public interface OracleUserJdbcRepository extends UserJdbcRepository {
+    }
+
+    /**
+     * Oracle role repository bean.
+     */
+    @Requires(env = {"oracle"})
+    @JdbcRepository(dialect = Dialect.ORACLE)
+    public interface OracleRoleJdbcRepository extends RoleJdbcRepository {
+    }
+
+    /**
+     * Oracle user-role repository bean.
+     */
+    @Requires(env = {"oracle"})
+    @JdbcRepository(dialect = Dialect.ORACLE)
+    public interface OracleUserRoleJdbcRepository extends UserRoleJdbcRepository {
+        /**
+         * Finds authority names for a user using Oracle SQL.
+         *
+         * @param username the user name whose authorities should be loaded
+         * @return authority names granted to the user
+         */
+        @Override
+        @Query(value = """
+                SELECT r.authority FROM "ROLE" r
+                INNER JOIN "USER_ROLE" ur ON ur.role_id = r.id
+                INNER JOIN "USER" u ON ur.user_id = u."ID"
+                WHERE u."USERNAME" = :username
+                """, nativeQuery = true)
+        List<String> findAllAuthoritiesByUsername(String username);
     }
 }

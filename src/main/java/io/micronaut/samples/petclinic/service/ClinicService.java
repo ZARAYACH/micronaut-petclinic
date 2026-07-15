@@ -1,17 +1,29 @@
 package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.cache.annotation.Cacheable;
-import io.micronaut.samples.petclinic.model.*;
-import io.micronaut.samples.petclinic.repository.*;
+import io.micronaut.data.model.Sort;
+import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.PetType;
+import io.micronaut.samples.petclinic.model.Speciality;
+import io.micronaut.samples.petclinic.model.Vet;
+import io.micronaut.samples.petclinic.model.VetWithSpecialities;
+import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.repository.OwnerRepository;
+import io.micronaut.samples.petclinic.repository.PetRepository;
+import io.micronaut.samples.petclinic.repository.PetTypeRepository;
+import io.micronaut.samples.petclinic.repository.SpecialityRepository;
+import io.micronaut.samples.petclinic.repository.VetRepository;
+import io.micronaut.samples.petclinic.repository.VisitRepository;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
+
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import io.micronaut.data.model.Sort;
 
 /**
  * Service class providing business logic for the Pet Clinic application.
@@ -26,7 +38,6 @@ public class ClinicService {
     private final VisitRepository visitRepository;
     private final VetRepository vetRepository;
     private final SpecialityRepository specialityRepository;
-    private final VetSpecialityRepository vetSpecialityRepository;
 
     /**
      * Creates the service facade with its repository dependencies.
@@ -37,22 +48,19 @@ public class ClinicService {
      * @param visitRepository repository for visits
      * @param vetRepository repository for vets
      * @param specialityRepository repository for specialities
-     * @param vetSpecialityRepository repository for vet-speciality join rows
      */
     public ClinicService(OwnerRepository ownerRepository,
                          PetRepository petRepository,
                           PetTypeRepository petTypeRepository,
                           VisitRepository visitRepository,
                           VetRepository vetRepository,
-                          SpecialityRepository specialityRepository,
-                          VetSpecialityRepository vetSpecialityRepository) {
+                         SpecialityRepository specialityRepository) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
         this.petTypeRepository = petTypeRepository;
         this.visitRepository = visitRepository;
         this.vetRepository = vetRepository;
         this.specialityRepository = specialityRepository;
-        this.vetSpecialityRepository = vetSpecialityRepository;
     }
 
     // ========== Owner Operations ==========

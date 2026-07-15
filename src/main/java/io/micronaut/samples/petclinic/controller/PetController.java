@@ -1,9 +1,13 @@
 package io.micronaut.samples.petclinic.controller;
 
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.PetForm;
 import io.micronaut.samples.petclinic.mapper.FormMapper;
@@ -11,6 +15,8 @@ import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.PetType;
 import io.micronaut.samples.petclinic.service.ClinicService;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -100,6 +106,7 @@ public class PetController {
      * @param ownerId the owner ID
      * @return the create pet form view
      */
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/new")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initCreationForm(@PathVariable Integer ownerId) {
@@ -124,6 +131,7 @@ public class PetController {
      * @param form    the pet form data
      * @return redirect to owner details
      */
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Post(value = "/new", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> processCreationForm(@PathVariable Integer ownerId, @Valid @Body PetForm form) {
         Optional<Owner> owner = getOwner(ownerId);
@@ -156,6 +164,7 @@ public class PetController {
      * @param petId   the pet ID
      * @return the edit pet form view
      */
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Get("/{petId}/edit")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initUpdateForm(@PathVariable Integer ownerId, @PathVariable Integer petId) {
@@ -182,6 +191,7 @@ public class PetController {
      * @param form    the updated pet form data
      * @return redirect to owner details
      */
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Post(value = "/{petId}/edit", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> processUpdateForm(@PathVariable Integer ownerId,
                                               @PathVariable Integer petId,

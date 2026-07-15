@@ -6,7 +6,10 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.samples.petclinic.model.Vet;
 import io.micronaut.samples.petclinic.service.ClinicService;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -32,6 +35,7 @@ public class VetController {
      * Display the list of veterinarians.
      * @return the vets list view
      */
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get
     @View("vets/vetList")
     public Map<String, Object> showVetList() {
@@ -44,6 +48,7 @@ public class VetController {
      * Alias for the main endpoint.
      * @return the vets list view
      */
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/html")
     @View("vets/vetList")
     public Map<String, Object> showResourcesVetList() {
@@ -54,6 +59,7 @@ public class VetController {
      * Return the list of veterinarians as JSON.
      * @return collection of vets in JSON format
      */
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/json")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Vet> showResourcesVetListJson() {

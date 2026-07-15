@@ -2,9 +2,15 @@ package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Error;
+import io.micronaut.reactor.config.ReactorConfiguration;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.authentication.AuthorizationException;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -13,12 +19,16 @@ import java.util.Objects;
  * Provides custom error pages for different HTTP status codes.
  */
 @Controller("/error")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class ErrorController {
+
+    private final ReactorConfiguration reactorConfiguration;
 
     /**
      * Creates the error controller.
      */
-    public ErrorController() {
+    public ErrorController(ReactorConfiguration reactorConfiguration) {
+        this.reactorConfiguration = reactorConfiguration;
     }
 
     /**
@@ -33,6 +43,22 @@ public class ErrorController {
                 "path", request.getPath(),
                 "message", "Page not found"
         );
+    }
+
+    /**
+     * Handle authorization failures raised by the security filter.
+     *
+     * @param request the original request
+     * @param exception the authorization exception
+     * @return the error view with the correct status
+     */
+    @Error(exception = AuthorizationException.class, global = true)
+    public HttpResponse<Map<String, Object>> authorizationFailure(HttpRequest<?> request,
+                                                                  AuthorizationException exception) {
+        HttpStatus status = exception.isForbidden() ? HttpStatus.FORBIDDEN : HttpStatus.UNAUTHORIZED;
+        return HttpResponse.status(status).body(
+                Map.of("path", request.getPath(),
+                        "message", HttpStatus.FORBIDDEN.getReason()));
     }
 
     /**

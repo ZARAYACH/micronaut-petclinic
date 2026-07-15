@@ -3,12 +3,34 @@ package io.micronaut.samples.petclinic.system;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.samples.petclinic.model.*;
-import io.micronaut.samples.petclinic.repository.*;
+import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.PetType;
+import io.micronaut.samples.petclinic.model.Role;
+import io.micronaut.samples.petclinic.model.Speciality;
+import io.micronaut.samples.petclinic.model.User;
+import io.micronaut.samples.petclinic.model.UserRole;
+import io.micronaut.samples.petclinic.model.UserRoleId;
+import io.micronaut.samples.petclinic.model.Vet;
+import io.micronaut.samples.petclinic.model.VetSpeciality;
+import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.repository.OwnerRepository;
+import io.micronaut.samples.petclinic.repository.PetRepository;
+import io.micronaut.samples.petclinic.repository.PetTypeRepository;
+import io.micronaut.samples.petclinic.repository.RoleJdbcRepository;
+import io.micronaut.samples.petclinic.repository.SpecialityRepository;
+import io.micronaut.samples.petclinic.repository.UserJdbcRepository;
+import io.micronaut.samples.petclinic.repository.UserRoleJdbcRepository;
+import io.micronaut.samples.petclinic.repository.VetRepository;
+import io.micronaut.samples.petclinic.repository.VetSpecialityRepository;
+import io.micronaut.samples.petclinic.repository.VisitRepository;
+import io.micronaut.samples.petclinic.utils.PasswordEncoder;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Set;
@@ -29,6 +51,11 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
     private final PetRepository petRepository;
     private final VisitRepository visitRepository;
     private final VetSpecialityRepository vetSpecialityRepository;
+    private final RoleJdbcRepository roleJdbcRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRoleJdbcRepository userRoleJdbcRepository;
+    private final UserJdbcRepository userJdbcRepository;
+
 
     /**
      * Creates the data loader with the repositories used to seed sample data.
@@ -40,6 +67,10 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
      * @param petRepository repository for pets
      * @param visitRepository repository for visits
      * @param vetSpecialityRepository repository for vet-speciality join rows
+     * @param roleJdbcRepository repository for sample security roles
+     * @param passwordEncoder encoder for sample user passwords
+     * @param userRoleJdbcRepository repository for sample user-role assignments
+     * @param userJdbcRepository repository for sample users
      */
     public DataLoader(VetRepository vetRepository,
                       SpecialityRepository specialityRepository,
@@ -47,7 +78,11 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
                       OwnerRepository ownerRepository,
                       PetRepository petRepository,
                       VisitRepository visitRepository,
-                      VetSpecialityRepository vetSpecialityRepository) {
+                      VetSpecialityRepository vetSpecialityRepository,
+                      RoleJdbcRepository roleJdbcRepository,
+                      PasswordEncoder passwordEncoder,
+                      UserRoleJdbcRepository userRoleJdbcRepository,
+                      UserJdbcRepository userJdbcRepository) {
         this.vetRepository = vetRepository;
         this.specialityRepository = specialityRepository;
         this.petTypeRepository = petTypeRepository;
@@ -55,6 +90,10 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
         this.petRepository = petRepository;
         this.visitRepository = visitRepository;
         this.vetSpecialityRepository = vetSpecialityRepository;
+        this.roleJdbcRepository = roleJdbcRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userRoleJdbcRepository = userRoleJdbcRepository;
+        this.userJdbcRepository = userJdbcRepository;
     }
 
     /**
@@ -71,6 +110,14 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
     }
 
     private void loadData() {
+        // create roles
+        Role roleStaff = createRole(Role.Authority.ROLE_STAFF);
+        Role roleAdmin = createRole(Role.Authority.ROLE_ADMIN);
+
+        createUser("admin@example.com", "password123", roleAdmin);
+        createUser("staff@example.com", "password123", roleStaff);
+
+
         // Create specialities
         Speciality radiology = createSpeciality("radiology");
         Speciality surgery = createSpeciality("surgery");
@@ -78,7 +125,7 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
 
         // Create vets
         Vet james = createVet("James", "Carter");
-        Vet helen = createVet("Helen", "Leary", radiology);
+        Vet helen = createVet("Helen", "Leary");
         Vet linda = createVet("Linda", "Douglas", surgery, dentistry);
         Vet rafael = createVet("Rafael", "Ortega", surgery);
         Vet henry = createVet("Henry", "Stevens", radiology);
@@ -133,18 +180,37 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
         createVisit(max, LocalDate.of(2013, 1, 3), "neutered");
     }
 
+    private Role createRole(Role.Authority authority) {
+        return roleJdbcRepository.save(new Role(null, authority));
+    }
+
+    private User createUser(@NotBlank String username, @NotBlank String rawPassword, Role role) {
+        User user = new User(username, passwordEncoder.encode(rawPassword));
+        user = userJdbcRepository.save(user);
+        UserRoleId userRoleId = new UserRoleId(user, role);
+        userRoleJdbcRepository.save(new UserRole(userRoleId));
+        return user;
+    }
+
+    private void createUserRole(User user, Role role) {
+        UserRoleId userRoleId = new UserRoleId(user, role);
+        userRoleJdbcRepository.save(new UserRole(userRoleId));
+    }
+
     private Speciality createSpeciality(String name) {
         Speciality speciality = new Speciality(name);
         return specialityRepository.save(speciality);
     }
 
     private Vet createVet(String firstName, String lastName, Speciality... specialities) {
-        Vet vet = new Vet(firstName, lastName).withSpecialities(Set.copyOf(Arrays.asList(specialities)));
-        Vet saved = vetRepository.save(vet);
+        Vet vet = new Vet(firstName, lastName)
+                .withSpecialities(Set.copyOf(Arrays.asList(specialities)));
+        vet = vetRepository.save(vet);
+
         for (Speciality speciality : specialities) {
-            vetSpecialityRepository.save(new VetSpeciality(saved.id(), speciality.id()));
+            vetSpecialityRepository.save(new VetSpeciality(vet.id(), speciality.id()));
         }
-        return saved;
+        return vet;
     }
 
     private PetType createPetType(String name) {

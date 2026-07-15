@@ -67,6 +67,11 @@
                         <li><a class="dropdown-item" href="/locale?lang=de&backUrl=${request.getPath()}">${msg.text("lang.de")}</a></li>
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/auth">
+                        <i class="fas fa-user"></i> ${msg.text("nav.login")}
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
