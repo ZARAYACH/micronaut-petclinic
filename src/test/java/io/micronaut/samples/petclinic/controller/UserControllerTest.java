@@ -5,6 +5,7 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.client.DefaultHttpClientConfiguration;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
@@ -43,7 +44,7 @@ class UserControllerTest {
     @Inject
     PasswordEncoder passwordEncoder;
 
-    private static HttpRequest<?> formPost(String uri, Map<String, String> form) {
+    private static MutableHttpRequest<?> formPost(String uri, Map<String, String> form) {
         return HttpRequest.POST(uri, form)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED);
     }
@@ -69,6 +70,17 @@ class UserControllerTest {
                 .exchange(HttpRequest.GET("/user/auth"), String.class);
 
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void shouldShowLoginLinkForAnonymousUsers() {
+        HttpResponse<String> response = client.toBlocking()
+                .exchange(HttpRequest.GET("/"), String.class);
+
+        assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
+        assertThat(response.body()).contains("href=\"/user/auth\"");
+        assertThat(response.body()).contains("Log in");
+        assertThat(response.body()).doesNotContain("action=\"/logout\"");
     }
 
     @Test
@@ -112,6 +124,47 @@ class UserControllerTest {
 
             assertThat((CharSequence) protectedResponse.status()).isEqualTo(HttpStatus.OK);
             assertThat(protectedResponse.body()).contains("Leo");
+        }
+    }
+
+    @Test
+    void shouldShowLogoutButtonForAuthenticatedUsers() {
+        try (HttpClient noRedirectClient = createNoRedirectClient()) {
+            HttpResponse<String> loginResponse = exchange(noRedirectClient, formPost("/login", Map.of(
+                    "username", "admin@example.com",
+                    "password", "password123"
+            )));
+            String sessionCookie = firstCookie(loginResponse);
+
+            HttpResponse<String> response = exchange(noRedirectClient, HttpRequest.GET("/")
+                    .header(HttpHeaders.COOKIE, sessionCookie));
+
+            assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
+            assertThat(response.body()).contains("action=\"/logout\"");
+            assertThat(response.body()).contains("Log out");
+            assertThat(response.body()).doesNotContain("href=\"/user/auth\"");
+        }
+    }
+
+    @Test
+    void shouldLogoutAuthenticatedSession() {
+        try (HttpClient noRedirectClient = createNoRedirectClient()) {
+            HttpResponse<String> loginResponse = exchange(noRedirectClient, formPost("/login", Map.of(
+                    "username", "admin@example.com",
+                    "password", "password123"
+            )));
+            String sessionCookie = firstCookie(loginResponse);
+
+            HttpResponse<String> logoutResponse = exchange(noRedirectClient, formPost("/logout", Map.of())
+                    .header(HttpHeaders.COOKIE, sessionCookie));
+
+            assertThat(logoutResponse.status().getCode()).isBetween(300, 399);
+            assertThat(logoutResponse.getHeaders().get(HttpHeaders.LOCATION)).isEqualTo("/");
+
+            HttpResponse<String> protectedResponse = exchange(noRedirectClient, HttpRequest.GET("/owners/1/pets/1/edit")
+                    .header(HttpHeaders.COOKIE, sessionCookie));
+
+            assertThat((CharSequence) protectedResponse.status()).isEqualTo(HttpStatus.UNAUTHORIZED);
         }
     }
 

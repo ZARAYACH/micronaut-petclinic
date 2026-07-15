@@ -67,11 +67,21 @@
                         <li><a class="dropdown-item" href="/locale?lang=de&backUrl=${request.getPath()}">${msg.text("lang.de")}</a></li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/auth">
-                        <i class="fas fa-user"></i> ${msg.text("nav.login")}
-                    </a>
-                </li>
+                @if(request != null && request.getAttribute("authenticated", Boolean.class).orElse(false))
+                    <li class="nav-item">
+                        <form action="/logout" method="post" class="d-inline">
+                            <button type="submit" class="nav-link nav-link-button">
+                                <i class="fas fa-right-from-bracket"></i> ${msg.text("nav.logout")}
+                            </button>
+                        </form>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/auth">
+                            <i class="fas fa-user"></i> ${msg.text("nav.login")}
+                        </a>
+                    </li>
+                @endif
             </ul>
         </div>
     </div>

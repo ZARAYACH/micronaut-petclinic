@@ -71,6 +71,17 @@ class ClinicServiceTest {
     }
 
     @Test
+    void shouldSaveNewVet() {
+        Vet vet = new Vet("Casey", "Morgan");
+
+        Vet savedVet = clinicService.saveVet(vet);
+
+        assertThat(savedVet.id()).isNotNull();
+        assertThat(savedVet.getFirstName()).isEqualTo("Casey");
+        assertThat(savedVet.getLastName()).isEqualTo("Morgan");
+    }
+
+    @Test
     void shouldFindVetWithSpecialities() {
         Collection<Vet> vets = clinicService.findAllVets();
         Vet vetWithSpecialities = vets.stream()

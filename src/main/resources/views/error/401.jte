@@ -32,8 +32,8 @@
                 <a href="/" class="btn btn-primary btn-lg">
                     <i class="fas fa-home me-2"></i>${msg.text("error.goHome")}
                 </a>
-                <a href="/owners/find" class="btn btn-secondary btn-lg">
-                    <i class="fas fa-search me-2"></i>${msg.text("nav.findOwners")}
+                <a href="/user/auth" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-user me-2"></i>${msg.text("nav.login")}
                 </a>
             </div>
         </div>

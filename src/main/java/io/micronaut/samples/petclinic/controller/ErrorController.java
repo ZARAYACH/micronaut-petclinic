@@ -5,6 +5,7 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Error;
+import io.micronaut.http.annotation.Get;
 import io.micronaut.reactor.config.ReactorConfiguration;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthorizationException;
@@ -45,6 +46,15 @@ public class ErrorController {
         );
     }
 
+    @Get("/401")
+    @View("error/401")
+    public Map<String, Object> unauthorised(HttpRequest<?> request) {
+        return Map.of(
+                "path", request.getPath(),
+                "message", "unauthorized"
+        );
+    }
+
     /**
      * Handle authorization failures raised by the security filter.
      *
@@ -58,7 +68,7 @@ public class ErrorController {
         HttpStatus status = exception.isForbidden() ? HttpStatus.FORBIDDEN : HttpStatus.UNAUTHORIZED;
         return HttpResponse.status(status).body(
                 Map.of("path", request.getPath(),
-                        "message", HttpStatus.FORBIDDEN.getReason()));
+                        "message", status.getReason()));
     }
 
     /**
