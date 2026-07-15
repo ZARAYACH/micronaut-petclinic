@@ -152,6 +152,31 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.micronaut.security</groupId>
+            <artifactId>micronaut-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.security</groupId>
+            <artifactId>micronaut-security-session</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.security</groupId>
+            <artifactId>micronaut-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.reactor</groupId>
+            <artifactId>micronaut-reactor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+            <version>6.5.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -282,6 +307,7 @@
                                 <buildArg>--initialize-at-run-time=io.netty.util.internal.CleanerJava25</buildArg>
                                 <buildArg>--initialize-at-run-time=sun.security.util.Password$ConsoleHolder</buildArg>
                                 <buildArg>--initialize-at-run-time=jdk.internal.io.JdkConsoleImpl$1ConsoleHolder</buildArg>
+                                <buildArg>--initialize-at-build-time=io.micronaut.security.authentication.AuthenticationMode</buildArg>
                             </buildArgs>
                         </configuration>
                     </plugin>

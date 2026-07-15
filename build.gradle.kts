@@ -118,6 +118,7 @@ graalvmNative {
     }
     binaries {
         all {
+            buildArgs.add("--initialize-at-build-time=io.micronaut.security.authentication.AuthenticationMode")
             resources.autodetect()
             if (JavaVersion.current().majorVersion == "25") {
                 buildArgs.add("-H:+SharedArenaSupport")
