@@ -72,6 +72,15 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldRenderSignUpPage() {
+        HttpResponse<String> response = client.toBlocking()
+                .exchange(HttpRequest.GET("/user/signUp"), String.class);
+
+        assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
+        assertThat(response.body()).contains("Create account");
+    }
+
+    @Test
     void shouldRedirectToAuthFailedWhenLoginFails() {
         try (HttpClient noRedirectClient = createNoRedirectClient()) {
             HttpResponse<String> response = exchange(noRedirectClient, formPost("/login", Map.of(

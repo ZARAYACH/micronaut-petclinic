@@ -18,7 +18,7 @@
                                 <i class="fas fa-user-md"></i> ${msg.text("welcome.viewVets")}
                             </a>
                             <a href="/user/signUp" class="btn btn-lg btn-outline-light">
-                                <i class="fas fa-user-plus"></i> Sign up
+                                <i class="fas fa-user-plus"></i> ${msg.text("welcome.signUp")}
                             </a>
                         </div>
                     </div>
