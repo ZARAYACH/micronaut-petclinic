@@ -27,6 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.micronaut.samples.petclinic.model.Role.Authority.ROLE_ADMIN_;
+import static io.micronaut.samples.petclinic.model.Role.Authority.ROLE_STAFF_;
+
 /**
  * Controller for owner-related operations.
  * Handles CRUD operations and searching for pet owners.
@@ -161,7 +164,7 @@ public class OwnerController {
      * @param form the owner form data
      * @return redirect to owner details on success, or form with errors
      */
-    @Secured(SecurityRule.IS_AUTHENTICATED)
+    @Secured(ROLE_STAFF_)
     @Post(value = "/new", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> processCreationForm(@Valid @Body OwnerForm form) {
         Owner owner = formMapper.toOwner(form);
@@ -235,7 +238,7 @@ public class OwnerController {
      * @param form    the updated owner form data
      * @return redirect to owner details on success
      */
-    @Secured(SecurityRule.IS_AUTHENTICATED)
+    @Secured({ROLE_STAFF_, ROLE_ADMIN_})
     @Post(value = "/{ownerId}/edit", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> processUpdateOwnerForm(@PathVariable Integer ownerId, @Valid @Body OwnerForm form) {
         Optional<Owner> existingOwner = clinicService.findOwnerById(ownerId);

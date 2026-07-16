@@ -5,11 +5,8 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.client.DefaultHttpClientConfiguration;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
-import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.samples.petclinic.model.User;
 import io.micronaut.samples.petclinic.repository.UserJdbcRepository;
@@ -18,11 +15,15 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static io.micronaut.samples.petclinic.controller.ControllerTestSupport.createNoRedirectClient;
+import static io.micronaut.samples.petclinic.controller.ControllerTestSupport.exchange;
+import static io.micronaut.samples.petclinic.controller.ControllerTestSupport.formPost;
+import static io.micronaut.samples.petclinic.controller.ControllerTestSupport.login;
+import static io.micronaut.samples.petclinic.controller.ControllerTestSupport.loginResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -43,26 +44,6 @@ class UserControllerTest {
 
     @Inject
     PasswordEncoder passwordEncoder;
-
-    private static MutableHttpRequest<?> formPost(String uri, Map<String, String> form) {
-        return HttpRequest.POST(uri, form)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static HttpResponse<String> exchange(HttpClient client, HttpRequest<?> request) {
-        try {
-            return client.toBlocking().exchange(request, String.class);
-        } catch (HttpClientResponseException e) {
-            return (HttpResponse<String>) e.getResponse();
-        }
-    }
-
-    private static String firstCookie(HttpResponse<?> response) {
-        List<String> setCookies = response.getHeaders().getAll(HttpHeaders.SET_COOKIE);
-        assertThat(setCookies).isNotEmpty();
-        return setCookies.getFirst().split(";", 2)[0];
-    }
 
     @Test
     void shouldRenderLoginPage() {
@@ -94,11 +75,8 @@ class UserControllerTest {
 
     @Test
     void shouldRedirectToAuthFailedWhenLoginFails() {
-        try (HttpClient noRedirectClient = createNoRedirectClient()) {
-            HttpResponse<String> response = exchange(noRedirectClient, formPost("/login", Map.of(
-                    "username", "admin@example.com",
-                    "password", "wrong-password"
-            )));
+        try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
+            HttpResponse<String> response = loginResponse(noRedirectClient, "admin@example.com", "wrong-password");
 
             assertThat(response.status().getCode()).isBetween(300, 399);
             assertThat(response.getHeaders().get(HttpHeaders.LOCATION)).isEqualTo("/user/authFailed");
@@ -107,16 +85,8 @@ class UserControllerTest {
 
     @Test
     void shouldLoginAndUseSessionCookieForProtectedPages() {
-        try (HttpClient noRedirectClient = createNoRedirectClient()) {
-            HttpResponse<String> loginResponse = exchange(noRedirectClient, formPost("/login", Map.of(
-                    "username", "admin@example.com",
-                    "password", "password123"
-            )));
-
-            assertThat(loginResponse.status().getCode()).isBetween(300, 399);
-            assertThat(loginResponse.getHeaders().get(HttpHeaders.LOCATION)).isEqualTo("/");
-
-            String sessionCookie = firstCookie(loginResponse);
+        try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
+            String sessionCookie = login(noRedirectClient, "admin@example.com", "password123");
             assertThat(sessionCookie).isNotBlank();
 
             HttpResponse<String> protectedResponse = exchange(noRedirectClient, HttpRequest.GET("/owners/1/pets/1/edit")
@@ -129,12 +99,8 @@ class UserControllerTest {
 
     @Test
     void shouldShowLogoutButtonForAuthenticatedUsers() {
-        try (HttpClient noRedirectClient = createNoRedirectClient()) {
-            HttpResponse<String> loginResponse = exchange(noRedirectClient, formPost("/login", Map.of(
-                    "username", "admin@example.com",
-                    "password", "password123"
-            )));
-            String sessionCookie = firstCookie(loginResponse);
+        try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
+            String sessionCookie = login(noRedirectClient, "admin@example.com", "password123");
 
             HttpResponse<String> response = exchange(noRedirectClient, HttpRequest.GET("/")
                     .header(HttpHeaders.COOKIE, sessionCookie));
@@ -148,12 +114,8 @@ class UserControllerTest {
 
     @Test
     void shouldLogoutAuthenticatedSession() {
-        try (HttpClient noRedirectClient = createNoRedirectClient()) {
-            HttpResponse<String> loginResponse = exchange(noRedirectClient, formPost("/login", Map.of(
-                    "username", "admin@example.com",
-                    "password", "password123"
-            )));
-            String sessionCookie = firstCookie(loginResponse);
+        try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
+            String sessionCookie = login(noRedirectClient, "admin@example.com", "password123");
 
             HttpResponse<String> logoutResponse = exchange(noRedirectClient, formPost("/logout", Map.of())
                     .header(HttpHeaders.COOKIE, sessionCookie));
@@ -170,7 +132,7 @@ class UserControllerTest {
 
     @Test
     void shouldRejectAnonymousUserFromAuthenticatedPage() {
-        try (HttpClient noRedirectClient = createNoRedirectClient()) {
+        try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
             HttpResponse<String> response = exchange(noRedirectClient, HttpRequest.GET("/owners/1/pets/1/edit")
                     .accept(MediaType.TEXT_HTML));
 
@@ -183,7 +145,7 @@ class UserControllerTest {
         String username = "user-" + UUID.randomUUID() + "@example.com";
         String password = "password123";
 
-        try (HttpClient noRedirectClient = createNoRedirectClient()) {
+        try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
             HttpResponse<String> response = exchange(noRedirectClient, formPost("/user/signUp", Map.of(
                     "username", username,
                     "password", password,
@@ -202,7 +164,7 @@ class UserControllerTest {
 
     @Test
     void shouldRejectDuplicateSignUp() {
-        try (HttpClient noRedirectClient = createNoRedirectClient()) {
+        try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
             HttpResponse<String> response = exchange(noRedirectClient, formPost("/user/signUp", Map.of(
                     "username", "admin@example.com",
                     "password", "password123",
@@ -211,12 +173,5 @@ class UserControllerTest {
 
             assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
         }
-    }
-
-    private HttpClient createNoRedirectClient() {
-        DefaultHttpClientConfiguration configuration = new DefaultHttpClientConfiguration();
-        configuration.setFollowRedirects(false);
-        configuration.setExceptionOnErrorStatus(false);
-        return HttpClient.create(server.getURL(), configuration);
     }
 }

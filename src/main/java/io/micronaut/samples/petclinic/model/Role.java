@@ -32,6 +32,11 @@ public record Role(@Nullable
         /**
          * Administrator authority.
          */
-        ROLE_ADMIN
+        ROLE_ADMIN;
+
+        public static final String ROLE_STAFF_ = "ROLE_STAFF";
+        public static final String ROLE_ADMIN_ = "ROLE_ADMIN";
+
+
     }
 }
