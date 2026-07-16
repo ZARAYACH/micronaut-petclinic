@@ -1,5 +1,6 @@
 package io.micronaut.samples.petclinic.dto;
 
+import io.micronaut.samples.petclinic.annotation.PasswordMatch;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
  * @param password the requested raw password
  * @param repeatPassword the repeated raw password entered for confirmation
  */
+@PasswordMatch
 @Serdeable
 public record SignUpForm(@NotBlank String username,
                          @NotBlank String password,
