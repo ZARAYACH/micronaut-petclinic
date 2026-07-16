@@ -1,7 +1,5 @@
 package io.micronaut.samples.petclinic.constraint;
 
-import io.micronaut.samples.petclinic.annotation.PasswordMatch;
-import io.micronaut.samples.petclinic.annotation.ValidVisitDate;
 import io.micronaut.samples.petclinic.dto.SignUpForm;
 import io.micronaut.samples.petclinic.dto.VisitForm;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -10,7 +8,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 
-import java.lang.annotation.Annotation;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -41,9 +38,10 @@ class CustomValidatorFactoryTest {
         );
 
         assertThat(violations)
-                .anySatisfy(violation -> {
+                .singleElement()
+                .satisfies(violation -> {
                     assertThat(violation.getPropertyPath().toString()).isEqualTo("date");
-                    assertThat(annotationType(violation)).isEqualTo(ValidVisitDate.class);
+                    assertThat(violation.getMessage()).isEqualTo("Visit date must be in the future");
                 });
     }
 
@@ -63,10 +61,7 @@ class CustomValidatorFactoryTest {
         );
 
         assertThat(violations)
-                .anySatisfy(violation -> assertThat(annotationType(violation)).isEqualTo(PasswordMatch.class));
-    }
-
-    private static Class<? extends Annotation> annotationType(ConstraintViolation<?> violation) {
-        return violation.getConstraintDescriptor().getAnnotation().annotationType();
+                .singleElement()
+                .satisfies(violation -> assertThat(violation.getMessage()).isEqualTo("Passwords must match"));
     }
 }
