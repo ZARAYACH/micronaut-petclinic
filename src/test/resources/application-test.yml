@@ -3,11 +3,10 @@ micronaut:
     port: -1
   application:
     name: micronaut-petclinic-test
-  server:
-    port: -1
   views:
     jte:
       dynamic: false
+
 
 # Test datasource configuration (H2 in-memory)
 datasources:
@@ -23,3 +22,15 @@ datasources:
 petclinic:
   sample-data:
     enabled: true
+
+endpoints:
+  info:
+    sensitive: false
+  health:
+    details-visible: authenticated
+    jdbc:
+      enabled: true
+
+info:
+  application:
+    name: ${micronaut.application.name}

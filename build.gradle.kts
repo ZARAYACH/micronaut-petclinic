@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.jakarta.validation.api)
     implementation(libs.micronaut.cache.caffeine)
     implementation(libs.micronaut.sourcegen.annotations)
+    implementation(libs.micronaut.managment)
 
     runtimeOnly(libs.h2)
     runtimeOnly(libs.ojdbc11)

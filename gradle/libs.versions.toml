@@ -27,6 +27,7 @@ micronaut-serde-processor = { module = "io.micronaut.serde:micronaut-serde-proce
 micronaut-sourcegen-annotations = { module = "io.micronaut.sourcegen:micronaut-sourcegen-annotations", version.ref = "micronaut-sourcegen" }
 micronaut-sourcegen-generator-java = { module = "io.micronaut.sourcegen:micronaut-sourcegen-generator-java", version.ref = "micronaut-sourcegen" }
 micronaut-test-junit5 = { module = "io.micronaut.test:micronaut-test-junit5" }
+micronaut-managment = { module = "io.micronaut:micronaut-management"}
 
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api" }
 h2 = { module = "com.h2database:h2" }
