@@ -1,0 +1,6 @@
+# MySQL Configuration Profile
+datasources:
+  default:
+    dialect: mysql
+    url: jdbc:tc:mysql:8.4.5:///petclinic
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

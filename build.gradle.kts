@@ -2,6 +2,7 @@ import gg.jte.ContentType
 
 plugins {
     alias(libs.plugins.micronaut.application)
+    alias(libs.plugins.micronaut.test.resources)
     jacoco
     alias(libs.plugins.graalvm.native)
     alias(libs.plugins.jte)
@@ -18,9 +19,36 @@ application {
     mainClass.set("io.micronaut.samples.petclinic.Application")
 }
 
+data class DatabaseIntegration(
+    val testTaskName: String,
+    val environment: String,
+    val descriptionName: String,
+)
+
+val databaseIntegrations = listOf(
+    DatabaseIntegration(
+        testTaskName = "testMysqlIntegration",
+        environment = "mysql",
+        descriptionName = "MySQL",
+    ),
+    DatabaseIntegration(
+        testTaskName = "testPostgresIntegration",
+        environment = "postgres",
+        descriptionName = "PostgreSQL",
+    ),
+    DatabaseIntegration(
+        testTaskName = "testOracleIntegration",
+        environment = "oracle",
+        descriptionName = "Oracle DB",
+    )
+)
+
 micronaut {
     runtime("netty")
     testRuntime("junit5")
+    testResources {
+        enabled = false
+    }
 }
 
 dependencies {
@@ -64,6 +92,10 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.assertj.core)
+    testImplementation(libs.testcontainers.jdbc)
+    testImplementation(libs.testcontainers.mysql)
+    testImplementation(libs.testcontainers.oracle.free)
+    testImplementation(libs.testcontainers.postgresql)
     jteGenerate(libs.jte.native.resources)
 }
 
@@ -103,10 +135,26 @@ tasks.named("inspectRuntimeClasspath") {
     dependsOn(tasks.named("generateJte"))
 }
 
+tasks.named("check").configure {
+    databaseIntegrations.forEach { integration ->
+        dependsOn(tasks.named(integration.testTaskName))
+    }
+}
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     maxParallelForks = 1
     systemProperty("micronaut.server.port", "-1")
+}
+
+databaseIntegrations.forEach { integration ->
+    tasks.register<Test>(integration.testTaskName) {
+        group = "verification"
+        description = "Runs tests against a disposable ${integration.descriptionName} Testcontainers database."
+        testClassesDirs = sourceSets.test.get().output.classesDirs
+        classpath = sourceSets.test.get().runtimeClasspath
+        systemProperty("micronaut.environments", integration.environment)
+    }
 }
 
 graalvmNative {
