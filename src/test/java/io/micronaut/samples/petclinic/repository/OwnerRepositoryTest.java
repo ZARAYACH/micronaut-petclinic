@@ -21,19 +21,19 @@ class OwnerRepositoryTest {
 
     @Test
     void shouldFindOwnerByLastName() {
-        Collection<Owner> owners = ownerRepository.findByLastNameContainingIgnoreCase("Davis", Sort.of(Sort.Order.asc("lastName")));
+        Collection<Owner> owners = ownerRepository.findByLastNameContainsIgnoreCase("Davis", Sort.of(Sort.Order.asc("lastName")));
         assertThat(owners).hasSize(2);
     }
 
     @Test
     void shouldFindOwnerByLastNameCaseInsensitive() {
-        Collection<Owner> owners = ownerRepository.findByLastNameContainingIgnoreCase("davis", Sort.of(Sort.Order.asc("lastName")));
+        Collection<Owner> owners = ownerRepository.findByLastNameContainsIgnoreCase("davis", Sort.of(Sort.Order.asc("lastName")));
         assertThat(owners).hasSize(2);
     }
 
     @Test
     void shouldFindOwnerByLastNamePartialMatch() {
-        Collection<Owner> owners = ownerRepository.findByLastNameContainingIgnoreCase("Dav", Sort.of(Sort.Order.asc("lastName")));
+        Collection<Owner> owners = ownerRepository.findByLastNameContainsIgnoreCase("Dav", Sort.of(Sort.Order.asc("lastName")));
         assertThat(owners).hasSize(2);
     }
 

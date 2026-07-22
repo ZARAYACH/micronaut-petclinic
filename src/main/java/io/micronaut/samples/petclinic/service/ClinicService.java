@@ -97,7 +97,7 @@ public class ClinicService {
      * @return collection of matching owners
      */
     public Collection<Owner> findOwnerByLastName(String lastName) {
-        return ownerRepository.findByLastNameContainingIgnoreCase(lastName, Sort.of(Sort.Order.asc("lastName")));
+        return ownerRepository.findByLastNameContainsIgnoreCase(lastName, Sort.of(Sort.Order.asc("lastName")));
     }
 
     /**

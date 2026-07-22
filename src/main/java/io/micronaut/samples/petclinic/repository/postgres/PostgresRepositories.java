@@ -3,7 +3,9 @@ package io.micronaut.samples.petclinic.repository.postgres;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
+import io.micronaut.data.model.Sort;
 import io.micronaut.data.model.query.builder.sql.Dialect;
+import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.Speciality;
 import io.micronaut.samples.petclinic.model.VetWithSpecialities;
@@ -33,6 +35,23 @@ public final class PostgresRepositories {
     @Requires(env = "postgres")
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresOwnerRepository extends OwnerRepository {
+
+        //ignoring the sort because this version of micronaut data has bug
+        //TODO:remove this when on micronaut data version 5.1.x and upwards.
+        @Override
+        default Collection<Owner>  findByLastNameIlike(String lastName, Sort sort) {
+            return findByLastName(lastName);
+        }
+
+        @Override
+        default Collection<Owner> findByLastNameContainsIgnoreCase(String lastName, Sort sort) {
+            return findByLastNameContainsIgnoreCase(lastName);
+        }
+
+        @Override
+        default List<Owner> findAll(Sort sort) {
+            return findAll();
+        }
     }
 
     /**
@@ -48,7 +67,9 @@ public final class PostgresRepositories {
          * @return pets belonging to the owner
          */
         @Override
-        @Query(value = "SELECT p.* FROM PETS p WHERE p.OWNER_ID = :ownerId ORDER BY p.NAME", nativeQuery = true)
+        @Query(value = """
+                SELECT p.* FROM "PETS" p WHERE p."OWNER_ID" = :ownerId ORDER BY p."NAME"
+                """, nativeQuery = true)
         Collection<Pet> findByOwnerId(Integer ownerId);
 
         /**
@@ -58,7 +79,9 @@ public final class PostgresRepositories {
          * @return pets belonging to the supplied owners
          */
         @Override
-        @Query(value = "SELECT p.* FROM PETS p WHERE p.OWNER_ID IN (:ownerIds) ORDER BY p.OWNER_ID, p.NAME", nativeQuery = true)
+        @Query(value = """
+                SELECT p.* FROM "PETS" p WHERE p."OWNER_ID" IN (:ownerIds) ORDER BY p."OWNER_ID", p."NAME"
+                """, nativeQuery = true)
         List<Pet> findByOwnerIdIn(List<Integer> ownerIds);
     }
 
@@ -93,17 +116,17 @@ public final class PostgresRepositories {
         @Query(value = """
                 SELECT
                     v.id,
-                    v.FIRST_NAME AS first_name,
-                    v.LAST_NAME AS last_name,
+                    v."FIRST_NAME" AS first_name,
+                    v."LAST_NAME" AS last_name,
                     STRING_AGG(
-                        CASE WHEN s.id IS NOT NULL THEN s.id::text || ':' || s.NAME END,
-                        '|' ORDER BY s.NAME
+                        CASE WHEN s.id IS NOT NULL THEN s.id::text || ':' || s."NAME" END,
+                        '|' ORDER BY s."NAME"
                     ) AS speciality_rows
-                FROM VETS v
-                LEFT JOIN VET_SPECIALTIES vs ON vs.VET_ID = v.id
-                LEFT JOIN SPECIALTIES s ON s.id = vs.SPECIALTY_ID
-                GROUP BY v.id, v.FIRST_NAME, v.LAST_NAME
-                ORDER BY v.LAST_NAME
+                FROM "VETS" v
+                LEFT JOIN "VET_SPECIALTIES" vs ON vs."VET_ID" = v.id
+                LEFT JOIN "SPECIALTIES" s ON s.id = vs."SPECIALTY_ID"
+                GROUP BY v.id, v."FIRST_NAME", v."LAST_NAME"
+                ORDER BY v."LAST_NAME"
                 """, nativeQuery = true)
         Collection<VetWithSpecialities> findAllWithSpecialities();
     }
@@ -121,7 +144,9 @@ public final class PostgresRepositories {
          * @return visits for the pet
          */
         @Override
-        @Query(value = "SELECT v.* FROM VISITS v WHERE v.PET_ID = :petId ORDER BY v.VISIT_DATE DESC", nativeQuery = true)
+        @Query(value = """
+            SELECT v.* FROM "VISITS" v WHERE v."PET_ID" = :petId ORDER BY v."VISIT_DATE" DESC
+                        """, nativeQuery = true)
         Collection<Visit> findByPetId(Integer petId);
     }
 
@@ -138,7 +163,9 @@ public final class PostgresRepositories {
          * @return specialities associated with the vet
          */
         @Override
-        @Query(value = "SELECT s.* FROM SPECIALTIES s JOIN VET_SPECIALTIES vs ON vs.SPECIALTY_ID = s.id WHERE vs.VET_ID = :vetId ORDER BY s.NAME", nativeQuery = true)
+        @Query(value = """
+                SELECT s.* FROM "SPECIALTIES" s JOIN "VET_SPECIALTIES" vs ON vs."SPECIALTY_ID" = s.id WHERE vs."VET_ID" = :vetId ORDER BY s."NAME"
+                """, nativeQuery = true)
         List<Speciality> findSpecialitiesByVetId(Integer vetId);
     }
 
