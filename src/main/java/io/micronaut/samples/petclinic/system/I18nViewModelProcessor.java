@@ -1,11 +1,11 @@
 package io.micronaut.samples.petclinic.system;
 
 import io.micronaut.context.MessageSource;
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.views.ModelAndView;
 import io.micronaut.views.model.ViewModelProcessor;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -15,7 +15,7 @@ import java.util.Map;
  * Enrich every view model with i18n helpers.
  */
 @Singleton
-public class I18nViewModelProcessor implements ViewModelProcessor<Object> {
+public class I18nViewModelProcessor implements ViewModelProcessor<Object, HttpRequest<?>> {
 
     private final MessageSource messageSource;
     private final io.micronaut.http.server.util.locale.HttpLocaleResolver httpLocaleResolver;
@@ -31,6 +31,7 @@ public class I18nViewModelProcessor implements ViewModelProcessor<Object> {
         this.messageSource = messageSource;
         this.httpLocaleResolver = httpLocaleResolver;
     }
+
 
     /**
      * Adds locale, message, and request helpers to the view model.

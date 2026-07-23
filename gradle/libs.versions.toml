@@ -1,12 +1,12 @@
 [versions]
-micronaut-platform = "4.10.17"
-micronaut-gradle-plugin = "4.6.2"
-micronaut-sourcegen = "1.8.5"
+micronaut-platform = "5.0.5"
+micronaut-gradle-plugin = "5.0.2"
+micronaut-sourcegen = "2.1.0"
 ojdbc = "23.26.2.0.0"
 mysql = "9.3.0"
 postgresql = "42.7.11"
 logback = "1.5.37"
-graalvm-native = "1.1.5"
+graalvm-native = "1.1.6"
 jte = "3.2.4"
 
 [libraries]
