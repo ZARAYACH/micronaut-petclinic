@@ -88,7 +88,7 @@ graalvmNative {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(21)
+    options.release.set(25)
     options.compilerArgs.addAll(
         listOf(
             "-Amicronaut.processing.group=io.micronaut.samples",
