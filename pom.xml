@@ -15,15 +15,15 @@
     <parent>
         <groupId>io.micronaut.platform</groupId>
         <artifactId>micronaut-parent</artifactId>
-        <version>5.0.3</version>
+        <version>5.0.5</version>
     </parent>
 
     <properties>
         <packaging>jar</packaging>
         <jdk.version>25</jdk.version>
         <release.version>25</release.version>
-        <micronaut.version>5.0.3</micronaut.version>
-        <micronaut.sourcegen.version>1.8.5</micronaut.sourcegen.version>
+        <micronaut.version>5.0.5</micronaut.version>
+        <micronaut.sourcegen.version>2.1.0</micronaut.sourcegen.version>
         <micronaut.runtime>netty</micronaut.runtime>
         <micronaut.aot.enabled>false</micronaut.aot.enabled>
         <exec.mainClass>io.micronaut.samples.petclinic.Application</exec.mainClass>
