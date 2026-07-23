@@ -7,6 +7,7 @@ micronaut:
     jte:
       dynamic: false
 
+
 # Test datasource configuration (H2 in-memory)
 datasources:
   default:
@@ -21,3 +22,15 @@ datasources:
 petclinic:
   sample-data:
     enabled: true
+
+endpoints:
+  info:
+    sensitive: false
+  health:
+    details-visible: authenticated
+    jdbc:
+      enabled: true
+
+info:
+  application:
+    name: ${micronaut.application.name}

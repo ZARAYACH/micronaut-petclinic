@@ -1,12 +1,12 @@
 [versions]
-micronaut-platform = "4.10.16"
+micronaut-platform = "4.10.17"
 micronaut-gradle-plugin = "4.6.2"
 micronaut-sourcegen = "1.8.5"
 ojdbc = "23.26.2.0.0"
 mysql = "9.3.0"
 postgresql = "42.7.11"
-logback = "1.5.35"
-graalvm-native = "1.1.2"
+logback = "1.5.37"
+graalvm-native = "1.1.5"
 jte = "3.2.4"
 spring-security-crypto = "6.5.11"
 
@@ -31,6 +31,7 @@ micronaut-test-junit5 = { module = "io.micronaut.test:micronaut-test-junit5" }
 micronaut-security = { module = "io.micronaut.security:micronaut-security" }
 micronaut-security-session = { module = "io.micronaut.security:micronaut-security-session" }
 micronaut-reactor = { module = "io.micronaut.reactor:micronaut-reactor" }
+micronaut-managment = { module = "io.micronaut:micronaut-management"}
 
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api" }
 h2 = { module = "com.h2database:h2" }

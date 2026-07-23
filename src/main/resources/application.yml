@@ -55,3 +55,15 @@ logger:
   levels:
     io.micronaut.samples.petclinic: DEBUG
     io.micronaut.data: DEBUG
+
+endpoints:
+  info:
+    sensitive: false
+  health:
+    details-visible: authenticated
+    jdbc:
+      enabled: true
+
+info:
+  application:
+    name: ${micronaut.application.name}
