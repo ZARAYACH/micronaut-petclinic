@@ -4,6 +4,8 @@ import io.micronaut.data.annotation.Query;
 import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.repository.CrudRepository;
 import io.micronaut.samples.petclinic.model.Visit;
+
+import java.time.LocalDate;
 import java.util.Collection;
 
 /**
@@ -19,4 +21,11 @@ public interface VisitRepository extends CrudRepository<Visit, Integer> {
      * @return collection of visits for the pet
      */
     Collection<Visit> findByPetId(Integer petId);
+
+    /**
+     * Find all visits for a specific visit date.
+     * @param date the visit date
+     * @return collection of visits for the supplied date
+     */
+    Collection<Visit> findByDate(LocalDate date);
 }

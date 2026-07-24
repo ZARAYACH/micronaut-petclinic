@@ -123,6 +123,10 @@ public final class PostgresRepositories {
         @Override
         @Query(value = "SELECT v.* FROM VISITS v WHERE v.PET_ID = :petId ORDER BY v.VISIT_DATE DESC", nativeQuery = true)
         Collection<Visit> findByPetId(Integer petId);
+
+        @Override
+        @Query(value = "SELECT v.* FROM VISITS v WHERE v.VISIT_DATE = :date ORDER BY v.PET_ID, v.id", nativeQuery = true)
+        Collection<Visit> findByDate(LocalDate date);
     }
 
     /**

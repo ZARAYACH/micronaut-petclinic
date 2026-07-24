@@ -24,6 +24,7 @@ import io.micronaut.samples.petclinic.repository.VisitRepository;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -49,6 +50,7 @@ public class ClinicService {
     private final SpecialityRepository specialityRepository;
     private final VetSpecialityRepository vetSpecialityRepository;
     private final ClinicRepository clinicRepository;
+    private final VisitNotificationService visitNotificationService;
 
     /**
      * Creates the service facade with its repository dependencies.
@@ -61,15 +63,17 @@ public class ClinicService {
      * @param specialityRepository repository for specialities
      * @param vetSpecialityRepository repository for vet-speciality join rows
      * @param clinicRepository repository for clinic locations
+     * @param visitNotificationService service for visit-related notifications
      */
     public ClinicService(OwnerRepository ownerRepository,
                          PetRepository petRepository,
-                         PetTypeRepository petTypeRepository,
-                         VisitRepository visitRepository,
-                         VetRepository vetRepository,
-                         SpecialityRepository specialityRepository,
-                         VetSpecialityRepository vetSpecialityRepository,
-                         ClinicRepository clinicRepository) {
+                          PetTypeRepository petTypeRepository,
+                          VisitRepository visitRepository,
+                          VetRepository vetRepository,
+                          SpecialityRepository specialityRepository,
+                          VetSpecialityRepository vetSpecialityRepository,
+                          VisitNotificationService visitNotificationService
+                          ClinicRepository clinicRepository) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
         this.petTypeRepository = petTypeRepository;
@@ -78,6 +82,7 @@ public class ClinicService {
         this.specialityRepository = specialityRepository;
         this.vetSpecialityRepository = vetSpecialityRepository;
         this.clinicRepository = clinicRepository;
+        this.visitNotificationService = visitNotificationService;
     }
 
     // ========== Owner Operations ==========
@@ -213,17 +218,27 @@ public class ClinicService {
     }
 
     /**
+     * Find all visits scheduled for a specific date.
+     * @param date the visit date
+     * @return visits scheduled for that date
+     */
+    public Collection<Visit> findVisitsByDate(LocalDate date) {
+        return visitRepository.findByDate(date);
+    }
+
+    /**
      * Save a visit (create or update).
      * @param visit the visit to save
      * @return the persisted visit returned by the repository
      */
     @Transactional
     public Visit saveVisit(Visit visit) {
-        if (visit.isNew()) {
-            return visitRepository.save(visit);
-        } else {
-            return visitRepository.update(visit);
+        boolean isNew = visit.isNew();
+        Visit savedVisit = isNew ? visitRepository.save(visit) : visitRepository.update(visit);
+        if (isNew) {
+            visitNotificationService.sendVisitConfirmation(savedVisit);
         }
+        return savedVisit;
     }
 
     /**
