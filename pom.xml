@@ -29,8 +29,8 @@
         <exec.mainClass>io.micronaut.samples.petclinic.Application</exec.mainClass>
         <jte.version>3.2.4</jte.version>
         <h2gis.version>2.2.5</h2gis.version>
-        <graalvm.buildtools.version>1.1.6</graalvm.buildtools.version>
-        <graalvm.svm.version>23.0.2</graalvm.svm.version>
+        <maven.native.plugin.version>1.1.6</maven.native.plugin.version>
+        <maven.shared.utils.version>3.4.2</maven.shared.utils.version>
     </properties>
 
     <dependencies>
@@ -163,12 +163,6 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.graalvm.nativeimage</groupId>
-            <artifactId>svm</artifactId>
-            <version>${graalvm.svm.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -279,7 +273,14 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>${graalvm.buildtools.version}</version>
+                        <version>${maven.native.plugin.version}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.maven.shared</groupId>
+                                <artifactId>maven-shared-utils</artifactId>
+                                <version>${maven.shared.utils.version}</version>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <id>native-compile</id>
