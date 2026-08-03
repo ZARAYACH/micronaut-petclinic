@@ -1,6 +1,10 @@
 package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.cache.annotation.Cacheable;
+import io.micronaut.context.BeanProvider;
+import io.micronaut.data.model.geo.LineString;
+import io.micronaut.data.model.geo.Point;
+import io.micronaut.data.model.geo.Polygon;
 import io.micronaut.samples.petclinic.model.*;
 import io.micronaut.samples.petclinic.repository.*;
 import jakarta.inject.Singleton;
@@ -27,6 +31,7 @@ public class ClinicService {
     private final VetRepository vetRepository;
     private final SpecialityRepository specialityRepository;
     private final VetSpecialityRepository vetSpecialityRepository;
+    private final BeanProvider<ClinicRepository> clinicRepository;
 
     /**
      * Creates the service facade with its repository dependencies.
@@ -38,14 +43,16 @@ public class ClinicService {
      * @param vetRepository repository for vets
      * @param specialityRepository repository for specialities
      * @param vetSpecialityRepository repository for vet-speciality join rows
+     * @param clinicRepository optional Oracle Spatial clinic repository
      */
     public ClinicService(OwnerRepository ownerRepository,
                          PetRepository petRepository,
-                          PetTypeRepository petTypeRepository,
-                          VisitRepository visitRepository,
-                          VetRepository vetRepository,
-                          SpecialityRepository specialityRepository,
-                          VetSpecialityRepository vetSpecialityRepository) {
+                         PetTypeRepository petTypeRepository,
+                         VisitRepository visitRepository,
+                         VetRepository vetRepository,
+                         SpecialityRepository specialityRepository,
+                         VetSpecialityRepository vetSpecialityRepository,
+                         BeanProvider<ClinicRepository> clinicRepository) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
         this.petTypeRepository = petTypeRepository;
@@ -53,6 +60,7 @@ public class ClinicService {
         this.vetRepository = vetRepository;
         this.specialityRepository = specialityRepository;
         this.vetSpecialityRepository = vetSpecialityRepository;
+        this.clinicRepository = clinicRepository;
     }
 
     // ========== Owner Operations ==========
@@ -268,5 +276,63 @@ public class ClinicService {
      */
     public Optional<Speciality> findSpecialityById(Integer id) {
         return specialityRepository.findById(id);
+    }
+
+    /**
+     * Finds physical clinic branches near a WGS 84 coordinate.
+     *
+     * @param longitude the longitude coordinate
+     * @param latitude the latitude coordinate
+     * @param radiusMeters the search radius in meters
+     * @return nearby clinics
+     */
+    public List<Clinic> findClinicsNear(double longitude, double latitude, double radiusMeters) {
+        return clinicRepository.get().findByLocationNear(new Point(longitude, latitude), radiusMeters);
+    }
+
+    /**
+     * Finds clinics whose location falls within the supplied bounding box.
+     *
+     * @param minLongitude western bound
+     * @param minLatitude southern bound
+     * @param maxLongitude eastern bound
+     * @param maxLatitude northern bound
+     * @return clinics inside the polygon
+     */
+    public List<Clinic> findClinicsWithinBounds(double minLongitude,
+                                                double minLatitude,
+                                                double maxLongitude,
+                                                double maxLatitude) {
+        return clinicRepository.get().findByLocationGeoWithin(toBoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
+    }
+
+    /**
+     * Finds clinics whose location intersects the supplied bounding box.
+     *
+     * @param minLongitude western bound
+     * @param minLatitude southern bound
+     * @param maxLongitude eastern bound
+     * @param maxLatitude northern bound
+     * @return clinics intersecting the polygon
+     */
+    public List<Clinic> findClinicsIntersectingBounds(double minLongitude,
+                                                      double minLatitude,
+                                                      double maxLongitude,
+                                                      double maxLatitude) {
+        return clinicRepository.get().findByLocationGeoIntersects(toBoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
+    }
+
+    private static Polygon toBoundingBox(double minLongitude,
+                                         double minLatitude,
+                                         double maxLongitude,
+                                         double maxLatitude) {
+        LineString shell = new LineString(List.of(
+                new Point(minLongitude, minLatitude),
+                new Point(minLongitude, maxLatitude),
+                new Point(maxLongitude, maxLatitude),
+                new Point(maxLongitude, minLatitude),
+                new Point(minLongitude, minLatitude)
+        ));
+        return new Polygon(List.of(shell));
     }
 }

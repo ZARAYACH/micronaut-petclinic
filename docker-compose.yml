@@ -46,7 +46,7 @@ services:
       - mysql
 
   postgres:
-    image: postgres:18.4
+    image: postgis/postgis:18-3.6
     ports:
       - "5432:5432"
     environment:
@@ -55,6 +55,7 @@ services:
       POSTGRES_PASSWORD: petclinic
     volumes:
       - postgres_data:/var/lib/postgresql
+      - ./docker/postgres:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U petclinic"]
       timeout: 5s

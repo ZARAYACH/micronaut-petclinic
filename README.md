@@ -57,6 +57,14 @@ docker-compose --profile oracle up
 
 > **Note:** The default configuration uses an ARM64 image for Apple Silicon Macs. For x86/AMD64 machines, update the image in `docker-compose.yml` to `container-registry.oracle.com/database/free:latest`.
 
+The Oracle profile also includes a Micronaut Data geospatial example backed by Oracle Spatial. It stores sample clinic branches as WGS 84 `Point` values and uses a derived `Near` repository method that Micronaut Data compiles to Oracle `SDO_WITHIN_DISTANCE`.
+
+Open http://localhost:8080/clinics to try the nearby-clinic search page.
+
+```bash
+curl "http://localhost:8080/clinics/nearby?latitude=43.0731&longitude=-89.4012&radiusMeters=5000"
+```
+
 ### MySQL
 
 ```bash

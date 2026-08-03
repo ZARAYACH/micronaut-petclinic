@@ -1,0 +1,71 @@
+package io.micronaut.samples.petclinic.model;
+
+import io.micronaut.data.annotation.GeneratedValue;
+import io.micronaut.data.annotation.Id;
+import io.micronaut.data.annotation.Index;
+import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.data.annotation.MappedProperty;
+import io.micronaut.data.annotation.Srid;
+import io.micronaut.data.model.geo.Point;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+/**
+ * Entity representing a physical pet clinic branch.
+ * <p>
+ * The {@code location} property uses WGS 84 coordinates. In Micronaut Data's
+ * {@link Point} model, {@code x} is longitude and {@code y} is latitude.
+ *
+ * @param id the database identifier, or {@code null} for a new clinic
+ * @param name the display name of the clinic branch
+ * @param address the street address
+ * @param city the city
+ * @param location the geospatial point for the branch
+ */
+@MappedEntity("CLINICS")
+@Serdeable
+public record Clinic(
+        @Id
+        @GeneratedValue
+        Integer id,
+
+        @MappedProperty("NAME")
+        @NotBlank
+        String name,
+
+        @MappedProperty("ADDRESS")
+        @NotBlank
+        String address,
+
+        @MappedProperty("CITY")
+        @NotBlank
+        String city,
+
+        @Srid(4326)
+        @Index(columns = "LOCATION")
+        @MappedProperty("LOCATION")
+        @NotNull
+        Point location
+) {
+
+    /**
+     * Creates an empty clinic for framework binding.
+     */
+    public Clinic() {
+        this(null, null, null, null, null);
+    }
+
+    /**
+     * Creates a new clinic without an id.
+     *
+     * @param name the display name
+     * @param address the street address
+     * @param city the city
+     * @param longitude the longitude coordinate
+     * @param latitude the latitude coordinate
+     */
+    public Clinic(String name, String address, String city, double longitude, double latitude) {
+        this(null, name, address, city, new Point(longitude, latitude));
+    }
+}

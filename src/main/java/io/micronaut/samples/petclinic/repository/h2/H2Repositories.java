@@ -4,8 +4,6 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
-import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.data.repository.GenericRepository;
 import io.micronaut.samples.petclinic.model.*;
 import io.micronaut.samples.petclinic.repository.*;
 import java.util.Collection;
@@ -131,5 +129,10 @@ public final class H2Repositories {
         @Override
         @Query(value = "SELECT s.* FROM SPECIALTIES s JOIN VET_SPECIALTIES vs ON vs.SPECIALTY_ID = s.id WHERE vs.VET_ID = :vetId ORDER BY s.NAME", nativeQuery = true)
         List<Speciality> findSpecialitiesByVetId(Integer vetId);
+    }
+
+    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @JdbcRepository(dialect = Dialect.H2)
+    public interface H2ClinicRepository extends ClinicRepository {
     }
 }
