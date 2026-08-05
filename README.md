@@ -57,14 +57,6 @@ docker-compose --profile oracle up
 
 > **Note:** The default configuration uses an ARM64 image for Apple Silicon Macs. For x86/AMD64 machines, update the image in `docker-compose.yml` to `container-registry.oracle.com/database/free:latest`.
 
-The Oracle profile also includes a Micronaut Data geospatial example backed by Oracle Spatial. It stores sample clinic branches as WGS 84 `Point` values and uses a derived `Near` repository method that Micronaut Data compiles to Oracle `SDO_WITHIN_DISTANCE`.
-
-Open http://localhost:8080/clinics to try the nearby-clinic search page.
-
-```bash
-curl "http://localhost:8080/clinics/nearby?latitude=43.0731&longitude=-89.4012&radiusMeters=5000"
-```
-
 ### MySQL
 
 ```bash
@@ -185,6 +177,19 @@ Use the language selector in the top-right corner to switch between:
 - Spanish (Español)
 - German (Deutsch)
 
+### Geospatial Clinic Search
+
+The application also includes a Micronaut Data geospatial example. It stores sample clinic branches as WGS 84 `Point` values (SRID 4326) and exposes three derived repository methods through `ClinicRepository`: `findByLocationNear`, `findByLocationGeoWithin`, and `findByLocationGeoIntersects`. Micronaut Data translates those derived methods to the spatial functions/operators of the active dialect. For example, `Near` is compiled to Oracle `SDO_WITHIN_DISTANCE` when the Oracle profile is active.
+
+Open http://localhost:8080/clinics to try the clinic search page.
+
+Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding box, and `intersects` for clinics whose location intersects a bounding box. In this sample, clinic locations are stored as points, so `within` and `intersects` usually return the same rows for the same box, but they still represent different spatial predicates.
+
+```bash
+curl "http://localhost:8080/clinics/nearby?latitude=43.0731&longitude=-89.4012&radiusMeters=5000"
+curl "http://localhost:8080/clinics/within?minLatitude=43.0000&minLongitude=-89.5500&maxLatitude=43.2000&maxLongitude=-89.2000"
+curl "http://localhost:8080/clinics/intersects?minLatitude=43.0000&minLongitude=-89.5500&maxLatitude=43.2000&maxLongitude=-89.2000"
+```
 ---
 
 ## Project Structure
