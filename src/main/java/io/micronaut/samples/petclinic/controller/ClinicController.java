@@ -1,12 +1,16 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.data.model.geo.Point;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.samples.petclinic.dto.ClinicDto;
+import io.micronaut.samples.petclinic.dto.ClinicPolygonRequest;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
 
@@ -110,6 +114,22 @@ public class ClinicController {
     }
 
     /**
+     * Returns clinics whose location falls within the supplied polygon.
+     *
+     * @param request polygon search request
+     * @return matching clinics
+     */
+    @Post(value = "/within", consumes = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<ClinicDto> withinPolygon(@Body ClinicPolygonRequest request) {
+        return clinicService.findClinicsWithinPolygon(request.coordinates().stream()
+                        .map(coordinate -> new Point(coordinate.longitude(), coordinate.latitude()))
+                        .toList()).stream()
+                .map(ClinicDto::from)
+                .toList();
+    }
+
+    /**
      * Returns clinics whose location intersects the supplied bounding box boundary.
      *
      * @param minLatitude minimum latitude
@@ -125,6 +145,22 @@ public class ClinicController {
                                       @QueryValue double maxLatitude,
                                       @QueryValue double maxLongitude) {
         return clinicService.findClinicsIntersectingBoundary(minLongitude, minLatitude, maxLongitude, maxLatitude).stream()
+                .map(ClinicDto::from)
+                .toList();
+    }
+
+    /**
+     * Returns clinics whose location intersects the supplied polygon boundary.
+     *
+     * @param request polygon search request
+     * @return matching clinics
+     */
+    @Post(value = "/intersects", consumes = MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<ClinicDto> intersectsPolygon(@Body ClinicPolygonRequest request) {
+        return clinicService.findClinicsIntersectingBoundary(request.coordinates().stream()
+                        .map(coordinate -> new Point(coordinate.longitude(), coordinate.latitude()))
+                        .toList()).stream()
                 .map(ClinicDto::from)
                 .toList();
     }

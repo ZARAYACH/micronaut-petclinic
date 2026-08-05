@@ -33,8 +33,8 @@ public interface ClinicRepository extends CrudRepository<Clinic, Integer> {
      * Finds clinics within the supplied distance of a point.
      *
      * @param geometry the search origin; x is longitude and y is latitude when a point is supplied
-     * @param distanceMeters the search radius in meters for WGS 84 data
+     * @param distance the search distance in the geometry coordinate unit
      * @return nearby clinics
      */
-    List<Clinic> findByLocationNear(Geometry geometry, double distanceMeters);
+    List<Clinic> findByLocationNear(Geometry geometry, double distance);
 }

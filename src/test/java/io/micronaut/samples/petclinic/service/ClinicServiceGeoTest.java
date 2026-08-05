@@ -20,7 +20,7 @@ class ClinicServiceGeoTest {
 
     @Test
     void shouldFindClinicsNearPoint() {
-        Collection<Clinic> clinics = clinicService.findClinicsNear(-89.3840, 43.0745, 0.003);
+        Collection<Clinic> clinics = clinicService.findClinicsNear(-89.3840, 43.0745, 350);
         assertThat(clinics).isNotEmpty();
         assertThat(clinics).extracting(Clinic::name)
                 .contains("Downtown Madison Pet Clinic", "Capitol Square Pet Clinic")
@@ -29,8 +29,8 @@ class ClinicServiceGeoTest {
 
     @Test
     void shouldExpandClinicsAsNearbyRadiusGrows() {
-        Collection<Clinic> smallRadiusClinics = clinicService.findClinicsNear(-89.3840, 43.0745, 0.003);
-        Collection<Clinic> largerRadiusClinics = clinicService.findClinicsNear(-89.3840, 43.0745, 0.05);
+        Collection<Clinic> smallRadiusClinics = clinicService.findClinicsNear(-89.3840, 43.0745, 350);
+        Collection<Clinic> largerRadiusClinics = clinicService.findClinicsNear(-89.3840, 43.0745, 5000);
 
         assertThat(smallRadiusClinics).isNotEmpty();
         assertThat(largerRadiusClinics.size()).isGreaterThan(smallRadiusClinics.size());

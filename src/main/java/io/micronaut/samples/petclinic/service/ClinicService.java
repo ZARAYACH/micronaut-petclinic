@@ -24,6 +24,7 @@ import io.micronaut.samples.petclinic.repository.VisitRepository;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,6 +38,8 @@ import java.util.stream.Collectors;
  */
 @Singleton
 public class ClinicService {
+
+    private static final double WGS84_METERS_PER_DEGREE = 111_320.0;
 
     private final OwnerRepository ownerRepository;
     private final PetRepository petRepository;
@@ -301,7 +304,7 @@ public class ClinicService {
      * @return nearby clinics
      */
     public List<Clinic> findClinicsNear(double longitude, double latitude, double radiusMeters) {
-        return clinicRepository.findByLocationNear(new Point(longitude, latitude), radiusMeters);
+        return clinicRepository.findByLocationNear(new Point(longitude, latitude), toWgs84Degrees(radiusMeters));
     }
 
     /**
@@ -321,6 +324,16 @@ public class ClinicService {
     }
 
     /**
+     * Finds clinics whose location falls within the supplied polygon.
+     *
+     * @param coordinates polygon shell coordinates
+     * @return clinics inside the polygon
+     */
+    public List<Clinic> findClinicsWithinPolygon(List<Point> coordinates) {
+        return clinicRepository.findByLocationGeoWithin(toPolygon(coordinates));
+    }
+
+    /**
      * Finds clinics whose location intersects the supplied bounding box boundary.
      *
      * @param minLongitude western bound
@@ -334,6 +347,16 @@ public class ClinicService {
                                                         double maxLongitude,
                                                         double maxLatitude) {
         return clinicRepository.findByLocationGeoIntersects(toBoundingBoxShell(minLongitude, minLatitude, maxLongitude, maxLatitude));
+    }
+
+    /**
+     * Finds clinics whose location intersects the supplied line.
+     *
+     * @param coordinates line coordinates
+     * @return clinics intersecting the line
+     */
+    public List<Clinic> findClinicsIntersectingBoundary(List<Point> coordinates) {
+        return clinicRepository.findByLocationGeoIntersects(toLineString(coordinates));
     }
 
     private static Polygon toBoundingBox(double minLongitude,
@@ -354,5 +377,36 @@ public class ClinicService {
                 new Point(maxLongitude, minLatitude),
                 new Point(minLongitude, minLatitude)
         ));
+    }
+
+    private static Polygon toPolygon(List<Point> coordinates) {
+        return new Polygon(List.of(toClosedLineString(coordinates)));
+    }
+
+    private static LineString toLineString(List<Point> coordinates) {
+        if (coordinates == null || coordinates.size() < 2) {
+            throw new IllegalArgumentException("A line search requires at least two coordinates");
+        }
+        if (coordinates.size() >= 3) {
+            return toClosedLineString(coordinates);
+        }
+        return new LineString(new ArrayList<>(coordinates));
+    }
+
+    private static LineString toClosedLineString(List<Point> coordinates) {
+        if (coordinates == null || coordinates.size() < 3) {
+            throw new IllegalArgumentException("A polygon search requires at least three coordinates");
+        }
+        List<Point> shell = new ArrayList<>(coordinates);
+        Point first = shell.getFirst();
+        Point last = shell.getLast();
+        if (first.x() != last.x() || first.y() != last.y()) {
+            shell.add(first);
+        }
+        return new LineString(shell);
+    }
+
+    private static double toWgs84Degrees(double meters) {
+        return meters / WGS84_METERS_PER_DEGREE;
     }
 }
