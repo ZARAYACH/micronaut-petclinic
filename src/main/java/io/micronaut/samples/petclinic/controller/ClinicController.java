@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.List;
 
 /**
- * Controller for Oracle Spatial clinic lookup examples.
+ * Controller for clinic geospatial lookup examples.
  */
 @Controller("/clinics")
 public class ClinicController {
@@ -49,13 +49,13 @@ public class ClinicController {
                                            @QueryValue(defaultValue = "43.0731") double latitude,
                                            @QueryValue(defaultValue = "-89.4012") double longitude,
                                            @QueryValue(defaultValue = "5000") double radiusMeters,
-                                           @QueryValue(defaultValue = "43.0000") double minLatitude,
-                                           @QueryValue(defaultValue = "-89.5500") double minLongitude,
-                                           @QueryValue(defaultValue = "43.2000") double maxLatitude,
-                                           @QueryValue(defaultValue = "-89.2000") double maxLongitude) {
+                                           @QueryValue(defaultValue = "43.0753") double minLatitude,
+                                           @QueryValue(defaultValue = "-89.5186") double minLongitude,
+                                           @QueryValue(defaultValue = "43.1836") double maxLatitude,
+                                           @QueryValue(defaultValue = "-89.2137") double maxLongitude) {
         List<ClinicDto> clinics = (switch (mode) {
             case "within" -> clinicService.findClinicsWithinBounds(minLongitude, minLatitude, maxLongitude, maxLatitude);
-            case "intersects" -> clinicService.findClinicsIntersectingBounds(minLongitude, minLatitude, maxLongitude, maxLatitude);
+            case "intersects" -> clinicService.findClinicsIntersectingBoundary(minLongitude, minLatitude, maxLongitude, maxLatitude);
             default -> clinicService.findClinicsNear(longitude, latitude, radiusMeters);
         }).stream().map(ClinicDto::from).toList();
         return Map.of(
@@ -110,7 +110,7 @@ public class ClinicController {
     }
 
     /**
-     * Returns clinics whose location intersects the supplied bounding box.
+     * Returns clinics whose location intersects the supplied bounding box boundary.
      *
      * @param minLatitude minimum latitude
      * @param minLongitude minimum longitude
@@ -124,7 +124,7 @@ public class ClinicController {
                                       @QueryValue double minLongitude,
                                       @QueryValue double maxLatitude,
                                       @QueryValue double maxLongitude) {
-        return clinicService.findClinicsIntersectingBounds(minLongitude, minLatitude, maxLongitude, maxLatitude).stream()
+        return clinicService.findClinicsIntersectingBoundary(minLongitude, minLatitude, maxLongitude, maxLatitude).stream()
                 .map(ClinicDto::from)
                 .toList();
     }

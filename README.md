@@ -183,12 +183,12 @@ The application also includes a Micronaut Data geospatial example. It stores sam
 
 Open http://localhost:8080/clinics to try the clinic search page.
 
-Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding box, and `intersects` for clinics whose location intersects a bounding box. In this sample, clinic locations are stored as points, so `within` and `intersects` usually return the same rows for the same box, but they still represent different spatial predicates.
+Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding-box polygon, and `intersects` for clinics whose location intersects the bounding-box boundary. Using a boundary `LineString` for `intersects` makes the example distinct from `within`, which uses a filled `Polygon`.
 
 ```bash
 curl "http://localhost:8080/clinics/nearby?latitude=43.0731&longitude=-89.4012&radiusMeters=5000"
 curl "http://localhost:8080/clinics/within?minLatitude=43.0000&minLongitude=-89.5500&maxLatitude=43.2000&maxLongitude=-89.2000"
-curl "http://localhost:8080/clinics/intersects?minLatitude=43.0000&minLongitude=-89.5500&maxLatitude=43.2000&maxLongitude=-89.2000"
+curl "http://localhost:8080/clinics/intersects?minLatitude=43.0753&minLongitude=-89.5186&maxLatitude=43.1836&maxLongitude=-89.2137"
 ```
 ---
 

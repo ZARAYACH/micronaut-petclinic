@@ -29,6 +29,6 @@ class ClinicControllerTest {
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
         assertThat(response.body()).contains("Find Nearby Clinics");
         assertThat(response.body()).contains("Clinics Within Area");
-        assertThat(response.body()).contains("Clinics Intersecting Area");
+        assertThat(response.body()).contains("Clinics Intersecting Boundary");
     }
 }

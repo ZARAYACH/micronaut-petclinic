@@ -1,21 +1,35 @@
 package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.cache.annotation.Cacheable;
-import io.micronaut.context.BeanProvider;
+import io.micronaut.data.model.Sort;
 import io.micronaut.data.model.geo.LineString;
 import io.micronaut.data.model.geo.Point;
 import io.micronaut.data.model.geo.Polygon;
-import io.micronaut.samples.petclinic.model.*;
-import io.micronaut.samples.petclinic.repository.*;
+import io.micronaut.samples.petclinic.model.Clinic;
+import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.PetType;
+import io.micronaut.samples.petclinic.model.Speciality;
+import io.micronaut.samples.petclinic.model.Vet;
+import io.micronaut.samples.petclinic.model.VetWithSpecialities;
+import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.repository.ClinicRepository;
+import io.micronaut.samples.petclinic.repository.OwnerRepository;
+import io.micronaut.samples.petclinic.repository.PetRepository;
+import io.micronaut.samples.petclinic.repository.PetTypeRepository;
+import io.micronaut.samples.petclinic.repository.SpecialityRepository;
+import io.micronaut.samples.petclinic.repository.VetRepository;
+import io.micronaut.samples.petclinic.repository.VetSpecialityRepository;
+import io.micronaut.samples.petclinic.repository.VisitRepository;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
+
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import io.micronaut.data.model.Sort;
 
 /**
  * Service class providing business logic for the Pet Clinic application.
@@ -31,7 +45,7 @@ public class ClinicService {
     private final VetRepository vetRepository;
     private final SpecialityRepository specialityRepository;
     private final VetSpecialityRepository vetSpecialityRepository;
-    private final BeanProvider<ClinicRepository> clinicRepository;
+    private final ClinicRepository clinicRepository;
 
     /**
      * Creates the service facade with its repository dependencies.
@@ -52,7 +66,7 @@ public class ClinicService {
                          VetRepository vetRepository,
                          SpecialityRepository specialityRepository,
                          VetSpecialityRepository vetSpecialityRepository,
-                         BeanProvider<ClinicRepository> clinicRepository) {
+                         ClinicRepository clinicRepository) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
         this.petTypeRepository = petTypeRepository;
@@ -287,7 +301,7 @@ public class ClinicService {
      * @return nearby clinics
      */
     public List<Clinic> findClinicsNear(double longitude, double latitude, double radiusMeters) {
-        return clinicRepository.get().findByLocationNear(new Point(longitude, latitude), radiusMeters);
+        return clinicRepository.findByLocationNear(new Point(longitude, latitude), radiusMeters);
     }
 
     /**
@@ -303,36 +317,42 @@ public class ClinicService {
                                                 double minLatitude,
                                                 double maxLongitude,
                                                 double maxLatitude) {
-        return clinicRepository.get().findByLocationGeoWithin(toBoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
+        return clinicRepository.findByLocationGeoWithin(toBoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
     }
 
     /**
-     * Finds clinics whose location intersects the supplied bounding box.
+     * Finds clinics whose location intersects the supplied bounding box boundary.
      *
      * @param minLongitude western bound
      * @param minLatitude southern bound
      * @param maxLongitude eastern bound
      * @param maxLatitude northern bound
-     * @return clinics intersecting the polygon
+     * @return clinics intersecting the boundary line
      */
-    public List<Clinic> findClinicsIntersectingBounds(double minLongitude,
-                                                      double minLatitude,
-                                                      double maxLongitude,
-                                                      double maxLatitude) {
-        return clinicRepository.get().findByLocationGeoIntersects(toBoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
+    public List<Clinic> findClinicsIntersectingBoundary(double minLongitude,
+                                                        double minLatitude,
+                                                        double maxLongitude,
+                                                        double maxLatitude) {
+        return clinicRepository.findByLocationGeoIntersects(toBoundingBoxShell(minLongitude, minLatitude, maxLongitude, maxLatitude));
     }
 
     private static Polygon toBoundingBox(double minLongitude,
                                          double minLatitude,
                                          double maxLongitude,
                                          double maxLatitude) {
-        LineString shell = new LineString(List.of(
+        return new Polygon(List.of(toBoundingBoxShell(minLongitude, minLatitude, maxLongitude, maxLatitude)));
+    }
+
+    private static LineString toBoundingBoxShell(double minLongitude,
+                                                 double minLatitude,
+                                                 double maxLongitude,
+                                                 double maxLatitude) {
+        return new LineString(List.of(
                 new Point(minLongitude, minLatitude),
                 new Point(minLongitude, maxLatitude),
                 new Point(maxLongitude, maxLatitude),
                 new Point(maxLongitude, minLatitude),
                 new Point(minLongitude, minLatitude)
         ));
-        return new Polygon(List.of(shell));
     }
 }
