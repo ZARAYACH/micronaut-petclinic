@@ -32,6 +32,17 @@ class ClinicControllerGeoTest {
     }
 
     @Test
+    void shouldReturnClinicsIntersectingBoundingBoxAsJson() {
+        HttpResponse<String> response = client.toBlocking()
+                .exchange(HttpRequest.GET("/clinics/intersects?minLatitude=43.00&minLongitude=-89.55&maxLatitude=43.20&maxLongitude=-89.20"), String.class);
+
+        assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
+        assertThat(response.body()).contains("West Madison Pet Clinic");
+        assertThat(response.body()).contains("Sun Prairie Pet Clinic");
+        assertThat(response.body()).doesNotContain("Janesville Pet Clinic");
+    }
+
+    @Test
     void shouldReturnNearbyClinicsAsJson() {
         HttpResponse<String> response = client.toBlocking()
                 .exchange(HttpRequest.GET("/clinics/nearby?latitude=43.0745&longitude=-89.3840&radiusMeters=0.003"), String.class);
