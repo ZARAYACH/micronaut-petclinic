@@ -44,23 +44,23 @@
 
                 <ul class="nav nav-tabs mb-3" id="clinic-search-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="manual-search-tab" type="button" role="tab"
-                                data-bs-toggle="tab" data-bs-target="#manual-search-panel"
-                                aria-controls="manual-search-panel" aria-selected="true">
-                            <i class="fas fa-keyboard me-2"></i>${msg.text("clinic.searchTab.manual")}
+                        <button class="nav-link active" id="map-search-tab" type="button" role="tab"
+                                data-bs-toggle="tab" data-bs-target="#map-search-panel"
+                                aria-controls="map-search-panel" aria-selected="true">
+                            <i class="fas fa-map me-2"></i>${msg.text("clinic.searchTab.map")}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="map-search-tab" type="button" role="tab"
-                                data-bs-toggle="tab" data-bs-target="#map-search-panel"
-                                aria-controls="map-search-panel" aria-selected="false">
-                            <i class="fas fa-map me-2"></i>${msg.text("clinic.searchTab.map")}
+                        <button class="nav-link" id="manual-search-tab" type="button" role="tab"
+                                data-bs-toggle="tab" data-bs-target="#manual-search-panel"
+                                aria-controls="manual-search-panel" aria-selected="false">
+                            <i class="fas fa-keyboard me-2"></i>${msg.text("clinic.searchTab.manual")}
                         </button>
                     </li>
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane fade show active" id="manual-search-panel" role="tabpanel"
+                    <div class="tab-pane fade" id="manual-search-panel" role="tabpanel"
                          aria-labelledby="manual-search-tab">
                         <div class="row g-3">
                             <div class="col-md-4 clinic-field clinic-field-near">
@@ -112,8 +112,11 @@
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="map-search-panel" role="tabpanel" aria-labelledby="map-search-tab">
+                    <div class="tab-pane fade show active" id="map-search-panel" role="tabpanel" aria-labelledby="map-search-tab">
                         <div id="clinic-map" class="clinic-map"></div>
+                        <div class="alert alert-info mt-3 mb-0" id="clinic-map-instructions" role="status">
+                            Click the map to choose a reference point. Drag the marker to move it, drag the radius handle to resize the search radius, then click Search.
+                        </div>
                         <div class="mt-3 d-flex justify-content-end gap-2">
                             <button class="btn btn-secondary btn-lg" type="button" id="clinic-clear-drawing">
                                 <i class="fas fa-eraser me-2"></i>Clear Drawing
@@ -199,6 +202,7 @@
             const mapTab = document.getElementById('map-search-tab');
             const mapPanel = document.getElementById('map-search-panel');
             const mapContainer = document.getElementById('clinic-map');
+            const mapInstructions = document.getElementById('clinic-map-instructions');
             const clearDrawingButton = document.getElementById('clinic-clear-drawing');
             const results = document.getElementById('clinic-results');
             const resultsTitle = document.getElementById('clinic-results-title');
@@ -209,11 +213,14 @@
 
             const nearFields = document.querySelectorAll('.clinic-field-near');
             const boundsFields = document.querySelectorAll('.clinic-field-bounds');
-            const mapBounds = [[42.45, -92.95], [47.10, -86.75]];
+            const mapBounds = [[42.88, -89.75], [43.27, -89.12]];
+            const mapCenter = [43.0731, -89.4012];
+            const mapZoom = 10;
             let clinicMap = null;
             let referenceMarker = null;
             let radiusCircle = null;
             let radiusHandle = null;
+            let hasNearSelection = false;
             let drawnLayer = null;
             let drawnPoints = [];
             let draftPointMarkers = null;
@@ -233,7 +240,8 @@
                 const isNear = mode === 'near';
                 toggleGroup(nearFields, !isNear);
                 toggleGroup(boundsFields, isNear);
-                clearDrawing();
+                resetMapAndResults();
+                updateMapInstructions(mode);
                 applyMapMode(mode);
             }
 
@@ -388,8 +396,8 @@
                 clinicMap = L.map('clinic-map', {
                     maxBounds: mapBounds,
                     maxBoundsViscosity: 1.0,
-                    minZoom: 6
-                }).setView([numberFieldValue('latitude'), numberFieldValue('longitude')], 7);
+                    minZoom: mapZoom
+                }).setView(mapCenter, mapZoom);
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
                     attribution: '&copy; OpenStreetMap contributors'
@@ -407,17 +415,17 @@
                 draftPointMarkers = L.layerGroup().addTo(clinicMap);
                 referenceMarker = L.marker([numberFieldValue('latitude'), numberFieldValue('longitude')], {
                     draggable: true
-                }).addTo(clinicMap);
+                });
                 radiusCircle = L.circle(referenceMarker.getLatLng(), {
                     radius: numberFieldValue('radiusMeters'),
                     color: '#0d6efd',
                     fillColor: '#0d6efd',
                     fillOpacity: 0.12
-                }).addTo(clinicMap);
+                });
                 radiusHandle = L.marker(radiusHandleLatLng(), {
                     draggable: true,
                     title: 'Drag to resize radius'
-                }).addTo(clinicMap);
+                });
 
                 if (clinicMap.pm) {
                     clinicMap.on('pm:create', function (event) {
@@ -438,7 +446,6 @@
                     }
                 });
 
-                updateBoundsFromInputs();
                 applyMapMode(modeSelect.value);
                 setTimeout(function () {
                     clinicMap.invalidateSize();
@@ -452,27 +459,14 @@
                 const isNear = mode === 'near';
                 updateDrawControls(mode);
                 if (isNear) {
-                    if (!clinicMap.hasLayer(referenceMarker)) {
-                        referenceMarker.addTo(clinicMap);
+                    if (hasNearSelection) {
+                        showNearSelection();
+                        updateRadiusHandle();
+                    } else {
+                        hideNearSelection();
                     }
-                    if (!clinicMap.hasLayer(radiusCircle)) {
-                        radiusCircle.addTo(clinicMap);
-                    }
-                    if (!clinicMap.hasLayer(radiusHandle)) {
-                        radiusHandle.addTo(clinicMap);
-                    }
-                    updateRadiusHandle();
                 } else {
-                    if (clinicMap.hasLayer(referenceMarker)) {
-                        clinicMap.removeLayer(referenceMarker);
-                    }
-                    if (clinicMap.hasLayer(radiusCircle)) {
-                        clinicMap.removeLayer(radiusCircle);
-                    }
-                    if (clinicMap.hasLayer(radiusHandle)) {
-                        clinicMap.removeLayer(radiusHandle);
-                    }
-                    updateBoundsFromInputs();
+                    hideNearSelection();
                 }
             }
 
@@ -504,11 +498,46 @@
 
             function setNearPoint(latlng) {
                 const normalized = clinicMap.wrapLatLng(L.latLng(latlng.lat, latlng.lng));
+                hasNearSelection = true;
                 referenceMarker.setLatLng(normalized);
                 radiusCircle.setLatLng(normalized);
+                radiusCircle.setRadius(numberFieldValue('radiusMeters'));
                 setFieldValue('latitude', normalized.lat.toFixed(4));
                 setFieldValue('longitude', normalized.lng.toFixed(4));
+                showNearSelection();
                 updateRadiusHandle();
+            }
+
+            function showNearSelection() {
+                if (!clinicMap.hasLayer(referenceMarker)) {
+                    referenceMarker.addTo(clinicMap);
+                }
+                if (!clinicMap.hasLayer(radiusCircle)) {
+                    radiusCircle.addTo(clinicMap);
+                }
+                if (!clinicMap.hasLayer(radiusHandle)) {
+                    radiusHandle.addTo(clinicMap);
+                }
+            }
+
+            function hideNearSelection() {
+                if (!clinicMap) {
+                    return;
+                }
+                if (referenceMarker && clinicMap.hasLayer(referenceMarker)) {
+                    clinicMap.removeLayer(referenceMarker);
+                }
+                if (radiusCircle && clinicMap.hasLayer(radiusCircle)) {
+                    clinicMap.removeLayer(radiusCircle);
+                }
+                if (radiusHandle && clinicMap.hasLayer(radiusHandle)) {
+                    clinicMap.removeLayer(radiusHandle);
+                }
+            }
+
+            function clearNearSelection() {
+                hasNearSelection = false;
+                hideNearSelection();
             }
 
             function radiusHandleLatLng() {
@@ -559,21 +588,6 @@
                 setFieldValue('minLongitude', bounds.getWest().toFixed(4));
                 setFieldValue('maxLatitude', bounds.getNorth().toFixed(4));
                 setFieldValue('maxLongitude', bounds.getEast().toFixed(4));
-            }
-
-            function updateBoundsFromInputs() {
-                if (!clinicMap || drawnLayer) {
-                    return;
-                }
-                const southWest = [numberFieldValue('minLatitude'), numberFieldValue('minLongitude')];
-                const northEast = [numberFieldValue('maxLatitude'), numberFieldValue('maxLongitude')];
-                drawnLayer = L.rectangle([southWest, northEast], {
-                    color: '#198754',
-                    fillOpacity: 0.08
-                }).addTo(clinicMap);
-                drawnPoints = layerLatLngs(drawnLayer);
-                renderDraftPointMarkers();
-                enableDrawnLayerEditing();
             }
 
             function appendDrawPoint(latlng) {
@@ -658,6 +672,16 @@
                 }
             }
 
+            function resetMapAndResults() {
+                clearDrawing();
+                clearNearSelection();
+                updateSummary(selectedModeLabel(), 0);
+                renderEmptyState();
+                if (clinicMap) {
+                    clinicMap.setView(mapCenter, mapZoom);
+                }
+            }
+
             function layerLatLngs(layer) {
                 if (!layer || !layer.getLatLngs) {
                     return [];
@@ -728,6 +752,7 @@
             }
 
             modeSelect.addEventListener('change', function () {
+                activateMapTab();
                 applyMode(this.value);
             });
             if (mapTab) {
@@ -736,7 +761,7 @@
                 });
             }
             if (clearDrawingButton) {
-                clearDrawingButton.addEventListener('click', clearDrawing);
+                clearDrawingButton.addEventListener('click', resetMapAndResults);
             }
             ['latitude', 'longitude'].forEach(function (name) {
                 form.elements[name].addEventListener('input', function () {
@@ -755,6 +780,50 @@
                 }
             });
 
+            function updateMapInstructions(mode) {
+                if (!mapInstructions) {
+                    return;
+                }
+                if (mode === 'near') {
+                    mapInstructions.textContent = 'Click the map to choose a reference point. Drag the marker to move it, drag the radius handle to resize the search radius, then click Search.';
+                } else if (mode === 'within') {
+                    mapInstructions.textContent = 'Draw a polygon on the map, or click points to build one. Clinics inside the selected polygon are shown after you click Search.';
+                } else {
+                    mapInstructions.textContent = 'Draw a line or boundary on the map, or click points to build one. Three or more points are closed into a shape; matching clinics are shown after you click Search.';
+                }
+            }
+
+            function hasMapSearchSelection(mode) {
+                if (mode === 'near') {
+                    return hasNearSelection;
+                }
+                if (mode === 'within') {
+                    return drawnLayer && drawnPoints.length >= 3;
+                }
+                return drawnLayer && drawnPoints.length >= 2;
+            }
+
+            function activateMapTab() {
+                if (!mapTab || !mapPanel) {
+                    return;
+                }
+                if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+                    bootstrap.Tab.getOrCreateInstance(mapTab).show();
+                } else {
+                    const manualTab = document.getElementById('manual-search-tab');
+                    const manualPanel = document.getElementById('manual-search-panel');
+                    if (manualTab && manualPanel) {
+                        manualTab.classList.remove('active');
+                        manualTab.setAttribute('aria-selected', 'false');
+                        manualPanel.classList.remove('show', 'active');
+                    }
+                    mapTab.classList.add('active');
+                    mapTab.setAttribute('aria-selected', 'true');
+                    mapPanel.classList.add('show', 'active');
+                }
+                setTimeout(initializeMap, 150);
+            }
+
             form.addEventListener('submit', function (event) {
                 event.preventDefault();
 
@@ -766,6 +835,12 @@
                 }
                 if (isMapTabActive()) {
                     initializeMap();
+                }
+                if (isMapTabActive() && !hasMapSearchSelection(mode)) {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                    return;
                 }
 
                 const request = searchRequest(mode);
@@ -792,6 +867,9 @@
             });
 
             applyMode(modeSelect.value);
+            if (isMapTabActive()) {
+                initializeMap();
+            }
         })();
     </script>
 `, msg = msg, request = request, locale = locale)

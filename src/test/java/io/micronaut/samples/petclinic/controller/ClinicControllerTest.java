@@ -30,6 +30,9 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("Find Nearby Clinics");
         assertThat(response.body()).contains("Manual");
         assertThat(response.body()).contains("Map");
+        assertThat(response.body()).contains("<button class=\"nav-link active\" id=\"map-search-tab\"");
+        assertThat(response.body()).contains("<div class=\"tab-pane fade show active\" id=\"map-search-panel\"");
+        assertThat(response.body()).contains("Click the map to choose a reference point");
         assertThat(response.body()).contains("Clinics Within Area");
         assertThat(response.body()).contains("Clinics Intersecting Boundary");
         assertThat(response.body()).contains("value=\"43.0731\"");
