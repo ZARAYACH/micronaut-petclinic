@@ -1,7 +1,6 @@
 package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.cache.annotation.Cacheable;
-import io.micronaut.context.env.Environment;
 import io.micronaut.data.model.Sort;
 import io.micronaut.data.model.geo.LineString;
 import io.micronaut.data.model.geo.Point;
@@ -40,7 +39,6 @@ import java.util.stream.Collectors;
 @Singleton
 public class ClinicService {
 
-    private static final double WGS84_METERS_PER_DEGREE = 111_320.0;
     private static final double GEOMETRY_EPSILON = 0.0000000001;
 
     private final OwnerRepository ownerRepository;
@@ -51,7 +49,6 @@ public class ClinicService {
     private final SpecialityRepository specialityRepository;
     private final VetSpecialityRepository vetSpecialityRepository;
     private final ClinicRepository clinicRepository;
-    private final Environment environment;
 
     /**
      * Creates the service facade with its repository dependencies.
@@ -64,7 +61,6 @@ public class ClinicService {
      * @param specialityRepository repository for specialities
      * @param vetSpecialityRepository repository for vet-speciality join rows
      * @param clinicRepository repository for clinic locations
-     * @param environment active Micronaut environments
      */
     public ClinicService(OwnerRepository ownerRepository,
                          PetRepository petRepository,
@@ -73,8 +69,7 @@ public class ClinicService {
                          VetRepository vetRepository,
                          SpecialityRepository specialityRepository,
                          VetSpecialityRepository vetSpecialityRepository,
-                         ClinicRepository clinicRepository,
-                         Environment environment) {
+                         ClinicRepository clinicRepository) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
         this.petTypeRepository = petTypeRepository;
@@ -83,7 +78,6 @@ public class ClinicService {
         this.specialityRepository = specialityRepository;
         this.vetSpecialityRepository = vetSpecialityRepository;
         this.clinicRepository = clinicRepository;
-        this.environment = environment;
     }
 
     // ========== Owner Operations ==========
@@ -310,7 +304,7 @@ public class ClinicService {
      * @return nearby clinics
      */
     public List<Clinic> findClinicsNear(double longitude, double latitude, double radiusMeters) {
-        return clinicRepository.findByLocationNear(new Point(longitude, latitude), nearSearchDistance(radiusMeters));
+        return clinicRepository.findByLocationNear(new Point(longitude, latitude), radiusMeters);
     }
 
     /**
@@ -517,17 +511,6 @@ public class ClinicService {
      */
     private static boolean isZero(double value) {
         return Math.abs(value) <= GEOMETRY_EPSILON;
-    }
-
-    private double nearSearchDistance(double radiusMeters) {
-        if (environment.getActiveNames().contains("oracle")) {
-            return radiusMeters;
-        }
-        return toWgs84Degrees(radiusMeters);
-    }
-
-    private static double toWgs84Degrees(double meters) {
-        return meters / WGS84_METERS_PER_DEGREE;
     }
 
 }

@@ -42,7 +42,7 @@ public record Clinic(
         @NotBlank
         String city,
 
-        @Srid(4326)
+        @Srid(value = 4326, type = Srid.CrsType.GEOGRAPHIC)
         @Index(columns = "LOCATION")
         @MappedProperty("LOCATION")
         @NotNull
