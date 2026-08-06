@@ -4,6 +4,8 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.samples.petclinic.model.Clinic;
 import io.micronaut.serde.annotation.Serdeable;
 
+import java.util.List;
+
 /**
  * Controller-facing clinic projection used by both HTML and JSON responses.
  *
@@ -40,5 +42,15 @@ public record ClinicDto(
                 clinic.location().y(),
                 clinic.location().x()
         );
+    }
+
+    /**
+     * Maps a Collection of persisted clinics entities to a Collection of DTOs.
+     *
+     * @param clinics the persisted clinics
+     * @return the DTO projection
+     */
+    public static List<ClinicDto> from(List<Clinic> clinics) {
+        return clinics.stream().map(ClinicDto::from).toList();
     }
 }

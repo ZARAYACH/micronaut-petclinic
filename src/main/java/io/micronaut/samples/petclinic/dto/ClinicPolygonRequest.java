@@ -1,6 +1,7 @@
 package io.micronaut.samples.petclinic.dto;
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.data.model.geo.Point;
 import io.micronaut.serde.annotation.Serdeable;
 
 import java.util.List;
@@ -21,5 +22,11 @@ public record ClinicPolygonRequest(
      */
     public ClinicPolygonRequest() {
         this(null);
+    }
+
+
+    public List<Point> coordinatesAsPointList() {
+        return coordinates.stream().map(ClinicCoordinateDto::asPoint).toList();
+
     }
 }

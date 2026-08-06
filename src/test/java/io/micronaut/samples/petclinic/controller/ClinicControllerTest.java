@@ -32,5 +32,23 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("Map");
         assertThat(response.body()).contains("Clinics Within Area");
         assertThat(response.body()).contains("Clinics Intersecting Boundary");
+        assertThat(response.body()).contains("value=\"43.0731\"");
+        assertThat(response.body()).contains("value=\"-89.4012\"");
+        assertThat(response.body()).contains("value=\"5000\"");
+        assertThat(response.body()).contains("0 clinics matched");
+        assertThat(response.body()).doesNotContain("Downtown Madison Pet Clinic");
+    }
+
+    @Test
+    void shouldRenderClinicSearchPageWithoutRunningQueryParameterSearch() {
+        HttpResponse<String> response = client.toBlocking()
+                .exchange(HttpRequest.GET("/clinics?mode=near&latitude=43.0745&longitude=-89.3840&radiusMeters=350"), String.class);
+
+        assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
+        assertThat(response.body()).contains("0 clinics matched");
+        assertThat(response.body()).doesNotContain("Downtown Madison Pet Clinic");
+        assertThat(response.body()).contains("value=\"43.0731\"");
+        assertThat(response.body()).contains("value=\"-89.4012\"");
+        assertThat(response.body()).contains("value=\"5000\"");
     }
 }

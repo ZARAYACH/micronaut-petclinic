@@ -1,6 +1,7 @@
 package io.micronaut.samples.petclinic.dto;
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.data.model.geo.Point;
 import io.micronaut.serde.annotation.Serdeable;
 
 /**
@@ -21,5 +22,9 @@ public record ClinicCoordinateDto(
      */
     public ClinicCoordinateDto() {
         this(0, 0);
+    }
+
+    public Point asPoint() {
+        return new Point(this.longitude, this.latitude);
     }
 }

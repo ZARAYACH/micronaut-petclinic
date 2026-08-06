@@ -186,9 +186,17 @@ Open http://localhost:8080/clinics to try the clinic search page.
 Use the manual form or the map tab to search clinic locations. Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding-box or drawn polygon, and `intersects` for clinics whose location intersects the bounding-box boundary. Using a boundary `LineString` for `intersects` makes the example distinct from `within`, which uses a filled `Polygon`.
 
 ```bash
-curl "http://localhost:8080/clinics/nearby?latitude=43.0731&longitude=-89.4012&radiusMeters=5000"
-curl "http://localhost:8080/clinics/within?minLatitude=43.0000&minLongitude=-89.5500&maxLatitude=43.2000&maxLongitude=-89.2000"
-curl "http://localhost:8080/clinics/intersects?minLatitude=43.0753&minLongitude=-89.5186&maxLatitude=43.1836&maxLongitude=-89.2137"
+curl -X POST http://localhost:8080/clinics/nearby \
+  -H "Content-Type: application/json" \
+  -d '{"latitude":43.0731,"longitude":-89.4012,"radiusMeters":5000}'
+
+curl -X POST http://localhost:8080/clinics/within \
+  -H "Content-Type: application/json" \
+  -d '{"coordinates":[{"latitude":43.0000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.5500}]}'
+
+curl -X POST http://localhost:8080/clinics/intersects \
+  -H "Content-Type: application/json" \
+  -d '{"coordinates":[{"latitude":43.0753,"longitude":-89.5186},{"latitude":43.1836,"longitude":-89.5186},{"latitude":43.1836,"longitude":-89.2137},{"latitude":43.0753,"longitude":-89.2137},{"latitude":43.0753,"longitude":-89.5186}]}'
 ```
 ---
 

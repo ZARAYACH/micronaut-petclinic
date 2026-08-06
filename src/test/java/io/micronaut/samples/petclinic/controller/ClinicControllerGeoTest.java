@@ -24,8 +24,21 @@ class ClinicControllerGeoTest {
 
     @Test
     void shouldReturnClinicsWithinBoundingBoxAsJson() {
+        String polygon = """
+                {
+                  "coordinates": [
+                    {"latitude": 43.00, "longitude": -89.55},
+                    {"latitude": 43.20, "longitude": -89.55},
+                    {"latitude": 43.20, "longitude": -89.20},
+                    {"latitude": 43.00, "longitude": -89.20},
+                    {"latitude": 43.00, "longitude": -89.55}
+                  ]
+                }
+                """;
+
         HttpResponse<String> response = client.toBlocking()
-                .exchange(HttpRequest.GET("/clinics/within?minLatitude=43.00&minLongitude=-89.55&maxLatitude=43.20&maxLongitude=-89.20"), String.class);
+                .exchange(HttpRequest.POST("/clinics/within", polygon)
+                        .contentType(MediaType.APPLICATION_JSON), String.class);
 
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
         assertThat(response.body()).contains("Downtown Madison Pet Clinic");
@@ -58,8 +71,21 @@ class ClinicControllerGeoTest {
 
     @Test
     void shouldReturnClinicsIntersectingBoundaryAsJson() {
+        String boundary = """
+                {
+                  "coordinates": [
+                    {"latitude": 43.0753, "longitude": -89.5186},
+                    {"latitude": 43.1836, "longitude": -89.5186},
+                    {"latitude": 43.1836, "longitude": -89.2137},
+                    {"latitude": 43.0753, "longitude": -89.2137},
+                    {"latitude": 43.0753, "longitude": -89.5186}
+                  ]
+                }
+                """;
+
         HttpResponse<String> response = client.toBlocking()
-                .exchange(HttpRequest.GET("/clinics/intersects?minLatitude=43.0753&minLongitude=-89.5186&maxLatitude=43.1836&maxLongitude=-89.2137"), String.class);
+                .exchange(HttpRequest.POST("/clinics/intersects", boundary)
+                        .contentType(MediaType.APPLICATION_JSON), String.class);
 
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
         assertThat(response.body()).contains("West Madison Pet Clinic");
@@ -115,8 +141,17 @@ class ClinicControllerGeoTest {
 
     @Test
     void shouldReturnNearbyClinicsAsJson() {
+        String nearby = """
+                {
+                  "latitude": 43.0745,
+                  "longitude": -89.3840,
+                  "radiusMeters": 350
+                }
+                """;
+
         HttpResponse<String> response = client.toBlocking()
-                .exchange(HttpRequest.GET("/clinics/nearby?latitude=43.0745&longitude=-89.3840&radiusMeters=350"), String.class);
+                .exchange(HttpRequest.POST("/clinics/nearby", nearby)
+                        .contentType(MediaType.APPLICATION_JSON), String.class);
 
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
         assertThat(response.body()).contains("Downtown Madison Pet Clinic");

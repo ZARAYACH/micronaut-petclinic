@@ -2,14 +2,6 @@
 @import java.util.List
 
 @param List<ClinicDto> clinics
-@param String mode
-@param double latitude
-@param double longitude
-@param double radiusMeters
-@param double minLatitude
-@param double minLongitude
-@param double maxLatitude
-@param double maxLongitude
 @param io.micronaut.samples.petclinic.system.I18nViewModelProcessor.Msg msg
 @param io.micronaut.http.HttpRequest<?> request
 @param java.util.Locale locale
@@ -43,9 +35,9 @@
                             <i class="fas fa-compass me-2"></i>${msg.text("clinic.searchMode")}
                         </label>
                         <select class="form-select form-select-lg" id="mode" name="mode">
-                            <option value="near" selected="${"near".equals(mode)}">${msg.text("clinic.mode.near")}</option>
-                            <option value="within" selected="${"within".equals(mode)}">${msg.text("clinic.mode.within")}</option>
-                            <option value="intersects" selected="${"intersects".equals(mode)}">${msg.text("clinic.mode.intersects")}</option>
+                            <option value="near" selected>${msg.text("clinic.mode.near")}</option>
+                            <option value="within">${msg.text("clinic.mode.within")}</option>
+                            <option value="intersects">${msg.text("clinic.mode.intersects")}</option>
                         </select>
                     </div>
                 </div>
@@ -76,41 +68,41 @@
                                     <i class="fas fa-map-pin me-2"></i>${msg.text("clinic.latitude")}
                                 </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="latitude"
-                                       name="latitude" value="${latitude}">
+                                       name="latitude" value="43.0731">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-near">
                                 <label for="longitude" class="form-label">
                                     <i class="fas fa-map-pin me-2"></i>${msg.text("clinic.longitude")}
                                 </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="longitude"
-                                       name="longitude" value="${longitude}">
+                                       name="longitude" value="-89.4012">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-near">
                                 <label for="radiusMeters" class="form-label">
                                     <i class="fas fa-ruler-combined me-2"></i>${msg.text("clinic.radiusMeters")}
                                 </label>
                                 <input type="number" step="100" min="100" class="form-control form-control-lg" id="radiusMeters"
-                                       name="radiusMeters" value="${radiusMeters}">
+                                       name="radiusMeters" value="5000">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
                                 <label for="minLatitude" class="form-label">${msg.text("clinic.minLatitude")}</label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="minLatitude"
-                                       name="minLatitude" value="${minLatitude}">
+                                       name="minLatitude" value="43.0753">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
                                 <label for="minLongitude" class="form-label">${msg.text("clinic.minLongitude")}</label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="minLongitude"
-                                       name="minLongitude" value="${minLongitude}">
+                                       name="minLongitude" value="-89.5186">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
                                 <label for="maxLatitude" class="form-label">${msg.text("clinic.maxLatitude")}</label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="maxLatitude"
-                                       name="maxLatitude" value="${maxLatitude}">
+                                       name="maxLatitude" value="43.1836">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
                                 <label for="maxLongitude" class="form-label">${msg.text("clinic.maxLongitude")}</label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="maxLongitude"
-                                       name="maxLongitude" value="${maxLongitude}">
+                                       name="maxLongitude" value="-89.2137">
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button class="btn btn-primary btn-lg w-100" type="submit">
@@ -138,7 +130,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="mb-1" id="clinic-results-title"
-                    data-template="${msg.text("clinic.resultsTitle", "__mode__")}">${msg.text("clinic.resultsTitle", msg.text("clinic.mode." + mode))}</h2>
+                    data-template="${msg.text("clinic.resultsTitle", "__mode__")}">${msg.text("clinic.resultsTitle", msg.text("clinic.mode.near"))}</h2>
                 <p class="text-muted mb-0" id="clinic-results-count"
                    data-template="${msg.text("clinic.resultsCount", "__count__")}">${msg.text("clinic.resultsCount", clinics != null ? clinics.size() : 0)}</p>
             </div>
@@ -188,7 +180,7 @@
 
                             <span class="pet-badge">
                                 <i class="fas fa-circle-check"></i>
-                                ${msg.text("clinic.mode." + mode)}
+                                ${msg.text("clinic.mode.near")}
                             </span>
                         </div>
                     </div>
@@ -257,25 +249,10 @@
                 return Number(fieldValue(name));
             }
 
-            function searchUrl(mode) {
-                const params = new URLSearchParams();
-                if (mode === 'near') {
-                    params.set('latitude', fieldValue('latitude'));
-                    params.set('longitude', fieldValue('longitude'));
-                    params.set('radiusMeters', fieldValue('radiusMeters'));
-                    return '/clinics/nearby?' + params.toString();
-                }
-                params.set('minLatitude', fieldValue('minLatitude'));
-                params.set('minLongitude', fieldValue('minLongitude'));
-                params.set('maxLatitude', fieldValue('maxLatitude'));
-                params.set('maxLongitude', fieldValue('maxLongitude'));
-                return '/clinics/' + mode + '?' + params.toString();
-            }
-
             function searchRequest(mode) {
-                if (isMapTabActive() && (mode === 'within' || mode === 'intersects') && drawnLayer) {
+                if (mode === 'near') {
                     return {
-                        url: '/clinics/' + mode,
+                        url: '/clinics/nearby',
                         options: {
                             method: 'POST',
                             headers: {
@@ -283,19 +260,44 @@
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                coordinates: drawnLayerCoordinates()
+                                latitude: numberFieldValue('latitude'),
+                                longitude: numberFieldValue('longitude'),
+                                radiusMeters: numberFieldValue('radiusMeters')
                             })
                         }
                     };
                 }
+                const coordinates = isMapTabActive() && drawnLayer
+                    ? drawnLayerCoordinates()
+                    : boundingBoxCoordinates();
                 return {
-                    url: searchUrl(mode),
+                    url: '/clinics/' + mode,
                     options: {
+                        method: 'POST',
                         headers: {
-                            'Accept': 'application/json'
-                        }
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            coordinates: coordinates
+                        })
                     }
                 };
+            }
+
+            function boundingBoxCoordinates() {
+                const minLatitude = numberFieldValue('minLatitude');
+                const minLongitude = numberFieldValue('minLongitude');
+                const maxLatitude = numberFieldValue('maxLatitude');
+                const maxLongitude = numberFieldValue('maxLongitude');
+                const coordinates = [
+                    {latitude: minLatitude, longitude: minLongitude},
+                    {latitude: maxLatitude, longitude: minLongitude},
+                    {latitude: maxLatitude, longitude: maxLongitude},
+                    {latitude: minLatitude, longitude: maxLongitude},
+                    {latitude: minLatitude, longitude: minLongitude}
+                ];
+                return coordinates;
             }
 
             function escapeHtml(value) {
