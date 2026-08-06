@@ -1,6 +1,7 @@
 package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.cache.annotation.Cacheable;
+import io.micronaut.context.env.Environment;
 import io.micronaut.data.model.Sort;
 import io.micronaut.data.model.geo.LineString;
 import io.micronaut.data.model.geo.Point;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 public class ClinicService {
 
     private static final double WGS84_METERS_PER_DEGREE = 111_320.0;
+    private static final double GEOMETRY_EPSILON = 0.0000000001;
 
     private final OwnerRepository ownerRepository;
     private final PetRepository petRepository;
@@ -49,6 +51,7 @@ public class ClinicService {
     private final SpecialityRepository specialityRepository;
     private final VetSpecialityRepository vetSpecialityRepository;
     private final ClinicRepository clinicRepository;
+    private final Environment environment;
 
     /**
      * Creates the service facade with its repository dependencies.
@@ -61,6 +64,7 @@ public class ClinicService {
      * @param specialityRepository repository for specialities
      * @param vetSpecialityRepository repository for vet-speciality join rows
      * @param clinicRepository optional Oracle Spatial clinic repository
+     * @param environment active Micronaut environments
      */
     public ClinicService(OwnerRepository ownerRepository,
                          PetRepository petRepository,
@@ -69,7 +73,8 @@ public class ClinicService {
                          VetRepository vetRepository,
                          SpecialityRepository specialityRepository,
                          VetSpecialityRepository vetSpecialityRepository,
-                         ClinicRepository clinicRepository) {
+                         ClinicRepository clinicRepository,
+                         Environment environment) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
         this.petTypeRepository = petTypeRepository;
@@ -78,6 +83,7 @@ public class ClinicService {
         this.specialityRepository = specialityRepository;
         this.vetSpecialityRepository = vetSpecialityRepository;
         this.clinicRepository = clinicRepository;
+        this.environment = environment;
     }
 
     // ========== Owner Operations ==========
@@ -304,7 +310,7 @@ public class ClinicService {
      * @return nearby clinics
      */
     public List<Clinic> findClinicsNear(double longitude, double latitude, double radiusMeters) {
-        return clinicRepository.findByLocationNear(new Point(longitude, latitude), toWgs84Degrees(radiusMeters));
+        return clinicRepository.findByLocationNear(new Point(longitude, latitude), nearSearchDistance(radiusMeters));
     }
 
     /**
@@ -334,28 +340,12 @@ public class ClinicService {
     }
 
     /**
-     * Finds clinics whose location intersects the supplied bounding box boundary.
-     *
-     * @param minLongitude western bound
-     * @param minLatitude southern bound
-     * @param maxLongitude eastern bound
-     * @param maxLatitude northern bound
-     * @return clinics intersecting the boundary line
-     */
-    public List<Clinic> findClinicsIntersectingBoundary(double minLongitude,
-                                                        double minLatitude,
-                                                        double maxLongitude,
-                                                        double maxLatitude) {
-        return clinicRepository.findByLocationGeoIntersects(toBoundingBoxShell(minLongitude, minLatitude, maxLongitude, maxLatitude));
-    }
-
-    /**
      * Finds clinics whose location intersects the supplied line.
      *
      * @param coordinates line coordinates
      * @return clinics intersecting the line
      */
-    public List<Clinic> findClinicsIntersectingBoundary(List<Point> coordinates) {
+    public List<Clinic> findClinicsIntersectingLine(List<Point> coordinates) {
         return clinicRepository.findByLocationGeoIntersects(toLineString(coordinates));
     }
 
@@ -380,15 +370,14 @@ public class ClinicService {
     }
 
     private static Polygon toPolygon(List<Point> coordinates) {
-        return new Polygon(List.of(toClosedLineString(coordinates)));
+        LineString shell = toClosedLineString(coordinates);
+        validateSimplePolygon(shell);
+        return new Polygon(List.of(shell));
     }
 
     private static LineString toLineString(List<Point> coordinates) {
         if (coordinates == null || coordinates.size() < 2) {
             throw new IllegalArgumentException("A line search requires at least two coordinates");
-        }
-        if (coordinates.size() >= 3) {
-            return toClosedLineString(coordinates);
         }
         return new LineString(new ArrayList<>(coordinates));
     }
@@ -406,7 +395,139 @@ public class ClinicService {
         return new LineString(shell);
     }
 
+    /**
+     * Ensures a polygon shell is simple before it is passed to spatial predicates.
+     *
+     * @param shell closed polygon boundary
+     */
+    private static void validateSimplePolygon(LineString shell) {
+        if (hasSelfIntersection(shell.points())) {
+            throw new IllegalArgumentException("A polygon boundary cannot cross itself");
+        }
+    }
+
+    /**
+     * Checks whether any non-adjacent polygon boundary segments cross each other.
+     *
+     * @param shell closed polygon boundary points
+     * @return {@code true} when the shell crosses itself
+     */
+    private static boolean hasSelfIntersection(List<Point> shell) {
+        List<Point> points = new ArrayList<>(shell);
+        Point first = points.getFirst();
+        Point last = points.getLast();
+        if (first.x() == last.x() && first.y() == last.y()) {
+            points.removeLast();
+        }
+        if (points.size() < 4) {
+            return false;
+        }
+        for (int i = 0; i < points.size(); i++) {
+            Point firstStart = points.get(i);
+            Point firstEnd = points.get((i + 1) % points.size());
+            for (int j = i + 1; j < points.size(); j++) {
+                if (areAdjacentSegments(i, j, points.size())) {
+                    continue;
+                }
+                Point secondStart = points.get(j);
+                Point secondEnd = points.get((j + 1) % points.size());
+                if (segmentsIntersect(firstStart, firstEnd, secondStart, secondEnd)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether two polygon edges share a vertex and therefore may touch.
+     *
+     * @param firstIndex first segment index
+     * @param secondIndex second segment index
+     * @param segmentCount total segment count
+     * @return {@code true} when the segments are neighbors
+     */
+    private static boolean areAdjacentSegments(int firstIndex, int secondIndex, int segmentCount) {
+        return Math.abs(firstIndex - secondIndex) == 1
+                || firstIndex == 0 && secondIndex == segmentCount - 1;
+    }
+
+    /**
+     * Checks whether two line segments intersect, including collinear overlap.
+     *
+     * @param firstStart first segment start
+     * @param firstEnd first segment end
+     * @param secondStart second segment start
+     * @param secondEnd second segment end
+     * @return {@code true} when the segments intersect
+     */
+    private static boolean segmentsIntersect(Point firstStart,
+                                             Point firstEnd,
+                                             Point secondStart,
+                                             Point secondEnd) {
+        double d1 = direction(firstStart, firstEnd, secondStart);
+        double d2 = direction(firstStart, firstEnd, secondEnd);
+        double d3 = direction(secondStart, secondEnd, firstStart);
+        double d4 = direction(secondStart, secondEnd, firstEnd);
+        if (((d1 > GEOMETRY_EPSILON && d2 < -GEOMETRY_EPSILON)
+                || (d1 < -GEOMETRY_EPSILON && d2 > GEOMETRY_EPSILON))
+                && ((d3 > GEOMETRY_EPSILON && d4 < -GEOMETRY_EPSILON)
+                || (d3 < -GEOMETRY_EPSILON && d4 > GEOMETRY_EPSILON))) {
+            return true;
+        }
+        return isZero(d1) && isPointOnSegment(secondStart, firstStart, firstEnd)
+                || isZero(d2) && isPointOnSegment(secondEnd, firstStart, firstEnd)
+                || isZero(d3) && isPointOnSegment(firstStart, secondStart, secondEnd)
+                || isZero(d4) && isPointOnSegment(firstEnd, secondStart, secondEnd);
+    }
+
+    /**
+     * Computes the orientation of a point relative to a directed line segment.
+     *
+     * @param start segment start
+     * @param end segment end
+     * @param point point to test
+     * @return positive, negative, or zero depending on the side of the segment
+     */
+    private static double direction(Point start, Point end, Point point) {
+        return (end.x() - start.x()) * (point.y() - start.y())
+                - (end.y() - start.y()) * (point.x() - start.x());
+    }
+
+    /**
+     * Checks whether a collinear point lies within a segment's bounding box.
+     *
+     * @param point point to test
+     * @param start segment start
+     * @param end segment end
+     * @return {@code true} when the point lies on the segment
+     */
+    private static boolean isPointOnSegment(Point point, Point start, Point end) {
+        return point.x() >= Math.min(start.x(), end.x()) - GEOMETRY_EPSILON
+                && point.x() <= Math.max(start.x(), end.x()) + GEOMETRY_EPSILON
+                && point.y() >= Math.min(start.y(), end.y()) - GEOMETRY_EPSILON
+                && point.y() <= Math.max(start.y(), end.y()) + GEOMETRY_EPSILON;
+    }
+
+    /**
+     * Compares floating-point geometry values using a small tolerance.
+     *
+     * @param value value to test
+     * @return {@code true} when the value is close enough to zero
+     */
+    private static boolean isZero(double value) {
+        return Math.abs(value) <= GEOMETRY_EPSILON;
+    }
+
+    private double nearSearchDistance(double radiusMeters) {
+        if (environment.getActiveNames().contains("oracle")) {
+            return radiusMeters;
+        }
+        return toWgs84Degrees(radiusMeters);
+    }
+
     private static double toWgs84Degrees(double meters) {
         return meters / WGS84_METERS_PER_DEGREE;
     }
+
 }

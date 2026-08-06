@@ -183,7 +183,7 @@ The application also includes a Micronaut Data geospatial example. It stores sam
 
 Open http://localhost:8080/clinics to try the clinic search page.
 
-Use the manual form or the map tab to search clinic locations. Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding-box or drawn polygon, and `intersects` for clinics whose location intersects the bounding-box boundary. Using a boundary `LineString` for `intersects` makes the example distinct from `within`, which uses a filled `Polygon`.
+Use the manual form or the map tab to search clinic locations. Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding-box or drawn polygon, and `intersects` for clinics whose location intersects an open `LineString`. Using a line for `intersects` makes the example distinct from `within`, which uses a filled `Polygon`.
 
 ```bash
 curl -X POST http://localhost:8080/clinics/nearby \
@@ -196,7 +196,7 @@ curl -X POST http://localhost:8080/clinics/within \
 
 curl -X POST http://localhost:8080/clinics/intersects \
   -H "Content-Type: application/json" \
-  -d '{"coordinates":[{"latitude":43.0753,"longitude":-89.5186},{"latitude":43.1836,"longitude":-89.5186},{"latitude":43.1836,"longitude":-89.2137},{"latitude":43.0753,"longitude":-89.2137},{"latitude":43.0753,"longitude":-89.5186}]}'
+  -d '{"coordinates":[{"latitude":43.0753,"longitude":-89.5186},{"latitude":43.1020,"longitude":-89.3545},{"latitude":43.1836,"longitude":-89.2137}]}'
 ```
 ---
 

@@ -76,15 +76,15 @@ public class ClinicController {
     }
 
     /**
-     * Returns clinics whose location intersects the supplied polygon boundary.
+     * Returns clinics whose location intersects the supplied line.
      *
-     * @param request polygon search request
+     * @param request line search request
      * @return matching clinics
      */
     @Post(value = "/intersects", consumes = MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public List<ClinicDto> intersectsLine(@Body ClinicPolygonRequest request) {
-        List<Clinic> clinics = clinicService.findClinicsIntersectingBoundary(
+        List<Clinic> clinics = clinicService.findClinicsIntersectingLine(
                 request.coordinatesAsPointList());
         return ClinicDto.from(clinics);
     }

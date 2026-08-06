@@ -6,8 +6,10 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Geospatial integration tests for {@link ClinicService}.
@@ -50,11 +52,39 @@ class ClinicServiceGeoTest {
     }
 
     @Test
-    void shouldFindClinicsIntersectingBoundary() {
-        Collection<Clinic> clinics = clinicService.findClinicsIntersectingBoundary(-89.5186, 43.0753, -89.2137, 43.1836);
+    void shouldRejectSelfIntersectingWithinPolygon() {
+        List<io.micronaut.data.model.geo.Point> coordinates = List.of(
+                new io.micronaut.data.model.geo.Point(-89.90936279296876, 42.9023053660702),
+                new io.micronaut.data.model.geo.Point(-89.38751220703125, 42.92845469924115),
+                new io.micronaut.data.model.geo.Point(-88.94119262695312, 43.0961493137274),
+                new io.micronaut.data.model.geo.Point(-89.33395385742189, 43.25038397145106),
+                new io.micronaut.data.model.geo.Point(-89.42733764648438, 43.21736647998013),
+                new io.micronaut.data.model.geo.Point(-89.47402954101564, 42.962633237852216),
+                new io.micronaut.data.model.geo.Point(-89.09637451171876, 43.069981133454796),
+                new io.micronaut.data.model.geo.Point(-89.90798950195314, 43.015873699839446),
+                new io.micronaut.data.model.geo.Point(-89.87091064453125, 43.14727016282878),
+                new io.micronaut.data.model.geo.Point(-89.176025390625, 43.135155533852306),
+                new io.micronaut.data.model.geo.Point(-89.65667724609376, 42.967657892987084),
+                new io.micronaut.data.model.geo.Point(-89.10598754882812, 42.97670123799119),
+                new io.micronaut.data.model.geo.Point(-89.50286865234376, 43.14025610479275),
+                new io.micronaut.data.model.geo.Point(-89.90936279296876, 42.9023053660702)
+        );
+
+        assertThatThrownBy(() -> clinicService.findClinicsWithinPolygon(coordinates))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("A polygon boundary cannot cross itself");
+    }
+
+    @Test
+    void shouldFindClinicsIntersectingLine() {
+        Collection<Clinic> clinics = clinicService.findClinicsIntersectingLine(List.of(
+                new io.micronaut.data.model.geo.Point(-89.5186, 43.0753),
+                new io.micronaut.data.model.geo.Point(-89.3545, 43.1020),
+                new io.micronaut.data.model.geo.Point(-89.2137, 43.1836)
+        ));
         assertThat(clinics).isNotEmpty();
         assertThat(clinics).extracting(Clinic::name)
-                .contains("West Madison Pet Clinic", "Sun Prairie Pet Clinic")
+                .contains("West Madison Pet Clinic", "East Madison Pet Clinic", "Sun Prairie Pet Clinic")
                 .doesNotContain("Downtown Madison Pet Clinic", "Janesville Pet Clinic");
     }
 }

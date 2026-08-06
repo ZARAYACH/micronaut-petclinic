@@ -32,9 +32,19 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("Map");
         assertThat(response.body()).contains("<button class=\"nav-link active\" id=\"map-search-tab\"");
         assertThat(response.body()).contains("<div class=\"tab-pane fade show active\" id=\"map-search-panel\"");
+        assertThat(response.body()).contains("class=\"clinic-map-instructions\"");
         assertThat(response.body()).contains("Click the map to choose a reference point");
+        assertThat(response.body()).contains("clinic-reset-search");
+        assertThat(response.body()).contains("id=\"clinic-example-line\"");
+        assertThat(response.body()).contains("Example Line");
+        assertThat(response.body()).contains("const exampleIntersectingLine = [");
+        assertThat(response.body()).contains("[43.1020, -89.3545]");
+        assertThat(response.body()).contains("function runClinicSearch()");
+        assertThat(response.body()).contains("updateMapInstructions('intersects');\n                runClinicSearch();");
+        assertThat(response.body()).contains(">Reset");
+        assertThat(response.body()).contains("<section id=\"clinic-results-section\" class=\"d-none\">");
         assertThat(response.body()).contains("Clinics Within Area");
-        assertThat(response.body()).contains("Clinics Intersecting Boundary");
+        assertThat(response.body()).contains("Clinics Intersecting Line");
         assertThat(response.body()).contains("value=\"43.0731\"");
         assertThat(response.body()).contains("value=\"-89.4012\"");
         assertThat(response.body()).contains("value=\"5000\"");
@@ -49,6 +59,7 @@ class ClinicControllerTest {
 
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
         assertThat(response.body()).contains("0 clinics matched");
+        assertThat(response.body()).contains("<section id=\"clinic-results-section\" class=\"d-none\">");
         assertThat(response.body()).doesNotContain("Downtown Madison Pet Clinic");
         assertThat(response.body()).contains("value=\"43.0731\"");
         assertThat(response.body()).contains("value=\"-89.4012\"");
