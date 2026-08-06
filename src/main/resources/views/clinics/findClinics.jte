@@ -92,22 +92,38 @@
                                        name="radiusMeters" value="5000">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
-                                <label for="minLatitude" class="form-label">${msg.text("clinic.minLatitude")}</label>
+                                <label for="minLatitude" class="form-label">
+                                    <span id="minLatitudeLabel"
+                                          data-within-label="${msg.text("clinic.minLatitude")}"
+                                          data-intersects-label="${msg.text("clinic.startLatitude")}">${msg.text("clinic.minLatitude")}</span>
+                                </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="minLatitude"
                                        name="minLatitude" value="43.0753">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
-                                <label for="minLongitude" class="form-label">${msg.text("clinic.minLongitude")}</label>
+                                <label for="minLongitude" class="form-label">
+                                    <span id="minLongitudeLabel"
+                                          data-within-label="${msg.text("clinic.minLongitude")}"
+                                          data-intersects-label="${msg.text("clinic.startLongitude")}">${msg.text("clinic.minLongitude")}</span>
+                                </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="minLongitude"
                                        name="minLongitude" value="-89.5186">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
-                                <label for="maxLatitude" class="form-label">${msg.text("clinic.maxLatitude")}</label>
+                                <label for="maxLatitude" class="form-label">
+                                    <span id="maxLatitudeLabel"
+                                          data-within-label="${msg.text("clinic.maxLatitude")}"
+                                          data-intersects-label="${msg.text("clinic.endLatitude")}">${msg.text("clinic.maxLatitude")}</span>
+                                </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="maxLatitude"
                                        name="maxLatitude" value="43.1836">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-bounds">
-                                <label for="maxLongitude" class="form-label">${msg.text("clinic.maxLongitude")}</label>
+                                <label for="maxLongitude" class="form-label">
+                                    <span id="maxLongitudeLabel"
+                                          data-within-label="${msg.text("clinic.maxLongitude")}"
+                                          data-intersects-label="${msg.text("clinic.endLongitude")}">${msg.text("clinic.maxLongitude")}</span>
+                                </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="maxLongitude"
                                        name="maxLongitude" value="-89.2137">
                             </div>
@@ -191,6 +207,12 @@
 
             const nearFields = document.querySelectorAll('.clinic-field-near');
             const boundsFields = document.querySelectorAll('.clinic-field-bounds');
+            const manualCoordinateLabels = [
+                document.getElementById('minLatitudeLabel'),
+                document.getElementById('minLongitudeLabel'),
+                document.getElementById('maxLatitudeLabel'),
+                document.getElementById('maxLongitudeLabel')
+            ];
             const mapBounds = [[42.88, -89.75], [43.27, -89.12]];
             const mapCenter = [43.0731, -89.4012];
             const mapZoom = 10;
@@ -223,10 +245,20 @@
                 const isNear = mode === 'near';
                 toggleGroup(nearFields, !isNear);
                 toggleGroup(boundsFields, isNear);
+                updateManualCoordinateLabels(mode);
                 resetMapAndResults();
                 toggleExampleLineButton(mode);
                 updateMapInstructions(mode);
                 applyMapMode(mode);
+            }
+
+            function updateManualCoordinateLabels(mode) {
+                const labelKey = mode === 'intersects' ? 'intersectsLabel' : 'withinLabel';
+                manualCoordinateLabels.forEach(function (label) {
+                    if (label && label.dataset[labelKey]) {
+                        label.textContent = label.dataset[labelKey];
+                    }
+                });
             }
 
             function fieldValue(name) {

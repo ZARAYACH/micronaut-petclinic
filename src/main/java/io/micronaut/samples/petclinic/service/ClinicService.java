@@ -63,7 +63,7 @@ public class ClinicService {
      * @param vetRepository repository for vets
      * @param specialityRepository repository for specialities
      * @param vetSpecialityRepository repository for vet-speciality join rows
-     * @param clinicRepository optional Oracle Spatial clinic repository
+     * @param clinicRepository repository for clinic locations
      * @param environment active Micronaut environments
      */
     public ClinicService(OwnerRepository ownerRepository,

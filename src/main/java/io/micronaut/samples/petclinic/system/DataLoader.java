@@ -58,7 +58,7 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
      * @param petRepository repository for pets
      * @param visitRepository repository for visits
      * @param vetSpecialityRepository repository for vet-speciality join rows
-     * @param clinicRepository optional Oracle Spatial clinic repository
+     * @param clinicRepository repository for clinic locations
      */
     public DataLoader(VetRepository vetRepository,
                       SpecialityRepository specialityRepository,

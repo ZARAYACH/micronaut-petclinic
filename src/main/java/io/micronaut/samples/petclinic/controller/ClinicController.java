@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.samples.petclinic.dto.ClinicDto;
 import io.micronaut.samples.petclinic.dto.ClinicNearbyRequest;
-import io.micronaut.samples.petclinic.dto.ClinicPolygonRequest;
+import io.micronaut.samples.petclinic.dto.ClinicCoordinatesRequest;
 import io.micronaut.samples.petclinic.model.Clinic;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
@@ -64,12 +64,12 @@ public class ClinicController {
     /**
      * Returns clinics whose location falls within the supplied polygon.
      *
-     * @param request polygon search request
+     * @param request coordinate search request
      * @return matching clinics
      */
     @Post(value = "/within", consumes = MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ClinicDto> withinPolygon(@Body ClinicPolygonRequest request) {
+    public List<ClinicDto> withinPolygon(@Body ClinicCoordinatesRequest request) {
         List<Clinic> clinics = clinicService.findClinicsWithinPolygon(
                 request.coordinatesAsPointList());
         return ClinicDto.from(clinics);
@@ -78,12 +78,12 @@ public class ClinicController {
     /**
      * Returns clinics whose location intersects the supplied line.
      *
-     * @param request line search request
+     * @param request coordinate search request
      * @return matching clinics
      */
     @Post(value = "/intersects", consumes = MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ClinicDto> intersectsLine(@Body ClinicPolygonRequest request) {
+    public List<ClinicDto> intersectsLine(@Body ClinicCoordinatesRequest request) {
         List<Clinic> clinics = clinicService.findClinicsIntersectingLine(
                 request.coordinatesAsPointList());
         return ClinicDto.from(clinics);

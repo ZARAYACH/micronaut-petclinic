@@ -48,6 +48,9 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("value=\"43.0731\"");
         assertThat(response.body()).contains("value=\"-89.4012\"");
         assertThat(response.body()).contains("value=\"5000\"");
+        assertThat(response.body()).contains("data-within-label=\"Min Latitude\"");
+        assertThat(response.body()).contains("data-intersects-label=\"Start Latitude\"");
+        assertThat(response.body()).contains("data-intersects-label=\"End Longitude\"");
         assertThat(response.body()).contains("0 clinics matched");
         assertThat(response.body()).doesNotContain("Downtown Madison Pet Clinic");
     }
