@@ -130,4 +130,9 @@ public final class MySqlRepositories {
         @Query(value = "SELECT s.* FROM SPECIALTIES s JOIN VET_SPECIALTIES vs ON vs.SPECIALTY_ID = s.id WHERE vs.VET_ID = :vetId ORDER BY s.NAME", nativeQuery = true)
         List<Speciality> findSpecialitiesByVetId(Integer vetId);
     }
+
+    @Requires(env = "mysql")
+    @JdbcRepository(dialect = Dialect.MYSQL)
+    public interface MySqlClinicRepository extends ClinicRepository {
+    }
 }

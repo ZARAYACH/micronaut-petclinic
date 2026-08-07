@@ -1,17 +1,36 @@
 package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.cache.annotation.Cacheable;
-import io.micronaut.samples.petclinic.model.*;
-import io.micronaut.samples.petclinic.repository.*;
+import io.micronaut.data.model.Sort;
+import io.micronaut.data.model.geo.LineString;
+import io.micronaut.data.model.geo.Point;
+import io.micronaut.data.model.geo.Polygon;
+import io.micronaut.samples.petclinic.model.Clinic;
+import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.PetType;
+import io.micronaut.samples.petclinic.model.Speciality;
+import io.micronaut.samples.petclinic.model.Vet;
+import io.micronaut.samples.petclinic.model.VetWithSpecialities;
+import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.repository.ClinicRepository;
+import io.micronaut.samples.petclinic.repository.OwnerRepository;
+import io.micronaut.samples.petclinic.repository.PetRepository;
+import io.micronaut.samples.petclinic.repository.PetTypeRepository;
+import io.micronaut.samples.petclinic.repository.SpecialityRepository;
+import io.micronaut.samples.petclinic.repository.VetRepository;
+import io.micronaut.samples.petclinic.repository.VetSpecialityRepository;
+import io.micronaut.samples.petclinic.repository.VisitRepository;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import io.micronaut.data.model.Sort;
 
 /**
  * Service class providing business logic for the Pet Clinic application.
@@ -20,6 +39,8 @@ import io.micronaut.data.model.Sort;
 @Singleton
 public class ClinicService {
 
+    private static final double GEOMETRY_EPSILON = 0.0000000001;
+
     private final OwnerRepository ownerRepository;
     private final PetRepository petRepository;
     private final PetTypeRepository petTypeRepository;
@@ -27,6 +48,7 @@ public class ClinicService {
     private final VetRepository vetRepository;
     private final SpecialityRepository specialityRepository;
     private final VetSpecialityRepository vetSpecialityRepository;
+    private final ClinicRepository clinicRepository;
 
     /**
      * Creates the service facade with its repository dependencies.
@@ -38,14 +60,16 @@ public class ClinicService {
      * @param vetRepository repository for vets
      * @param specialityRepository repository for specialities
      * @param vetSpecialityRepository repository for vet-speciality join rows
+     * @param clinicRepository repository for clinic locations
      */
     public ClinicService(OwnerRepository ownerRepository,
                          PetRepository petRepository,
-                          PetTypeRepository petTypeRepository,
-                          VisitRepository visitRepository,
-                          VetRepository vetRepository,
-                          SpecialityRepository specialityRepository,
-                          VetSpecialityRepository vetSpecialityRepository) {
+                         PetTypeRepository petTypeRepository,
+                         VisitRepository visitRepository,
+                         VetRepository vetRepository,
+                         SpecialityRepository specialityRepository,
+                         VetSpecialityRepository vetSpecialityRepository,
+                         ClinicRepository clinicRepository) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
         this.petTypeRepository = petTypeRepository;
@@ -53,6 +77,7 @@ public class ClinicService {
         this.vetRepository = vetRepository;
         this.specialityRepository = specialityRepository;
         this.vetSpecialityRepository = vetSpecialityRepository;
+        this.clinicRepository = clinicRepository;
     }
 
     // ========== Owner Operations ==========
@@ -269,4 +294,223 @@ public class ClinicService {
     public Optional<Speciality> findSpecialityById(Integer id) {
         return specialityRepository.findById(id);
     }
+
+    /**
+     * Finds physical clinic branches near a WGS 84 coordinate.
+     *
+     * @param longitude the longitude coordinate
+     * @param latitude the latitude coordinate
+     * @param radiusMeters the search radius in meters
+     * @return nearby clinics
+     */
+    public List<Clinic> findClinicsNear(double longitude, double latitude, double radiusMeters) {
+        return clinicRepository.findByLocationNear(new Point(longitude, latitude), radiusMeters);
+    }
+
+    /**
+     * Finds clinics whose location falls within the supplied bounding box.
+     *
+     * @param minLongitude western bound
+     * @param minLatitude southern bound
+     * @param maxLongitude eastern bound
+     * @param maxLatitude northern bound
+     * @return clinics inside the polygon
+     */
+    public List<Clinic> findClinicsWithinBounds(double minLongitude,
+                                                double minLatitude,
+                                                double maxLongitude,
+                                                double maxLatitude) {
+        return clinicRepository.findByLocationGeoWithin(toBoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
+    }
+
+    /**
+     * Finds clinics whose location falls within the supplied polygon.
+     *
+     * @param coordinates polygon shell coordinates
+     * @return clinics inside the polygon
+     */
+    public List<Clinic> findClinicsWithinPolygon(List<Point> coordinates) {
+        return clinicRepository.findByLocationGeoWithin(toPolygon(coordinates));
+    }
+
+    /**
+     * Finds clinics whose service area intersects the supplied line.
+     *
+     * @param coordinates line coordinates
+     * @return clinics intersecting the line
+     */
+    public List<Clinic> findClinicsIntersectingLine(List<Point> coordinates) {
+        return clinicRepository.findByServiceAreaGeoIntersects(toLineString(coordinates));
+    }
+
+    private static Polygon toBoundingBox(double minLongitude,
+                                         double minLatitude,
+                                         double maxLongitude,
+                                         double maxLatitude) {
+        return new Polygon(List.of(toBoundingBoxShell(minLongitude, minLatitude, maxLongitude, maxLatitude)));
+    }
+
+    private static LineString toBoundingBoxShell(double minLongitude,
+                                                 double minLatitude,
+                                                 double maxLongitude,
+                                                 double maxLatitude) {
+        return new LineString(List.of(
+                new Point(minLongitude, minLatitude),
+                new Point(minLongitude, maxLatitude),
+                new Point(maxLongitude, maxLatitude),
+                new Point(maxLongitude, minLatitude),
+                new Point(minLongitude, minLatitude)
+        ));
+    }
+
+    private static Polygon toPolygon(List<Point> coordinates) {
+        LineString shell = toClosedLineString(coordinates);
+        validateSimplePolygon(shell);
+        return new Polygon(List.of(shell));
+    }
+
+    private static LineString toLineString(List<Point> coordinates) {
+        if (coordinates == null || coordinates.size() < 2) {
+            throw new IllegalArgumentException("A line search requires at least two coordinates");
+        }
+        return new LineString(new ArrayList<>(coordinates));
+    }
+
+    private static LineString toClosedLineString(List<Point> coordinates) {
+        if (coordinates == null || coordinates.size() < 3) {
+            throw new IllegalArgumentException("A polygon search requires at least three coordinates");
+        }
+        List<Point> shell = new ArrayList<>(coordinates);
+        Point first = shell.getFirst();
+        Point last = shell.getLast();
+        if (first.x() != last.x() || first.y() != last.y()) {
+            shell.add(first);
+        }
+        return new LineString(shell);
+    }
+
+    /**
+     * Ensures a polygon shell is simple before it is passed to spatial predicates.
+     *
+     * @param shell closed polygon boundary
+     */
+    private static void validateSimplePolygon(LineString shell) {
+        if (hasSelfIntersection(shell.points())) {
+            throw new IllegalArgumentException("A polygon boundary cannot cross itself");
+        }
+    }
+
+    /**
+     * Checks whether any non-adjacent polygon boundary segments cross each other.
+     *
+     * @param shell closed polygon boundary points
+     * @return {@code true} when the shell crosses itself
+     */
+    private static boolean hasSelfIntersection(List<Point> shell) {
+        List<Point> points = new ArrayList<>(shell);
+        Point first = points.getFirst();
+        Point last = points.getLast();
+        if (first.x() == last.x() && first.y() == last.y()) {
+            points.removeLast();
+        }
+        if (points.size() < 4) {
+            return false;
+        }
+        for (int i = 0; i < points.size(); i++) {
+            Point firstStart = points.get(i);
+            Point firstEnd = points.get((i + 1) % points.size());
+            for (int j = i + 1; j < points.size(); j++) {
+                if (areAdjacentSegments(i, j, points.size())) {
+                    continue;
+                }
+                Point secondStart = points.get(j);
+                Point secondEnd = points.get((j + 1) % points.size());
+                if (segmentsIntersect(firstStart, firstEnd, secondStart, secondEnd)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether two polygon edges share a vertex and therefore may touch.
+     *
+     * @param firstIndex first segment index
+     * @param secondIndex second segment index
+     * @param segmentCount total segment count
+     * @return {@code true} when the segments are neighbors
+     */
+    private static boolean areAdjacentSegments(int firstIndex, int secondIndex, int segmentCount) {
+        return Math.abs(firstIndex - secondIndex) == 1
+                || firstIndex == 0 && secondIndex == segmentCount - 1;
+    }
+
+    /**
+     * Checks whether two line segments intersect, including collinear overlap.
+     *
+     * @param firstStart first segment start
+     * @param firstEnd first segment end
+     * @param secondStart second segment start
+     * @param secondEnd second segment end
+     * @return {@code true} when the segments intersect
+     */
+    private static boolean segmentsIntersect(Point firstStart,
+                                             Point firstEnd,
+                                             Point secondStart,
+                                             Point secondEnd) {
+        double d1 = direction(firstStart, firstEnd, secondStart);
+        double d2 = direction(firstStart, firstEnd, secondEnd);
+        double d3 = direction(secondStart, secondEnd, firstStart);
+        double d4 = direction(secondStart, secondEnd, firstEnd);
+        if (((d1 > GEOMETRY_EPSILON && d2 < -GEOMETRY_EPSILON)
+                || (d1 < -GEOMETRY_EPSILON && d2 > GEOMETRY_EPSILON))
+                && ((d3 > GEOMETRY_EPSILON && d4 < -GEOMETRY_EPSILON)
+                || (d3 < -GEOMETRY_EPSILON && d4 > GEOMETRY_EPSILON))) {
+            return true;
+        }
+        return isZero(d1) && isPointOnSegment(secondStart, firstStart, firstEnd)
+                || isZero(d2) && isPointOnSegment(secondEnd, firstStart, firstEnd)
+                || isZero(d3) && isPointOnSegment(firstStart, secondStart, secondEnd)
+                || isZero(d4) && isPointOnSegment(firstEnd, secondStart, secondEnd);
+    }
+
+    /**
+     * Computes the orientation of a point relative to a directed line segment.
+     *
+     * @param start segment start
+     * @param end segment end
+     * @param point point to test
+     * @return positive, negative, or zero depending on the side of the segment
+     */
+    private static double direction(Point start, Point end, Point point) {
+        return (end.x() - start.x()) * (point.y() - start.y())
+                - (end.y() - start.y()) * (point.x() - start.x());
+    }
+
+    /**
+     * Checks whether a collinear point lies within a segment's bounding box.
+     *
+     * @param point point to test
+     * @param start segment start
+     * @param end segment end
+     * @return {@code true} when the point lies on the segment
+     */
+    private static boolean isPointOnSegment(Point point, Point start, Point end) {
+        return point.x() >= Math.min(start.x(), end.x()) - GEOMETRY_EPSILON
+                && point.x() <= Math.max(start.x(), end.x()) + GEOMETRY_EPSILON
+                && point.y() >= Math.min(start.y(), end.y()) - GEOMETRY_EPSILON
+                && point.y() <= Math.max(start.y(), end.y()) + GEOMETRY_EPSILON;
+    }
+
+    /**
+     * Compares floating-point geometry values using a small tolerance.
+     *
+     * @param value value to test
+     * @return {@code true} when the value is close enough to zero
+     */
+    private static boolean isZero(double value) {
+        return Math.abs(value) <= GEOMETRY_EPSILON;
+    }
+
 }

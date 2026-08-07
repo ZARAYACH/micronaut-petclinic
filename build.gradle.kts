@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.micronaut.managment)
 
     runtimeOnly(libs.h2)
+    runtimeOnly(libs.h2gis)
     runtimeOnly(libs.ojdbc11)
     runtimeOnly(libs.mysql.connector.j)
     runtimeOnly(libs.postgresql)

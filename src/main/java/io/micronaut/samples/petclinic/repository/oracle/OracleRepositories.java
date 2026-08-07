@@ -25,6 +25,14 @@ public final class OracleRepositories {
     }
 
     /**
+     * Oracle clinic repository bean.
+     */
+    @Requires(env = "oracle")
+    @JdbcRepository(dialect = Dialect.ORACLE)
+    public interface OracleClinicRepository extends ClinicRepository {
+    }
+
+    /**
      * Oracle pet repository bean.
      */
     @Requires(env = "oracle")
