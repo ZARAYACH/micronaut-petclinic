@@ -33,5 +33,10 @@
     "name": "org.h2gis.functions.spatial.predicates.ST_Within",
     "allDeclaredConstructors": true,
     "allPublicMethods": true
+  },
+  {
+    "name": "org.h2gis.functions.spatial.properties.ST_DistanceSphere",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
   }
 ]
