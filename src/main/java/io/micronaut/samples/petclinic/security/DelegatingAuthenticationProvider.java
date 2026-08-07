@@ -7,22 +7,13 @@ import io.micronaut.samples.petclinic.model.UserState;
 import io.micronaut.samples.petclinic.service.AuthoritiesFetcher;
 import io.micronaut.samples.petclinic.service.UserFetcher;
 import io.micronaut.samples.petclinic.utils.PasswordEncoder;
-import io.micronaut.scheduling.TaskExecutors;
-import io.micronaut.security.authentication.AuthenticationException;
 import io.micronaut.security.authentication.AuthenticationFailed;
 import io.micronaut.security.authentication.AuthenticationRequest;
 import io.micronaut.security.authentication.AuthenticationResponse;
-import io.micronaut.security.authentication.provider.HttpRequestReactiveAuthenticationProvider;
-import jakarta.inject.Named;
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider;
 import jakarta.inject.Singleton;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import static io.micronaut.security.authentication.AuthenticationFailureReason.ACCOUNT_EXPIRED;
 import static io.micronaut.security.authentication.AuthenticationFailureReason.ACCOUNT_LOCKED;
@@ -37,12 +28,11 @@ import static io.micronaut.security.authentication.AuthenticationFailureReason.U
  * @param <B> the HTTP request body type
  */
 @Singleton
-class DelegatingAuthenticationProvider<B> implements HttpRequestReactiveAuthenticationProvider<B> {
+class DelegatingAuthenticationProvider<B> implements HttpRequestAuthenticationProvider<B> {
 
     private final UserFetcher userFetcher;
     private final PasswordEncoder passwordEncoder;
     private final AuthoritiesFetcher authoritiesFetcher;
-    private final Scheduler scheduler;
 
     /**
      * Creates the provider with services used to load and verify users.
@@ -50,41 +40,35 @@ class DelegatingAuthenticationProvider<B> implements HttpRequestReactiveAuthenti
      * @param userFetcher loads persisted user state
      * @param passwordEncoder verifies submitted passwords
      * @param authoritiesFetcher loads user authorities after successful authentication
-     * @param executorService blocking executor used for database and password hashing work
      */
     DelegatingAuthenticationProvider(UserFetcher userFetcher,
                                      PasswordEncoder passwordEncoder,
-                                     AuthoritiesFetcher authoritiesFetcher,
-                                     @Named(TaskExecutors.BLOCKING) ExecutorService executorService) {
+                                     AuthoritiesFetcher authoritiesFetcher) {
         this.userFetcher = userFetcher;
         this.passwordEncoder = passwordEncoder;
         this.authoritiesFetcher = authoritiesFetcher;
-        this.scheduler = Schedulers.fromExecutorService(executorService);
     }
+
 
     /**
      * Authenticates a user name and password request.
      *
-     * @param requestContext the current HTTP request, when one is available
-     * @param authenticationRequest the submitted user name and password
+     * @param requestContext        the current HTTP request, when one is available
+     * @param authenticationRequest the submitted username and password
      * @return a publisher that emits a successful authentication or fails with an authentication exception
      */
     @Override
-    @NonNull
-    public Publisher<AuthenticationResponse> authenticate(
+    public @NonNull AuthenticationResponse authenticate(
             @Nullable HttpRequest<B> requestContext,
-            @NonNull AuthenticationRequest<String, String> authenticationRequest
-    ) {
-        return Flux.<AuthenticationResponse>create(emitter -> {
+            @NonNull AuthenticationRequest<String, String> authenticationRequest) {
+
             UserState user = fetchUserState(authenticationRequest);
             AuthenticationFailed authenticationFailed = validate(user, authenticationRequest);
             if (authenticationFailed != null) {
-                emitter.error(new AuthenticationException(authenticationFailed));
+                return authenticationFailed;
             } else {
-                emitter.next(createSuccessfulAuthenticationResponse(user));
-                emitter.complete();
+                return createSuccessfulAuthenticationResponse(user);
             }
-        }, FluxSink.OverflowStrategy.ERROR).subscribeOn(scheduler);
     }
 
     /**

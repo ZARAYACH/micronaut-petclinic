@@ -27,7 +27,7 @@ micronaut:
       login-failure: /user/authFailed
       unauthorized:
         url: /user/auth
-        enabled: false
+        enabled: true
     intercept-url-map:
       - pattern: /resources/**
         http-method: GET

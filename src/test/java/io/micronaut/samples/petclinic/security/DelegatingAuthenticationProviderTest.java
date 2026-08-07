@@ -8,9 +8,6 @@ import io.micronaut.security.authentication.UsernamePasswordCredentials;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -57,9 +54,9 @@ class DelegatingAuthenticationProviderTest {
     }
 
     private AuthenticationResponse authenticate(String username, String password) {
-        return Mono.from(authenticationProvider.authenticate(
+        return authenticationProvider.authenticate(
                 null,
                 new UsernamePasswordCredentials(username, password)
-        )).block(Duration.ofSeconds(5));
+        );
     }
 }

@@ -1,12 +1,11 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Error;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.reactor.config.ReactorConfiguration;
+import io.micronaut.http.annotation.Produces;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.rules.SecurityRule;
@@ -23,15 +22,6 @@ import java.util.Objects;
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class ErrorController {
 
-    private final ReactorConfiguration reactorConfiguration;
-
-    /**
-     * Creates the error controller.
-     */
-    public ErrorController(ReactorConfiguration reactorConfiguration) {
-        this.reactorConfiguration = reactorConfiguration;
-    }
-
     /**
      * Handle 404 Not Found errors.
      * @param request the original request
@@ -46,44 +36,47 @@ public class ErrorController {
         );
     }
 
-    @Get("/401")
-    @View("error/401")
-    public Map<String, Object> unauthorised(HttpRequest<?> request) {
-        return Map.of(
-                "path", request.getPath(),
-                "message", "unauthorized"
-        );
-    }
-
     /**
      * Handle authorization failures raised by the security filter.
      *
      * @param request the original request
-     * @param exception the authorization exception
      * @return the error view with the correct status
      */
-    @Error(exception = AuthorizationException.class, global = true)
-    public HttpResponse<Map<String, Object>> authorizationFailure(HttpRequest<?> request,
-                                                                  AuthorizationException exception) {
-        HttpStatus status = exception.isForbidden() ? HttpStatus.FORBIDDEN : HttpStatus.UNAUTHORIZED;
-        return HttpResponse.status(status).body(
-                Map.of("path", request.getPath(),
-                        "message", status.getReason()));
+    @Error(status = HttpStatus.UNAUTHORIZED, global = true)
+    @View("error/401")
+    public Map<String, Object> unauthorized(HttpRequest<?> request) {
+        return Map.of(
+                "path", request.getPath(),
+                "message", "Unauthorized"
+        );
+    }
+    /**
+     * Handle authorization failures raised by the security filter.
+     *
+     * @param request the original request
+     * @return the error view with the correct status
+     */
+    @Error(status = HttpStatus.FORBIDDEN, global = true)
+    @View("error/401")
+    public Map<String, Object> forbidden(HttpRequest<?> request) {
+        return Map.of(
+                "path", request.getPath(),
+                "message", "Forbidden"
+        );
     }
 
     /**
      * Handle 500 Internal Server Error.
      * @param request the original request
-     * @param throwable the exception that occurred
      * @return the error view
      */
-    @Error(global = true)
+    @Error(status = HttpStatus.INTERNAL_SERVER_ERROR, global = true)
     @View("error/error")
-    public Map<String, Object> handleError(HttpRequest<?> request, Throwable throwable) {
+    public Map<String, Object> internalServerError(HttpRequest<?> request) {
         return Map.of(
                 "path", request.getPath(),
-                "message", Objects.toString(throwable.getMessage(), ""),
-                "exception", throwable.getClass().getSimpleName()
+                "message", "Internal Server Error",
+                "exception", "InternalServerError"
         );
     }
 }
