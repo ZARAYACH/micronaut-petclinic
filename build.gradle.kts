@@ -41,7 +41,6 @@ dependencies {
     implementation(libs.micronaut.security.session)
     implementation(libs.spring.security.crypto)
     implementation(libs.slf4j.jcl.over)
-    implementation(libs.micronaut.reactor)
     implementation(libs.micronaut.managment)
 
     runtimeOnly(libs.h2)

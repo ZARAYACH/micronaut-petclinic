@@ -1,6 +1,5 @@
 package io.micronaut.samples.petclinic.security;
 
-import io.micronaut.security.authentication.AuthenticationException;
 import io.micronaut.security.authentication.AuthenticationFailed;
 import io.micronaut.security.authentication.AuthenticationFailureReason;
 import io.micronaut.security.authentication.AuthenticationResponse;
@@ -10,7 +9,6 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * Tests for the custom authentication provider.
@@ -33,24 +31,22 @@ class DelegatingAuthenticationProviderTest {
 
     @Test
     void shouldRejectInvalidPassword() {
-        assertThatExceptionOfType(AuthenticationException.class)
-                .isThrownBy(() -> authenticate("admin@example.com", "bad-password"))
-                .satisfies(exception -> {
-                    assertThat(exception.getResponse()).isInstanceOf(AuthenticationFailed.class);
-                    AuthenticationFailed response = (AuthenticationFailed) exception.getResponse();
-                    assertThat(response.getReason()).isEqualTo(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);
-                });
+        AuthenticationResponse response = authenticate("admin@example.com", "bad-password");
+
+        assertThat(response.isAuthenticated()).isFalse();
+        assertThat(response).isInstanceOf(AuthenticationFailed.class);
+        assertThat(((AuthenticationFailed) response).getReason())
+                .isEqualTo(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);
     }
 
     @Test
     void shouldRejectUnknownUser() {
-        assertThatExceptionOfType(AuthenticationException.class)
-                .isThrownBy(() -> authenticate("missing@example.com", "password123"))
-                .satisfies(exception -> {
-                    assertThat(exception.getResponse()).isInstanceOf(AuthenticationFailed.class);
-                    AuthenticationFailed response = (AuthenticationFailed) exception.getResponse();
-                    assertThat(response.getReason()).isEqualTo(AuthenticationFailureReason.USER_NOT_FOUND);
-                });
+        AuthenticationResponse response = authenticate("missing@example.com", "password123");
+
+        assertThat(response.isAuthenticated()).isFalse();
+        assertThat(response).isInstanceOf(AuthenticationFailed.class);
+        assertThat(((AuthenticationFailed) response).getReason())
+                .isEqualTo(AuthenticationFailureReason.USER_NOT_FOUND);
     }
 
     private AuthenticationResponse authenticate(String username, String password) {
