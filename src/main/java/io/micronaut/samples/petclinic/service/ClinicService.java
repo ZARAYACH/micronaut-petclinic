@@ -334,13 +334,13 @@ public class ClinicService {
     }
 
     /**
-     * Finds clinics whose location intersects the supplied line.
+     * Finds clinics whose service area intersects the supplied line.
      *
      * @param coordinates line coordinates
      * @return clinics intersecting the line
      */
     public List<Clinic> findClinicsIntersectingLine(List<Point> coordinates) {
-        return clinicRepository.findByLocationGeoIntersects(toLineString(coordinates));
+        return clinicRepository.findByServiceAreaGeoIntersects(toLineString(coordinates));
     }
 
     private static Polygon toBoundingBox(double minLongitude,

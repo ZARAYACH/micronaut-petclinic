@@ -101,9 +101,9 @@ class ClinicControllerGeoTest {
         String line = """
                 {
                   "coordinates": [
-                    {"latitude": 43.0753, "longitude": -89.5186},
-                    {"latitude": 43.1020, "longitude": -89.3545},
-                    {"latitude": 43.1836, "longitude": -89.2137}
+                    {"latitude": 43.0650, "longitude": -89.5500},
+                    {"latitude": 43.1100, "longitude": -89.3300},
+                    {"latitude": 43.1900, "longitude": -89.2000}
                   ]
                 }
                 """;
@@ -125,9 +125,9 @@ class ClinicControllerGeoTest {
         String line = """
                 {
                   "coordinates": [
-                    {"latitude": 43.0753, "longitude": -89.5186},
-                    {"latitude": 43.1020, "longitude": -89.3545},
-                    {"latitude": 43.1836, "longitude": -89.2137}
+                    {"latitude": 43.0650, "longitude": -89.5500},
+                    {"latitude": 43.1100, "longitude": -89.3300},
+                    {"latitude": 43.1900, "longitude": -89.2000}
                   ]
                 }
                 """;
@@ -148,8 +148,8 @@ class ClinicControllerGeoTest {
         String line = """
                 {
                   "coordinates": [
-                    {"latitude": 43.0753, "longitude": -89.5186},
-                    {"latitude": 43.1836, "longitude": -89.2137}
+                    {"latitude": 43.0650, "longitude": -89.5500},
+                    {"latitude": 43.1900, "longitude": -89.2000}
                   ]
                 }
                 """;

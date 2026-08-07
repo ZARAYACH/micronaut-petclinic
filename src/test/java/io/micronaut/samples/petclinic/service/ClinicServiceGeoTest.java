@@ -79,9 +79,9 @@ class ClinicServiceGeoTest {
     @Test
     void shouldFindClinicsIntersectingLine() {
         Collection<Clinic> clinics = clinicService.findClinicsIntersectingLine(List.of(
-                new Point(-89.5186, 43.0753),
-                new Point(-89.3545, 43.1020),
-                new Point(-89.2137, 43.1836)
+                new Point(-89.5500, 43.0650),
+                new Point(-89.3300, 43.1100),
+                new Point(-89.2000, 43.1900)
         ));
         assertThat(clinics).isNotEmpty();
         assertThat(clinics).extracting(Clinic::name)

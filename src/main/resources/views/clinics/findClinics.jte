@@ -248,9 +248,9 @@
             const manualLineFields = document.querySelectorAll('.clinic-field-manual-line');
             let mapBounds = [[42.88, -89.75], [43.27, -89.12]];
             const exampleIntersectingLine = [
-                [43.0753, -89.5186],
-                [43.1020, -89.3545],
-                [43.1836, -89.2137]
+                [43.0650, -89.5500],
+                [43.1100, -89.3300],
+                [43.1900, -89.2000]
             ];
             let clinicMap = null;
             let mapLimitZoom = null;

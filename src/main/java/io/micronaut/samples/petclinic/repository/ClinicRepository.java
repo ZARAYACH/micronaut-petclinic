@@ -22,12 +22,12 @@ public interface ClinicRepository extends CrudRepository<Clinic, Integer> {
     List<Clinic> findByLocationGeoWithin(Geometry geometry);
 
     /**
-     * Finds clinics whose point location intersects the supplied geometry.
+     * Finds clinics whose service area intersects the supplied geometry.
      *
      * @param geometry the search geometry, typically a polygon or line
      * @return matching clinics
      */
-    List<Clinic> findByLocationGeoIntersects(Geometry geometry);
+    List<Clinic> findByServiceAreaGeoIntersects(Geometry geometry);
 
     /**
      * Finds clinics within the supplied distance of a point.
