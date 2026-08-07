@@ -1,8 +1,9 @@
 package io.micronaut.samples.petclinic.dto;
 
 import io.micronaut.core.annotation.Introspected;
-import io.micronaut.samples.petclinic.annotation.ValidVisitDate;
 import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,7 +20,7 @@ import java.time.LocalDate;
 @Serdeable
 public record VisitForm(
         @NotNull(message = "Visit date is required")
-        @ValidVisitDate
+        @FutureOrPresent(message = "Visit date must be in the future")
         LocalDate date,
 
         @NotBlank(message = "Description is required")

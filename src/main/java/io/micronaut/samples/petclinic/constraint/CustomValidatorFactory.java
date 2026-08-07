@@ -2,7 +2,6 @@ package io.micronaut.samples.petclinic.constraint;
 
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.samples.petclinic.annotation.PasswordMatch;
-import io.micronaut.samples.petclinic.annotation.ValidVisitDate;
 import io.micronaut.samples.petclinic.dto.SignUpForm;
 import io.micronaut.validation.validator.constraints.ConstraintValidator;
 import jakarta.inject.Singleton;
@@ -11,16 +10,6 @@ import java.time.LocalDate;
 
 @Factory
 public class CustomValidatorFactory {
-
-    @Singleton
-    ConstraintValidator<ValidVisitDate, Object> visitDateValidator() {
-        return (value, annotationMetadata, context) -> {
-            if (value instanceof LocalDate visitDate) {
-                return LocalDate.now().isBefore(visitDate);
-            }
-            return false;
-        };
-    }
 
     @Singleton
     ConstraintValidator<PasswordMatch, SignUpForm> passwordMatchValidator() {

@@ -34,7 +34,7 @@ class CustomValidatorFactoryTest {
     @Test
     void shouldRejectVisitDateThatIsNotInTheFuture() {
         Set<ConstraintViolation<VisitForm>> violations = validator.validate(
-                new VisitForm(LocalDate.now(), "Follow-up")
+                new VisitForm(LocalDate.now().minusDays(7), "Follow-up")
         );
 
         assertThat(violations)
