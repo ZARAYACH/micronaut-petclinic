@@ -32,7 +32,7 @@ public final class H2Repositories {
     /**
      * H2 owner repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2OwnerRepository extends OwnerRepository {
     }
@@ -40,7 +40,7 @@ public final class H2Repositories {
     /**
      * H2 pet repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2PetRepository extends PetRepository {
         /**
@@ -67,7 +67,7 @@ public final class H2Repositories {
     /**
      * H2 pet type repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2PetTypeRepository extends PetTypeRepository {
     }
@@ -75,7 +75,7 @@ public final class H2Repositories {
     /**
      * H2 speciality repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2SpecialityRepository extends SpecialityRepository {
     }
@@ -83,7 +83,7 @@ public final class H2Repositories {
     /**
      * H2 vet repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VetRepository extends VetRepository {
         /**
@@ -113,7 +113,7 @@ public final class H2Repositories {
     /**
      * H2 visit repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VisitRepository extends VisitRepository {
         /**
@@ -130,7 +130,7 @@ public final class H2Repositories {
     /**
      * H2 vet-speciality join repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VetSpecialityRepository extends VetSpecialityRepository {
         /**
@@ -147,7 +147,7 @@ public final class H2Repositories {
     /**
      * H2 user repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2UserJdbcRepository extends UserJdbcRepository {
     }
@@ -155,7 +155,7 @@ public final class H2Repositories {
     /**
      * H2 role repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2RoleJdbcRepository extends RoleJdbcRepository {
     }
@@ -163,7 +163,7 @@ public final class H2Repositories {
     /**
      * H2 user-role repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property="datasources.default.dialect", value ="H2")
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2UserRoleJdbcRepository extends UserRoleJdbcRepository {
         /**

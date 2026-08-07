@@ -131,12 +131,13 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldRejectAnonymousUserFromAuthenticatedPage() {
+    void shouldRedirectAnonymousUserFromAuthenticatedPageToLogin() {
         try (HttpClient noRedirectClient = createNoRedirectClient(server)) {
             HttpResponse<String> response = exchange(noRedirectClient, HttpRequest.GET("/owners/1/pets/1/edit")
                     .accept(MediaType.TEXT_HTML));
 
-            assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.UNAUTHORIZED);
+            assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.SEE_OTHER);
+            assertThat(response.getHeaders().get(HttpHeaders.LOCATION)).isEqualTo("/user/auth");
         }
     }
 
