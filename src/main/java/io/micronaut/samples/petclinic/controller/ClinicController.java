@@ -41,9 +41,7 @@ public class ClinicController {
     @Get("/")
     @View("clinics/findClinics")
     public Map<String, Object> findClinics() {
-        return Map.of(
-                "clinics", List.of()
-        );
+        return Map.of();
     }
 
     /**

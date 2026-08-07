@@ -40,7 +40,7 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("const exampleIntersectingLine = [");
         assertThat(response.body()).contains("[43.1020, -89.3545]");
         assertThat(response.body()).contains("function runClinicSearch()");
-        assertThat(response.body()).contains("updateMapInstructions('intersects');\n                runClinicSearch();");
+        assertThat(response.body()).contains("replaceManualPoints('line', exampleIntersectingLine.map(function (point) {");
         assertThat(response.body()).contains(">Reset");
         assertThat(response.body()).contains("<section id=\"clinic-results-section\" class=\"d-none\">");
         assertThat(response.body()).contains("Clinics Within Area");
@@ -48,9 +48,6 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("value=\"43.0731\"");
         assertThat(response.body()).contains("value=\"-89.4012\"");
         assertThat(response.body()).contains("value=\"5000\"");
-        assertThat(response.body()).contains("data-within-label=\"Min Latitude\"");
-        assertThat(response.body()).contains("data-intersects-label=\"Start Latitude\"");
-        assertThat(response.body()).contains("data-intersects-label=\"End Longitude\"");
         assertThat(response.body()).contains("0 clinics matched");
         assertThat(response.body()).doesNotContain("Downtown Madison Pet Clinic");
     }
