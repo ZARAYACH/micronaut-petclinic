@@ -27,7 +27,7 @@ class ClinicControllerTest {
                 .exchange(HttpRequest.GET("/clinics"), String.class);
 
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
-        assertThat(response.body()).contains("Find Nearby Clinics");
+        assertThat(response.body()).contains("Find Clinics");
         assertThat(response.body()).contains("Manual");
         assertThat(response.body()).contains("Map");
         assertThat(response.body()).contains("<button class=\"nav-link active\" id=\"map-search-tab\"");
@@ -45,9 +45,6 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("<section id=\"clinic-results-section\" class=\"d-none\">");
         assertThat(response.body()).contains("Clinics Within Area");
         assertThat(response.body()).contains("Clinics Intersecting Line");
-        assertThat(response.body()).contains("value=\"43.0731\"");
-        assertThat(response.body()).contains("value=\"-89.4012\"");
-        assertThat(response.body()).contains("value=\"5000\"");
         assertThat(response.body()).contains("0 clinics matched");
         assertThat(response.body()).doesNotContain("Downtown Madison Pet Clinic");
     }
@@ -61,8 +58,5 @@ class ClinicControllerTest {
         assertThat(response.body()).contains("0 clinics matched");
         assertThat(response.body()).contains("<section id=\"clinic-results-section\" class=\"d-none\">");
         assertThat(response.body()).doesNotContain("Downtown Madison Pet Clinic");
-        assertThat(response.body()).contains("value=\"43.0731\"");
-        assertThat(response.body()).contains("value=\"-89.4012\"");
-        assertThat(response.body()).contains("value=\"5000\"");
     }
 }

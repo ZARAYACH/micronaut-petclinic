@@ -97,21 +97,21 @@
                                     <i class="fas fa-map-pin me-2"></i>${msg.text("clinic.latitude")}
                                 </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="latitude"
-                                       name="latitude" value="43.0731">
+                                       name="latitude">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-near">
                                 <label for="longitude" class="form-label">
                                     <i class="fas fa-map-pin me-2"></i>${msg.text("clinic.longitude")}
                                 </label>
                                 <input type="number" step="0.0001" class="form-control form-control-lg" id="longitude"
-                                       name="longitude" value="-89.4012">
+                                       name="longitude">
                             </div>
                             <div class="col-md-4 clinic-field clinic-field-near">
                                 <label for="radiusMeters" class="form-label">
                                     <i class="fas fa-ruler-combined me-2"></i>${msg.text("clinic.radiusMeters")}
                                 </label>
                                 <input type="number" step="100" min="100" class="form-control form-control-lg" id="radiusMeters"
-                                       name="radiusMeters" value="5000">
+                                       name="radiusMeters">
                             </div>
                             <div class="col-12 clinic-field clinic-field-manual-polygon">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -252,6 +252,7 @@
                 [43.1100, -89.3300],
                 [43.1900, -89.2000]
             ];
+            const defaultRadiusMeters = 5000;
             let clinicMap = null;
             let mapLimitZoom = null;
             let referenceMarker = null;
@@ -619,11 +620,11 @@
 
                 resultMarkers = L.featureGroup().addTo(clinicMap);
                 draftPointMarkers = L.layerGroup().addTo(clinicMap);
-                referenceMarker = L.marker([numberFieldValue('latitude'), numberFieldValue('longitude')], {
+                referenceMarker = L.marker(clinicMap.getCenter(), {
                     draggable: true
                 });
                 radiusCircle = L.circle(referenceMarker.getLatLng(), {
-                    radius: numberFieldValue('radiusMeters'),
+                    radius: defaultRadiusMeters,
                     color: '#0d6efd',
                     fillColor: '#0d6efd',
                     fillOpacity: 0.12
@@ -721,12 +722,19 @@
 
             function setNearPoint(latlng) {
                 const normalized = clinicMap.wrapLatLng(L.latLng(latlng.lat, latlng.lng));
+                const radiusMeters = numberFieldValue('radiusMeters');
+                const selectedRadiusMeters = Number.isFinite(radiusMeters) && radiusMeters >= 100
+                    ? radiusMeters
+                    : defaultRadiusMeters;
                 hasNearSelection = true;
                 referenceMarker.setLatLng(normalized);
                 radiusCircle.setLatLng(normalized);
-                radiusCircle.setRadius(numberFieldValue('radiusMeters'));
+                radiusCircle.setRadius(selectedRadiusMeters);
                 setFieldValue('latitude', normalized.lat.toFixed(4));
                 setFieldValue('longitude', normalized.lng.toFixed(4));
+                if (!Number.isFinite(radiusMeters) || radiusMeters < 100) {
+                    setFieldValue('radiusMeters', defaultRadiusMeters);
+                }
                 showNearSelection();
                 updateRadiusHandle();
             }
@@ -765,7 +773,7 @@
 
             function radiusHandleLatLng() {
                 const center = referenceMarker.getLatLng();
-                const radiusMeters = numberFieldValue('radiusMeters');
+                const radiusMeters = numberFieldValue('radiusMeters') || defaultRadiusMeters;
                 const longitudeOffset = radiusMeters / (111320 * Math.cos(center.lat * Math.PI / 180));
                 return L.latLng(center.lat, center.lng + longitudeOffset);
             }
@@ -959,6 +967,16 @@
                 }
             }
 
+            function resetSearch() {
+                clearManualPoints('within');
+                clearManualPoints('intersects');
+                setFieldValue('latitude', '');
+                setFieldValue('longitude', '');
+                setFieldValue('radiusMeters', '');
+                hasManualSelectionSinceModeChange = false;
+                resetMapAndResults();
+            }
+
             function useExampleIntersectingLine() {
                 replaceManualPoints('line', exampleIntersectingLine.map(function (point) {
                     return {lat: point[0], lng: point[1]};
@@ -1141,7 +1159,7 @@
                 });
             }
             document.querySelectorAll('.clinic-reset-search').forEach(function (button) {
-                button.addEventListener('click', resetMapAndResults);
+                button.addEventListener('click', resetSearch);
             });
             if (exampleLineButton) {
                 exampleLineButton.addEventListener('click', useExampleIntersectingLine);
