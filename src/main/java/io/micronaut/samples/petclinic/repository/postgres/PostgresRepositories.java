@@ -22,6 +22,9 @@ import io.micronaut.samples.petclinic.repository.VisitRepository;
 import java.util.Collection;
 import java.util.List;
 
+import static io.micronaut.samples.petclinic.repository.RepositoryRequirements.DEFAULT_DIALECT_PROPERTY;
+import static io.micronaut.samples.petclinic.repository.RepositoryRequirements.DIALECT_POSTGRES;
+
 /**
  * PostgreSQL-backed Micronaut Data repository beans active in the {@code postgres} environment.
  */
@@ -32,7 +35,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL owner repository bean.
      */
-    @Requires(env = "postgres")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresOwnerRepository extends OwnerRepository {
     }
@@ -40,7 +43,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL pet repository bean.
      */
-    @Requires(env = "postgres")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresPetRepository extends PetRepository {
         /**
@@ -67,7 +70,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL pet type repository bean.
      */
-    @Requires(env = "postgres")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresPetTypeRepository extends PetTypeRepository {
     }
@@ -75,7 +78,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL speciality repository bean.
      */
-    @Requires(env = "postgres")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresSpecialityRepository extends SpecialityRepository {
     }
@@ -83,7 +86,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL vet repository bean.
      */
-    @Requires(env = "postgres")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresVetRepository extends VetRepository {
         /**
@@ -113,7 +116,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL visit repository bean.
      */
-    @Requires(env = "postgres")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresVisitRepository extends VisitRepository {
         /**
@@ -130,7 +133,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL vet-speciality join repository bean.
      */
-    @Requires(env = "postgres")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresVetSpecialityRepository extends VetSpecialityRepository {
         /**

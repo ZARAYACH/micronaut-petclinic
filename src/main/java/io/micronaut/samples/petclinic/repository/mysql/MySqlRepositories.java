@@ -22,6 +22,9 @@ import io.micronaut.samples.petclinic.repository.VisitRepository;
 import java.util.Collection;
 import java.util.List;
 
+import static io.micronaut.samples.petclinic.repository.RepositoryRequirements.DEFAULT_DIALECT_PROPERTY;
+import static io.micronaut.samples.petclinic.repository.RepositoryRequirements.DIALECT_MYSQL;
+
 /**
  * MySQL-backed Micronaut Data repository beans active in the {@code mysql} environment.
  */
@@ -32,7 +35,7 @@ public final class MySqlRepositories {
     /**
      * MySQL owner repository bean.
      */
-    @Requires(env = "mysql")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MySqlOwnerRepository extends OwnerRepository {
     }
@@ -40,7 +43,7 @@ public final class MySqlRepositories {
     /**
      * MySQL pet repository bean.
      */
-    @Requires(env = "mysql")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MySqlPetRepository extends PetRepository {
         /**
@@ -67,7 +70,7 @@ public final class MySqlRepositories {
     /**
      * MySQL pet type repository bean.
      */
-    @Requires(env = "mysql")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MySqlPetTypeRepository extends PetTypeRepository {
     }
@@ -75,7 +78,7 @@ public final class MySqlRepositories {
     /**
      * MySQL speciality repository bean.
      */
-    @Requires(env = "mysql")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MySqlSpecialityRepository extends SpecialityRepository {
     }
@@ -83,7 +86,7 @@ public final class MySqlRepositories {
     /**
      * MySQL vet repository bean.
      */
-    @Requires(env = "mysql")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MySqlVetRepository extends VetRepository {
         /**
@@ -113,7 +116,7 @@ public final class MySqlRepositories {
     /**
      * MySQL visit repository bean.
      */
-    @Requires(env = "mysql")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MySqlVisitRepository extends VisitRepository {
         /**
@@ -130,7 +133,7 @@ public final class MySqlRepositories {
     /**
      * MySQL vet-speciality join repository bean.
      */
-    @Requires(env = "mysql")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MySqlVetSpecialityRepository extends VetSpecialityRepository {
         /**
@@ -147,7 +150,7 @@ public final class MySqlRepositories {
     /**
      * MySQL user repository bean.
      */
-    @Requires(env = {"mysql"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MysqlUserJdbcRepository extends UserJdbcRepository {
     }
@@ -155,7 +158,7 @@ public final class MySqlRepositories {
     /**
      * MySQL role repository bean.
      */
-    @Requires(env = {"mysql"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MysqlRoleJdbcRepository extends RoleJdbcRepository {
     }
@@ -163,7 +166,7 @@ public final class MySqlRepositories {
     /**
      * MySQL user-role repository bean.
      */
-    @Requires(env = {"mysql"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
     @JdbcRepository(dialect = Dialect.MYSQL)
     public interface MysqlUserRoleJdbcRepository extends UserRoleJdbcRepository {
         /**

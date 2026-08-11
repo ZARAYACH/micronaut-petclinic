@@ -22,6 +22,9 @@ import io.micronaut.samples.petclinic.repository.VisitRepository;
 import java.util.Collection;
 import java.util.List;
 
+import static io.micronaut.samples.petclinic.repository.RepositoryRequirements.DEFAULT_DIALECT_PROPERTY;
+import static io.micronaut.samples.petclinic.repository.RepositoryRequirements.DIALECT_H2;
+
 /**
  * H2-backed Micronaut Data repository beans used when no external database environment is active.
  */
@@ -32,7 +35,7 @@ public final class H2Repositories {
     /**
      * H2 owner repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2OwnerRepository extends OwnerRepository {
     }
@@ -40,7 +43,7 @@ public final class H2Repositories {
     /**
      * H2 pet repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2PetRepository extends PetRepository {
         /**
@@ -67,7 +70,7 @@ public final class H2Repositories {
     /**
      * H2 pet type repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2PetTypeRepository extends PetTypeRepository {
     }
@@ -75,7 +78,7 @@ public final class H2Repositories {
     /**
      * H2 speciality repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2SpecialityRepository extends SpecialityRepository {
     }
@@ -83,7 +86,7 @@ public final class H2Repositories {
     /**
      * H2 vet repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VetRepository extends VetRepository {
         /**
@@ -113,7 +116,7 @@ public final class H2Repositories {
     /**
      * H2 visit repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VisitRepository extends VisitRepository {
         /**
@@ -130,7 +133,7 @@ public final class H2Repositories {
     /**
      * H2 vet-speciality join repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VetSpecialityRepository extends VetSpecialityRepository {
         /**
@@ -147,7 +150,7 @@ public final class H2Repositories {
     /**
      * H2 user repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2UserJdbcRepository extends UserJdbcRepository {
     }
@@ -155,7 +158,7 @@ public final class H2Repositories {
     /**
      * H2 role repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2RoleJdbcRepository extends RoleJdbcRepository {
     }
@@ -163,7 +166,7 @@ public final class H2Repositories {
     /**
      * H2 user-role repository bean.
      */
-    @Requires(property="datasources.default.dialect", value ="H2")
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2UserRoleJdbcRepository extends UserRoleJdbcRepository {
         /**
