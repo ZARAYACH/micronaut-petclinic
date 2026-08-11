@@ -9,7 +9,6 @@ h2gis = "2.2.5"
 logback = "1.6.1"
 graalvm-native = "1.1.6"
 jte = "3.2.4"
-testcontainers = "2.0.5"
 
 [libraries]
 micronaut-platform-parent = { module = "io.micronaut.platform:micronaut-parent", version.ref = "micronaut-platform" }
@@ -45,10 +44,6 @@ junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 assertj-core = { module = "org.assertj:assertj-core" }
-testcontainers-jdbc = { module = "org.testcontainers:testcontainers-jdbc", version.ref = "testcontainers" }
-testcontainers-mysql = { module = "org.testcontainers:testcontainers-mysql", version.ref = "testcontainers" }
-testcontainers-oracle-free = { module = "org.testcontainers:testcontainers-oracle-free", version.ref = "testcontainers" }
-testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 
 [plugins]
 micronaut-application = { id = "io.micronaut.application", version.ref = "micronaut-gradle-plugin" }

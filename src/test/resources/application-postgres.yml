@@ -1,6 +1,7 @@
 # PostgreSQL Configuration Profile
 datasources:
   default:
-    url: jdbc:tc:postgresql:18.4:///petclinic
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    db-type: postgres
+    db-name: petclinic
+    schema-generate: CREATE_DROP
     dialect: POSTGRES

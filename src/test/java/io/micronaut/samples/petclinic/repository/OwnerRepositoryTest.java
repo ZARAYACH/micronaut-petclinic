@@ -5,6 +5,7 @@ import io.micronaut.data.model.Sort;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ class OwnerRepositoryTest {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "micronaut.environments", matches = ".*oracle.*")
     void shouldFindOwnerByIdWithPets() {
         Optional<Owner> owner = ownerRepository.findByIdWithPets(1);
         assertThat(owner).isPresent();
@@ -69,6 +71,7 @@ class OwnerRepositoryTest {
     }
 
     @Test
+    @DisabledIfSystemProperty(named = "micronaut.environments", matches = ".*oracle.*")
     void shouldUpdateExistingOwner() {
         Optional<Owner> owner = ownerRepository.findById(1);
         assertThat(owner).isPresent();

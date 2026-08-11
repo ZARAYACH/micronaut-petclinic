@@ -257,7 +257,7 @@ export MICRONAUT_ENVIRONMENTS=postgres # for PostgreSQL
 
 ## Testing
 
-`./mvnw test` runs the integration suite against the default in-memory H2 database. `./mvnw verify` runs that H2 suite first, then reruns it against disposable PostgreSQL, MySQL, and Oracle Testcontainers databases.
+`./mvnw test` runs the integration suite against the default in-memory H2 database. `./mvnw verify` runs that H2 suite first, then reruns it against disposable PostgreSQL, MySQL, and Oracle databases managed by Micronaut Test Resources.
 
 ```bash
 # H2 integration suite
@@ -267,7 +267,7 @@ export MICRONAUT_ENVIRONMENTS=postgres # for PostgreSQL
 ./mvnw verify
 ```
 
-Docker must be running for `verify`; Testcontainers pulls missing images automatically. Oracle startup is typically slower than PostgreSQL and MySQL.
+Docker must be running for `verify`; Micronaut Test Resources provisions the disposable database containers and pulls missing images automatically. Oracle startup is typically slower than PostgreSQL and MySQL.
 
 ```bash
 # Gradle equivalents

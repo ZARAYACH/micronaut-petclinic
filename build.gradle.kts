@@ -37,7 +37,7 @@ val databaseIntegrations = listOf(
         descriptionName = "PostgreSQL",
     ),
     DatabaseIntegration(
-        testTaskName = "testOracleIntegration",
+        testTaskName = "testOracleDbIntegration",
         environment = "oracle",
         descriptionName = "Oracle DB",
     )
@@ -47,7 +47,7 @@ micronaut {
     runtime("netty")
     testRuntime("junit5")
     testResources {
-        enabled = false
+        enabled = true
     }
 }
 
@@ -92,10 +92,6 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.assertj.core)
-    testImplementation(libs.testcontainers.jdbc)
-    testImplementation(libs.testcontainers.mysql)
-    testImplementation(libs.testcontainers.oracle.free)
-    testImplementation(libs.testcontainers.postgresql)
     jteGenerate(libs.jte.native.resources)
 }
 
@@ -105,20 +101,6 @@ jte {
     binaryStaticContent = true
     jteExtension("gg.jte.nativeimage.NativeResourcesExtension")
     generate()
-}
-
-graalvmNative {
-    binaries {
-        named("main") {
-            buildArgs.add("--enable-native-access=ALL-UNNAMED")
-            buildArgs.add("--exclude-config")
-            buildArgs.add(".*micronaut-http-netty-[^/]+\\.jar")
-            buildArgs.add("^/META-INF/native-image/io\\.micronaut\\.micronaut\\.http\\.netty/native-image\\.properties$")
-            buildArgs.add("--initialize-at-run-time=io.netty.util.internal.CleanerJava25")
-            buildArgs.add("--initialize-at-run-time=sun.security.util.Password\$ConsoleHolder")
-            buildArgs.add("--initialize-at-run-time=jdk.internal.io.JdkConsoleImpl\$1ConsoleHolder")
-        }
-    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -145,28 +127,27 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     maxParallelForks = 1
     systemProperty("micronaut.server.port", "-1")
+    applyDefaultEnvironment()
 }
 
 databaseIntegrations.forEach { integration ->
     tasks.register<Test>(integration.testTaskName) {
         group = "verification"
-        description = "Runs tests against a disposable ${integration.descriptionName} Testcontainers database."
+        description =
+            "Runs tests against a disposable ${integration.descriptionName} database from Micronaut Test Resources."
         testClassesDirs = sourceSets.test.get().output.classesDirs
         classpath = sourceSets.test.get().runtimeClasspath
-        systemProperty("micronaut.environments", integration.environment)
+        systemProperty("micronaut.environments", "test,${integration.environment}")
     }
 }
 
-graalvmNative {
-    metadataRepository {
-        enabled = true
-    }
-    binaries {
-        all {
-            resources.autodetect()
-            if (JavaVersion.current().majorVersion == "25") {
-                buildArgs.add("-H:+SharedArenaSupport")
-            }
-        }
+tasks.named<JavaExec>("run") {
+    applyDefaultEnvironment()
+}
+
+fun JavaForkOptions.applyDefaultEnvironment() {
+    if (System.getProperty("micronaut.environments").isNullOrBlank() &&
+        System.getenv("MICRONAUT_ENVIRONMENTS").isNullOrBlank()) {
+        systemProperty("micronaut.environments", "h2")
     }
 }
