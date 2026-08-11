@@ -7,30 +7,30 @@ public sealed interface UserState permits User {
     /**
      * @return the login name
      */
-    String getUsername();
+    String username();
 
     /**
      * @return the encoded password hash
      */
-    String getPassword();
+    String password();
 
     /**
      * @return whether the user is allowed to authenticate
      */
-    boolean isEnabled();
+    boolean enabled();
 
     /**
      * @return whether the account has expired
      */
-    boolean isAccountExpired();
+    boolean expired();
 
     /**
      * @return whether the account is locked
      */
-    boolean isAccountLocked();
+    boolean locked();
 
     /**
      * @return whether the password has expired
      */
-    boolean isPasswordExpired();
+    boolean passwordExpired();
 }

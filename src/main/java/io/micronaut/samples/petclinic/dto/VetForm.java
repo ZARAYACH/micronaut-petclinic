@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Size;
  * @param firstName the submitted first name
  * @param lastName the submitted last name
  */
-@Introspected
 @Serdeable
 public record VetForm(
         Integer id,

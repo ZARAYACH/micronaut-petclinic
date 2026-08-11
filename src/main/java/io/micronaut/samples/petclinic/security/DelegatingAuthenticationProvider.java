@@ -83,19 +83,19 @@ class DelegatingAuthenticationProvider<B> implements HttpRequestAuthenticationPr
         if (user == null) {
             authenticationFailed = new AuthenticationFailed(USER_NOT_FOUND);
 
-        } else if (!user.isEnabled()) {
+        } else if (!user.enabled()) {
             authenticationFailed = new AuthenticationFailed(USER_DISABLED);
 
-        } else if (user.isAccountExpired()) {
+        } else if (user.expired()) {
             authenticationFailed = new AuthenticationFailed(ACCOUNT_EXPIRED);
 
-        } else if (user.isAccountLocked()) {
+        } else if (user.locked()) {
             authenticationFailed = new AuthenticationFailed(ACCOUNT_LOCKED);
 
-        } else if (user.isPasswordExpired()) {
+        } else if (user.passwordExpired()) {
             authenticationFailed = new AuthenticationFailed(PASSWORD_EXPIRED);
 
-        } else if (!passwordEncoder.matches(authenticationRequest.getSecret().toString(), user.getPassword())) {
+        } else if (!passwordEncoder.matches(authenticationRequest.getSecret().toString(), user.password())) {
             authenticationFailed = new AuthenticationFailed(CREDENTIALS_DO_NOT_MATCH);
         }
 
@@ -120,7 +120,7 @@ class DelegatingAuthenticationProvider<B> implements HttpRequestAuthenticationPr
      * @return an authenticated response containing the user's authorities
      */
     private AuthenticationResponse createSuccessfulAuthenticationResponse(UserState user) {
-        List<String> authorities = authoritiesFetcher.findAuthoritiesByUsername(user.getUsername());
-        return AuthenticationResponse.success(user.getUsername(), authorities);
+        List<String> authorities = authoritiesFetcher.findAuthoritiesByUsername(user.username());
+        return AuthenticationResponse.success(user.username(), authorities);
     }
 }
