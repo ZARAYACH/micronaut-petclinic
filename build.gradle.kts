@@ -112,18 +112,3 @@ tasks.withType<Test>().configureEach {
     maxParallelForks = 1
     systemProperty("micronaut.server.port", "-1")
 }
-
-graalvmNative {
-    metadataRepository {
-        enabled = true
-    }
-//    binaries {
-//        all {
-//            buildArgs.add("--initialize-at-build-time=io.micronaut.security.authentication.AuthenticationMode")
-//            resources.autodetect()
-//            if (JavaVersion.current().majorVersion == "25") {
-//                buildArgs.add("-H:+SharedArenaSupport")
-//            }
-//        }
-//    }
-}
