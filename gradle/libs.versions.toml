@@ -1,12 +1,13 @@
 [versions]
-micronaut-platform = "4.10.17"
-micronaut-gradle-plugin = "4.6.2"
-micronaut-sourcegen = "1.8.5"
+micronaut-platform = "5.1.0"
+micronaut-gradle-plugin = "5.0.2"
+micronaut-sourcegen = "2.1.0"
 ojdbc = "23.26.2.0.0"
 mysql = "9.3.0"
 postgresql = "42.7.11"
-logback = "1.5.37"
-graalvm-native = "1.1.5"
+h2gis = "2.2.5"
+logback = "1.6.1"
+graalvm-native = "1.1.6"
 jte = "3.2.4"
 
 [libraries]
@@ -31,6 +32,7 @@ micronaut-managment = { module = "io.micronaut:micronaut-management"}
 
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api" }
 h2 = { module = "com.h2database:h2" }
+h2gis = { module = "org.orbisgis:h2gis", version.ref = "h2gis" }
 ojdbc11 = { module = "com.oracle.database.jdbc:ojdbc11", version.ref = "ojdbc" }
 mysql-connector-j = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }

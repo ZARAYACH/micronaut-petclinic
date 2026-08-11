@@ -147,6 +147,19 @@
                             </div>
                         </a>
                     </div>
+                    <div class="col-md-4">
+                        <a href="/clinics" class="text-decoration-none">
+                            <div class="card h-100 text-center p-4">
+                                <div class="card-body">
+                                    <div class="feature-icon gradient-2 mx-auto mb-3">
+                                        <i class="fas fa-hospital"></i>
+                                    </div>
+                                    <h4>${msg.text("getStarted.clinics.title")}</h4>
+                                    <p class="text-muted">${msg.text("getStarted.clinics.desc")}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
