@@ -113,10 +113,10 @@ tasks.withType<Test>().configureEach {
     systemProperty("micronaut.server.port", "-1")
 }
 
-//graalvmNative {
-//    metadataRepository {
-//        enabled = true
-//    }
+graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
 //    binaries {
 //        all {
 //            buildArgs.add("--initialize-at-build-time=io.micronaut.security.authentication.AuthenticationMode")
@@ -126,4 +126,4 @@ tasks.withType<Test>().configureEach {
 //            }
 //        }
 //    }
-//}
+}

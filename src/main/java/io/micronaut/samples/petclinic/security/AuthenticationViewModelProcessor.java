@@ -14,7 +14,7 @@ import java.util.Map;
  * Exposes authentication state to rendered views.
  */
 @Singleton
-public class AuthenticationViewModelProcessor implements ViewModelProcessor<Object> {
+public class AuthenticationViewModelProcessor implements ViewModelProcessor<Object, HttpRequest<?>> {
 
     private static final String AUTHENTICATED = "authenticated";
 
