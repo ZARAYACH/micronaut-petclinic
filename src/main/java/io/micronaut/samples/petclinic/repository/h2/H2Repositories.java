@@ -86,7 +86,7 @@ public final class H2Repositories {
     /**
      * H2 vet repository bean.
      */
-    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
+    @Requires(notEnv = {"mysql", "postgres", "oracle"})
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VetRepository extends VetRepository {
         /**
@@ -145,6 +145,11 @@ public final class H2Repositories {
         @Override
         @Query(value = "SELECT s.* FROM SPECIALTIES s JOIN VET_SPECIALTIES vs ON vs.SPECIALTY_ID = s.id WHERE vs.VET_ID = :vetId ORDER BY s.NAME", nativeQuery = true)
         List<Speciality> findSpecialitiesByVetId(Integer vetId);
+    }
+
+    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @JdbcRepository(dialect = Dialect.H2)
+    public interface H2ClinicRepository extends ClinicRepository {
     }
 
     /**

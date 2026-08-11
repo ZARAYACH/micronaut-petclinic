@@ -201,6 +201,27 @@ Use the language selector in the top-right corner to switch between:
 - Spanish (Español)
 - German (Deutsch)
 
+### Geospatial Clinic Search
+
+The application also includes a Micronaut Data geospatial example. It stores sample clinic branches as WGS 84 `Point` values (SRID 4326) and exposes three derived repository methods through `ClinicRepository`: `findByLocationNear`, `findByLocationGeoWithin`, and `findByLocationGeoIntersects`. Micronaut Data translates those derived methods to the spatial functions/operators of the active dialect. For example, `Near` is compiled to Oracle `SDO_WITHIN_DISTANCE` when the Oracle profile is active.
+
+Open http://localhost:8080/clinics to try the clinic search page.
+
+Use the manual form or the map tab to search clinic locations. Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding-box or drawn polygon, and `intersects` for clinics whose location intersects an open `LineString`. Using a line for `intersects` makes the example distinct from `within`, which uses a filled `Polygon`.
+
+```bash
+curl -X POST http://localhost:8080/clinics/nearby \
+  -H "Content-Type: application/json" \
+  -d '{"latitude":43.0731,"longitude":-89.4012,"radiusMeters":5000}'
+
+curl -X POST http://localhost:8080/clinics/within \
+  -H "Content-Type: application/json" \
+  -d '{"coordinates":[{"latitude":43.0000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.5500}]}'
+
+curl -X POST http://localhost:8080/clinics/intersects \
+  -H "Content-Type: application/json" \
+  -d '{"coordinates":[{"latitude":43.0753,"longitude":-89.5186},{"latitude":43.1020,"longitude":-89.3545},{"latitude":43.1836,"longitude":-89.2137}]}'
+```
 ---
 
 ## Project Structure

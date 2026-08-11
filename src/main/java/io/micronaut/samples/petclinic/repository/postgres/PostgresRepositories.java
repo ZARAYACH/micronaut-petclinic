@@ -150,7 +150,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL user repository bean.
      */
-    @Requires(env = {"postgres"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgesUserJdbcRepository extends UserJdbcRepository {
     }
@@ -158,7 +158,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL role repository bean.
      */
-    @Requires(env = {"postgres"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgesRoleJdbcRepository extends RoleJdbcRepository {
     }
@@ -166,7 +166,7 @@ public final class PostgresRepositories {
     /**
      * PostgreSQL user-role repository bean.
      */
-    @Requires(env = {"postgres"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgesUserRoleJdbcRepository extends UserRoleJdbcRepository {
         /**
@@ -183,5 +183,10 @@ public final class PostgresRepositories {
                 WHERE u."USERNAME" = :username
                 """, nativeQuery = true)
         List<String> findAllAuthoritiesByUsername(String username);
+    }
+
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_POSTGRES)
+    @JdbcRepository(dialect = Dialect.POSTGRES)
+    public interface PostgresClinicRepository extends ClinicRepository {
     }
 }

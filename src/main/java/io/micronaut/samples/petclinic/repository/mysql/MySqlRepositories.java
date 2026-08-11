@@ -147,6 +147,11 @@ public final class MySqlRepositories {
         List<Speciality> findSpecialitiesByVetId(Integer vetId);
     }
 
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_MYSQL)
+    @JdbcRepository(dialect = Dialect.MYSQL)
+    public interface MySqlClinicRepository extends ClinicRepository {
+    }
+
     /**
      * MySQL user repository bean.
      */
