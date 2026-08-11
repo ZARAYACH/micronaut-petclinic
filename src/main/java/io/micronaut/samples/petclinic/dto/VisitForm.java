@@ -16,7 +16,6 @@ import java.time.LocalDate;
  * @param date the submitted visit date
  * @param description the submitted visit description
  */
-@Introspected
 @Serdeable
 public record VisitForm(
         @NotNull(message = "Visit date is required")
