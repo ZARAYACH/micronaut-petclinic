@@ -1,4 +1,5 @@
 import gg.jte.ContentType
+import org.graalvm.buildtools.gradle.tasks.NativeRunTask
 
 plugins {
     alias(libs.plugins.micronaut.application)
@@ -37,7 +38,7 @@ val databaseIntegrations = listOf(
         descriptionName = "PostgreSQL",
     ),
     DatabaseIntegration(
-        testTaskName = "testOracleDbIntegration",
+        testTaskName = "testOracleIntegration",
         environment = "oracle",
         descriptionName = "Oracle DB",
     )
@@ -130,6 +131,12 @@ tasks.withType<Test>().configureEach {
     applyDefaultEnvironment()
 }
 
+tasks.named<NativeRunTask>("nativeTest") {
+    if (defaultMicronautEnvironment()) {
+        environment.put("MICRONAUT_ENVIRONMENTS", "test,h2")
+    }
+}
+
 databaseIntegrations.forEach { integration ->
     tasks.register<Test>(integration.testTaskName) {
         group = "verification"
@@ -145,9 +152,12 @@ tasks.named<JavaExec>("run") {
     applyDefaultEnvironment()
 }
 
-fun JavaForkOptions.applyDefaultEnvironment() {
-    if (System.getProperty("micronaut.environments").isNullOrBlank() &&
-        System.getenv("MICRONAUT_ENVIRONMENTS").isNullOrBlank()) {
-        systemProperty("micronaut.environments", "h2")
+fun defaultMicronautEnvironment(): Boolean =
+    System.getProperty("micronaut.environments").isNullOrBlank() &&
+            System.getenv("MICRONAUT_ENVIRONMENTS").isNullOrBlank()
+
+fun JavaForkOptions.applyDefaultEnvironment(environment: String = "h2") {
+    if (defaultMicronautEnvironment()) {
+        systemProperty("micronaut.environments", environment)
     }
 }
