@@ -159,7 +159,7 @@ public final class OracleRepositories {
     /**
      * Oracle user repository bean.
      */
-    @Requires(env = {"oracle"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_ORACLE)
     @JdbcRepository(dialect = Dialect.ORACLE)
     public interface OracleUserJdbcRepository extends UserJdbcRepository {
     }
@@ -167,7 +167,7 @@ public final class OracleRepositories {
     /**
      * Oracle role repository bean.
      */
-    @Requires(env = {"oracle"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_ORACLE)
     @JdbcRepository(dialect = Dialect.ORACLE)
     public interface OracleRoleJdbcRepository extends RoleJdbcRepository {
     }
@@ -175,7 +175,7 @@ public final class OracleRepositories {
     /**
      * Oracle user-role repository bean.
      */
-    @Requires(env = {"oracle"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_ORACLE)
     @JdbcRepository(dialect = Dialect.ORACLE)
     public interface OracleUserRoleJdbcRepository extends UserRoleJdbcRepository {
         /**
