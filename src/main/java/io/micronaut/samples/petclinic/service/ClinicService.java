@@ -72,7 +72,7 @@ public class ClinicService {
                           VetRepository vetRepository,
                           SpecialityRepository specialityRepository,
                           VetSpecialityRepository vetSpecialityRepository,
-                          VisitNotificationService visitNotificationService
+                          VisitNotificationService visitNotificationService,
                           ClinicRepository clinicRepository) {
         this.ownerRepository = ownerRepository;
         this.petRepository = petRepository;
