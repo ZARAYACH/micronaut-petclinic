@@ -38,23 +38,6 @@ public final class PostgresRepositories {
     @Requires(env = "postgres")
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresOwnerRepository extends OwnerRepository {
-
-        //ignoring the sort because this version of micronaut data has bug
-        //TODO:remove this when on micronaut data version 5.1.x and upwards.
-        @Override
-        default Collection<Owner>  findByLastNameIlike(String lastName, Sort sort) {
-            return findByLastName(lastName);
-        }
-
-        @Override
-        default Collection<Owner> findByLastNameContainsIgnoreCase(String lastName, Sort sort) {
-            return findByLastNameContainsIgnoreCase(lastName);
-        }
-
-        @Override
-        default List<Owner> findAll(Sort sort) {
-            return findAll();
-        }
     }
 
     /**
