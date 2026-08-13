@@ -44,11 +44,14 @@ val databaseIntegrations = listOf(
     )
 )
 
+val testResourcesClientTimeoutSeconds = 180
+
 micronaut {
     runtime("netty")
     testRuntime("junit5")
     testResources {
         enabled = true
+        clientTimeout.set(testResourcesClientTimeoutSeconds)
     }
 }
 
