@@ -320,7 +320,7 @@ public class ClinicService {
                                                 double minLatitude,
                                                 double maxLongitude,
                                                 double maxLatitude) {
-        return clinicRepository.findByLocationGeoWithin(toBoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
+        return clinicRepository.findByLocationGeoWithin(toPolygon(minLongitude, minLatitude, maxLongitude, maxLatitude));
     }
 
     /**
@@ -343,24 +343,18 @@ public class ClinicService {
         return clinicRepository.findByServiceAreaGeoIntersects(toLineString(coordinates));
     }
 
-    private static Polygon toBoundingBox(double minLongitude,
-                                         double minLatitude,
-                                         double maxLongitude,
-                                         double maxLatitude) {
-        return new Polygon(List.of(toBoundingBoxShell(minLongitude, minLatitude, maxLongitude, maxLatitude)));
-    }
-
-    private static LineString toBoundingBoxShell(double minLongitude,
-                                                 double minLatitude,
-                                                 double maxLongitude,
-                                                 double maxLatitude) {
-        return new LineString(List.of(
+    private static Polygon toPolygon(double minLongitude,
+                                     double minLatitude,
+                                     double maxLongitude,
+                                     double maxLatitude) {
+        List<Point> coords = List.of(
                 new Point(minLongitude, minLatitude),
                 new Point(minLongitude, maxLatitude),
                 new Point(maxLongitude, maxLatitude),
                 new Point(maxLongitude, minLatitude),
                 new Point(minLongitude, minLatitude)
-        ));
+        );
+        return toPolygon(coords);
     }
 
     private static Polygon toPolygon(List<Point> coordinates) {

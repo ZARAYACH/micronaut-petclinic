@@ -5,10 +5,11 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.samples.petclinic.ClinicServiceFixtures;
+import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,6 +22,9 @@ class OwnerControllerTest {
     @Inject
     @Client("/")
     HttpClient client;
+
+    @Inject
+    ClinicServiceFixtures clinicServiceFixtures;
 
     @Test
     void shouldShowFindOwnersForm() {
@@ -50,11 +54,12 @@ class OwnerControllerTest {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "micronaut.environments", matches = ".*oracle.*", disabledReason = "Oracle-generated IDs come from sequences, so test data does not reliably start at fixed IDs like 1.")
     void shouldShowOwnerDetails() {
+        Owner owner = clinicServiceFixtures.requiredOwner("George", "Franklin");
+
         HttpResponse<String> response = client.toBlocking()
-                .exchange(HttpRequest.GET("/owners/1"), String.class);
-        
+                .exchange(HttpRequest.GET("/owners/" + owner.id()), String.class);
+
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
         assertThat(response.body()).contains("George");
         assertThat(response.body()).contains("Franklin");
@@ -70,13 +75,15 @@ class OwnerControllerTest {
     }
 
     @Test
-    @DisabledIfSystemProperty(named = "micronaut.environments", matches = ".*oracle.*", disabledReason = "Oracle-generated IDs come from sequences, so test data does not reliably start at fixed IDs like 1.")
     void shouldShowEditOwnerForm() {
+        Owner owner = clinicServiceFixtures.requiredOwner("George", "Franklin");
+
         HttpResponse<String> response = client.toBlocking()
-                .exchange(HttpRequest.GET("/owners/1/edit"), String.class);
+                .exchange(HttpRequest.GET("/owners/" + owner.id() + "/edit"), String.class);
         
         assertThat((CharSequence) response.status()).isEqualTo(HttpStatus.OK);
         assertThat(response.body()).contains("Edit Owner");
         assertThat(response.body()).contains("George");
     }
+
 }
