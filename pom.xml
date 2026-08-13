@@ -28,7 +28,7 @@
         <exec.mainClass>io.micronaut.samples.petclinic.Application</exec.mainClass>
         <jte.version>3.2.4</jte.version>
         <h2gis.version>2.2.5</h2gis.version>
-        <maven.native.plugin.version>1.1.6</maven.native.plugin.version>
+        <maven.native.plugin.version>1.1.9</maven.native.plugin.version>
         <maven.shared.utils.version>3.4.2</maven.shared.utils.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
