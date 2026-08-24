@@ -1,5 +1,5 @@
 [versions]
-micronaut-platform = "5.1.1"
+micronaut-platform = "5.1.2"
 micronaut-gradle-plugin = "5.0.2"
 micronaut-sourcegen = "2.1.0"
 ojdbc = "23.26.3.0.0"
