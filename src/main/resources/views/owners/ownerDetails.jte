@@ -133,6 +133,10 @@
                                                     <div class="visit-item">
                                                         <div class="visit-date">${visit.date() != null ? visit.date().toString() : ""}</div>
                                                         <div class="visit-description">${visit.description()}</div>
+                                                        <div class="visit-meta">
+                                                            <span><i class="fas fa-clock me-1"></i>${visit.duration() != null ? visit.duration().toMinutes() + " " + msg.text("visit.minutes") : ""}</span>
+                                                            <span><i class="fas fa-calendar-check me-1"></i>${visit.period() != null ? visit.period().toTotalMonths() + " " + msg.text("visit.months") : ""}</span>
+                                                        </div>
                                                     </div>
                                                 @endfor
                                             </div>

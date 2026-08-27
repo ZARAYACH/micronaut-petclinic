@@ -13,6 +13,7 @@ import io.micronaut.samples.petclinic.model.Speciality;
 import io.micronaut.samples.petclinic.model.Vet;
 import io.micronaut.samples.petclinic.model.VetWithSpecialities;
 import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.dto.VisitSearchCriteria;
 import io.micronaut.samples.petclinic.repository.ClinicRepository;
 import io.micronaut.samples.petclinic.repository.OwnerRepository;
 import io.micronaut.samples.petclinic.repository.PetRepository;
@@ -24,10 +25,13 @@ import io.micronaut.samples.petclinic.repository.VisitRepository;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 
+import java.time.Duration;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -210,6 +214,21 @@ public class ClinicService {
      */
     public Collection<Visit> findVisitsByPetId(Integer petId) {
         return visitRepository.findByPetId(petId);
+    }
+
+    /**
+     * Searches visits using the supplied optional filters.
+     *
+     * @param criteria the search filters
+     * @return matching visits ordered from newest to oldest
+     */
+    public List<Visit> searchVisits(VisitSearchCriteria criteria) {
+        return visitRepository.findByDateBetweenAndDurationLessThanEqualsAndPeriodLessThanEquals(
+                criteria.fromDate(),
+                criteria.toDate(),
+                Duration.ofMinutes(criteria.maxDurationMinutes()),
+                Period.ofMonths(criteria.maxFollowUpMonths())
+        );
     }
 
     /**
