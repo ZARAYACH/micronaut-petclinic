@@ -1,5 +1,6 @@
 package io.micronaut.samples.petclinic.controller;
 
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -8,7 +9,6 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.samples.petclinic.dto.VisitDto;
 import io.micronaut.samples.petclinic.dto.VisitSearchCriteria;
-import io.micronaut.samples.petclinic.model.Visit;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
 
@@ -20,6 +20,7 @@ import java.util.Map;
  * Displays and filters visits.
  */
 @Controller("/visits")
+@Requires(env = "oracle")
 public class VisitSearchController {
 
     private final ClinicService clinicService;
