@@ -8,6 +8,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.server.exceptions.NotFoundException;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.PetForm;
 import io.micronaut.samples.petclinic.mapper.FormMapper;
@@ -107,7 +108,7 @@ public class PetController {
     @Get("/new")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initCreationForm(@PathVariable Integer ownerId) {
-        Owner owner = getOwner(ownerId).orElseThrow();
+        Owner owner = getOwner(ownerId).orElseThrow(NotFoundException::new);
         return Map.of("pet", new PetForm(),
                 "owner", owner,
                 "types", clinicService.findPetTypes(),
@@ -158,7 +159,7 @@ public class PetController {
     @Get("/{petId}/edit")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initUpdateForm(@PathVariable Integer ownerId, @PathVariable Integer petId) {
-        Pet pet = clinicService.findPetById(petId).orElseThrow();
+        Pet pet = clinicService.findPetById(petId).orElseThrow(NotFoundException::new);
         return Map.of("pet", formMapper.toPetForm(pet),
                 "petId", petId,
                 "owner", pet.getOwner(),
