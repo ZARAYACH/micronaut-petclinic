@@ -55,6 +55,21 @@ Open http://localhost:8080
 docker-compose --profile oracle up
 ```
 
+For an existing Oracle volume, apply the tablespace fix once or recreate the
+local volume before starting the application:
+
+```bash
+docker-compose --profile oracle exec -T oracle sqlplus -s system/petclinic@FREEPDB1 <<'SQL'
+CREATE TABLESPACE petclinic_data DATAFILE '/opt/oracle/oradata/FREE/FREEPDB1/petclinic_data01.dbf' SIZE 100M AUTOEXTEND ON NEXT 10M MAXSIZE 2G EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;
+ALTER USER petclinic DEFAULT TABLESPACE PETCLINIC_DATA;
+ALTER USER petclinic QUOTA UNLIMITED ON PETCLINIC_DATA;
+EXIT;
+SQL
+```
+
+Alternatively, `docker-compose --profile oracle down -v` removes the local
+Oracle volume so the startup script can create the user correctly next time.
+
 > **Note:** The default configuration uses an ARM64 image for Apple Silicon Macs. For x86/AMD64 machines, update the image in `docker-compose.yml` to `container-registry.oracle.com/database/free:latest`.
 
 ### MySQL
@@ -199,6 +214,20 @@ curl -X POST http://localhost:8080/clinics/intersects \
   -d '{"coordinates":[{"latitude":43.0753,"longitude":-89.5186},{"latitude":43.1020,"longitude":-89.3545},{"latitude":43.1836,"longitude":-89.2137}]}'
 ```
 ---
+
+### Oracle semantic chunk retrieval
+
+The Oracle profile also includes a retrieval-only vector search example based on Micronaut Data's [vector type support](https://github.com/micronaut-projects/micronaut-data/pull/3637). It seeds a small pet-care knowledge base, stores each chunk as a `FloatVector` in an Oracle `VECTOR(384, FLOAT32)` column, and uses the derived vector-search repository method with cosine distance.
+
+Start the Oracle profile and open http://localhost:8080/knowledge. The demo uses LangChain4j's local [all-MiniLM-L6-v2](https://github.com/langchain4j/langchain4j/blob/main/docs/docs/integrations/embedding-models/1-in-process.md) ONNX embedding model, so no LLM or external API key is required. It returns ranked chunks with their source, topic, species, and distance. The HTTP API is:
+
+```bash
+curl -X POST http://localhost:8080/knowledge/search \
+  -H "Content-Type: application/json" \
+  -d '{"query":"What vaccinations does my puppy need?"}'
+```
+
+The embedding service is intentionally an interface, making it straightforward to replace the local model with another embedding provider while keeping Oracle retrieval unchanged.
 
 ## Project Structure
 
