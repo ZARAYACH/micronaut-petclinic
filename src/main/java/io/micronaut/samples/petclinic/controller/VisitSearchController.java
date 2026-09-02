@@ -1,7 +1,6 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -11,6 +10,7 @@ import io.micronaut.samples.petclinic.dto.VisitDto;
 import io.micronaut.samples.petclinic.dto.VisitSearchCriteria;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.views.View;
+import org.jspecify.annotations.NonNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -55,10 +55,10 @@ public class VisitSearchController {
      */
     @Produces(MediaType.APPLICATION_JSON)
     @Get("/search")
-    public List<VisitDto> search(@QueryValue @Nullable LocalDate fromDate,
-                                 @QueryValue @Nullable LocalDate toDate,
-                                 @QueryValue @Nullable Integer maxDurationMinutes,
-                                 @QueryValue @Nullable Integer maxFollowUpMonths) {
+    public List<VisitDto> search(@QueryValue @NonNull LocalDate fromDate,
+                                 @QueryValue @NonNull LocalDate toDate,
+                                 @QueryValue(defaultValue = "120" ) Integer maxDurationMinutes,
+                                 @QueryValue(defaultValue = "6") Integer maxFollowUpMonths) {
         VisitSearchCriteria criteria = new VisitSearchCriteria(fromDate, toDate, maxDurationMinutes, maxFollowUpMonths);
         return VisitDto.from(clinicService.searchVisits(criteria));
     }

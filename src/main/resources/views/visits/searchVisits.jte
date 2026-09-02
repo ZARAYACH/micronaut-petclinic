@@ -22,18 +22,18 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-3">
                         <label for="fromDate" class="form-label">${msg.text("visit.search.fromDate")}</label>
-                        <input type="date" class="form-control" id="fromDate" name="fromDate">
+                        <input type="date" class="form-control" id="fromDate" id="fromDate" name="fromDate">
                     </div>
                     <div class="col-md-3">
                         <label for="toDate" class="form-label">${msg.text("visit.search.toDate")}</label>
-                        <input type="date" class="form-control" id="toDate" name="toDate">
+                        <input type="date" class="form-control" id="toDate" id="toDate" name="toDate">
                     </div>
                     <div class="col-md-3">
                         <label for="maxDurationMinutes"
                                class="form-label">${msg.text("visit.search.durationLessThan")}</label>
                         <div class="d-flex align-items-center gap-2">
                             <input type="range" class="form-range" id="maxDurationMinutes" name="maxDurationMinutes"
-                                   min="0" max="240" step="15" value="0">
+                                   min="0" max="240" step="15" value="120">
                             <output id="durationValue" data-any-label="${msg.text("visit.search.any")}"
                                     class="text-nowrap">
                             </output>
@@ -44,7 +44,7 @@
                                class="form-label">${msg.text("visit.search.followUpLessThan")}</label>
                         <div class="d-flex align-items-center gap-2">
                             <input type="range" class="form-range" id="maxFollowUpMonths" name="maxFollowUpMonths"
-                                   min="0" max="36" step="1" value="0">
+                                   min="0" max="36" step="1" value="12">
                             <output id="followUpValue" data-any-label="${msg.text("visit.search.any")}"
                                     class="text-nowrap">
                             </output>
@@ -97,7 +97,7 @@
                 const input = document.getElementById(inputId);
                 const output = document.getElementById(outputId);
                 const update = () => {
-                    output.textContent = input.value === "0" ? output.dataset.anyLabel : input.value;
+                    output.textContent = input.value;
                 };
                 input.addEventListener("input", update);
                 update();
@@ -150,24 +150,23 @@
 
                 const params = new URLSearchParams();
                 for (const [name, value] of new FormData(form).entries()) {
-                    if (value && value !== "0") {
+                    if (value) {
                         params.set(name, value);
                     }
                 }
 
-                // The combined backend query expects a complete range. These values
-                // represent an unbounded search when the user leaves a filter empty.
                 if (!params.has("fromDate")) {
-                    params.set("fromDate", "1900-01-01");
+                    const lastYear = new Date();
+                    lastYear.setFullYear(lastYear.getFullYear() - 1);
+                    const lastYearFormatted = lastYear.toISOString().split('T')[0]
+                    params.set("fromDate", lastYearFormatted);
+
+                    document.getElementById("fromDate").value = lastYearFormatted
                 }
                 if (!params.has("toDate")) {
-                    params.set("toDate", "9999-12-31");
-                }
-                if (!params.has("maxDurationMinutes")) {
-                    params.set("maxDurationMinutes", "240");
-                }
-                if (!params.has("maxFollowUpMonths")) {
-                    params.set("maxFollowUpMonths", "36");
+                    const date = new Date().toISOString().split('T')[0]
+                    params.set("toDate", date);
+                    document.getElementById("toDate").value = date
                 }
 
                 loading.classList.remove("d-none");

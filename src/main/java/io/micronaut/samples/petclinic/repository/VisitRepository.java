@@ -4,6 +4,7 @@ import io.micronaut.data.annotation.Join;
 import io.micronaut.data.model.Sort;
 import io.micronaut.data.repository.CrudRepository;
 import io.micronaut.samples.petclinic.model.Visit;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -131,5 +132,5 @@ public interface VisitRepository extends CrudRepository<Visit, Integer> {
     @Join(value = "pet", type = LEFT_FETCH)
     @Join(value = "pet.type", type = LEFT_FETCH)
     @Join(value = "pet.owner", type = LEFT_FETCH)
-    List<Visit> findByDateBetweenAndDurationLessThanEqualsAndPeriodLessThanEquals(LocalDate from, LocalDate to, Duration duration, Period period);
+    List<Visit> findByDateBetweenAndDurationLessThanEqualsAndPeriodLessThanEquals(@NonNull LocalDate from, @NonNull LocalDate to, @NonNull Duration duration, @NonNull Period period);
 }

@@ -1,5 +1,7 @@
 package io.micronaut.samples.petclinic.dto;
 
+import org.jspecify.annotations.NonNull;
+
 import java.time.LocalDate;
 
 /**
@@ -11,9 +13,9 @@ import java.time.LocalDate;
  * @param maxFollowUpMonths exclusive upper bound for follow-up period
  */
 public record VisitSearchCriteria(
-        LocalDate fromDate,
-        LocalDate toDate,
-        Integer maxDurationMinutes,
-        Integer maxFollowUpMonths
+        @NonNull LocalDate fromDate,
+        @NonNull LocalDate toDate,
+        int maxDurationMinutes,
+        int maxFollowUpMonths
 ) {
 }
