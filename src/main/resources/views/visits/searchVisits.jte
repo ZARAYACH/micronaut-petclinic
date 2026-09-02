@@ -22,11 +22,11 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-3">
                         <label for="fromDate" class="form-label">${msg.text("visit.search.fromDate")}</label>
-                        <input type="date" class="form-control" id="fromDate" id="fromDate" name="fromDate">
+                        <input type="date" class="form-control" id="fromDate" name="fromDate">
                     </div>
                     <div class="col-md-3">
                         <label for="toDate" class="form-label">${msg.text("visit.search.toDate")}</label>
-                        <input type="date" class="form-control" id="toDate" id="toDate" name="toDate">
+                        <input type="date" class="form-control" id="toDate" name="toDate">
                     </div>
                     <div class="col-md-3">
                         <label for="maxDurationMinutes"

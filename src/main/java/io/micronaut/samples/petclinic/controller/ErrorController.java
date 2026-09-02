@@ -17,7 +17,7 @@ import java.util.Map;
 @Controller("/error")
 public class ErrorController {
 
-    Logger LOG = LoggerFactory.getLogger(ErrorController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ErrorController.class);
 
     /**
      * Creates the error controller.
