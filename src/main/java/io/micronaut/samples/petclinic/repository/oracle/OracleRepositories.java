@@ -33,22 +33,6 @@ public final class OracleRepositories {
     }
 
     /**
-     * Oracle pet-care document repository bean.
-     */
-    @Requires(env = "oracle")
-    @JdbcRepository(dialect = Dialect.ORACLE)
-    public interface OraclePetCareDocumentRepository extends PetCareDocumentRepository {
-    }
-
-    /**
-     * Oracle vector-searchable pet-care chunk repository bean.
-     */
-    @Requires(env = "oracle")
-    @JdbcRepository(dialect = Dialect.ORACLE)
-    public interface OraclePetCareChunkRepository extends PetCareChunkRepository {
-    }
-
-    /**
      * Oracle pet repository bean.
      */
     @Requires(env = "oracle")
