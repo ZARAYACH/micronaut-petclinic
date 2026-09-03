@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.spring.security.crypto)
     implementation(libs.slf4j.jcl.over)
     implementation(libs.micronaut.managment)
+    implementation(libs.langchain4j.embeddings.all.minilm.l6.v2)
 
     runtimeOnly(libs.h2)
     runtimeOnly(libs.h2gis)
@@ -111,4 +112,17 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     maxParallelForks = 1
     systemProperty("micronaut.server.port", "-1")
+}
+
+graalvmNative {
+    binaries {
+        all {
+            resources.autodetect()
+            buildArgs.add("--initialize-at-run-time=ai.onnxruntime.OnnxRuntime")
+            buildArgs.add("--initialize-at-run-time=ai.onnxruntime.OrtEnvironment")
+            buildArgs.add("--initialize-at-run-time=ai.djl.huggingface.tokenizers.jni.LibUtils")
+            buildArgs.add("--initialize-at-run-time=ai.djl.huggingface.tokenizers.jni.TokenizersLibrary")
+            buildArgs.add("--initialize-at-run-time=dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel")
+        }
+    }
 }
