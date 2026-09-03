@@ -7,7 +7,6 @@ import io.micronaut.http.annotation.Error;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,13 +74,11 @@ public class ErrorController {
     /**
      * Handle 500 Internal Server Error.
      * @param request the original request
-     * @param throwable the exception that occurred
      * @return the error view
      */
-    @Error(global = true)
+    @Error(status = HttpStatus.INTERNAL_SERVER_ERROR, global = true)
     @View("error/error")
-    public Map<String, Object> internalServerError(HttpRequest<?> request, Throwable throwable) {
-        LOG.error("Error :", throwable);
+    public Map<String, Object> internalServerError(HttpRequest<?> request) {
         return Map.of(
                 "path", request.getPath(),
                 "message", HttpStatus.INTERNAL_SERVER_ERROR.getReason(),

@@ -22,6 +22,8 @@ micronaut:
 
   security:
     authentication: session
+    basic-auth:
+      enabled: false
     redirect:
       login-success: /
       login-failure: /user/authFailed
@@ -30,6 +32,10 @@ micronaut:
         enabled: true
     intercept-url-map:
       - pattern: /resources/**
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: /favicon.ico
         http-method: GET
         access:
           - isAnonymous()

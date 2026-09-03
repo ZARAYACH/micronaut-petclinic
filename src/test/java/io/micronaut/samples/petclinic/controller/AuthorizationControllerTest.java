@@ -1,8 +1,10 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.http.HttpHeaders;
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -78,10 +80,13 @@ class AuthorizationControllerTest {
 
             String cookie = login(client, username, password);
 
-            HttpResponse<String> response = exchange(client, formPost("/owners/1/pets/1/visits/new", Map.of(
+            HttpResponse<String> response = exchange(client, HttpRequest.POST("/owners/1/pets/1/visits/new", Map.of(
                     "date", LocalDate.now().plusDays(1).toString(),
-                    "description", "Follow-up"
-            )).header(HttpHeaders.COOKIE, cookie));
+                    "description", "Follow-up",
+                    "durationMinutes", 30,
+                    "followUpPeriodMonths", 6
+            )).contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.COOKIE, cookie));
 
             assertThat(response.status().getCode()).isBetween(300, 399);
             assertThat(response.getHeaders().get(HttpHeaders.LOCATION)).isEqualTo("/owners/1");
