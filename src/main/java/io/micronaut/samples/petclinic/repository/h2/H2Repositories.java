@@ -17,6 +17,7 @@ import io.micronaut.samples.petclinic.repository.VetRepository;
 import io.micronaut.samples.petclinic.repository.VetSpecialityRepository;
 import io.micronaut.samples.petclinic.repository.VisitRepository;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
