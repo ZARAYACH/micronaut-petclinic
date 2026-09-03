@@ -8,6 +8,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.server.exceptions.NotFoundException;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.PetForm;
 import io.micronaut.samples.petclinic.mapper.FormMapper;
@@ -113,18 +114,13 @@ public class PetController {
     @Get("/new")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initCreationForm(@PathVariable Integer ownerId) {
-        Optional<Owner> owner = getOwner(ownerId);
-
-        if (owner.isPresent()) {
-            return Map.of(
-                    "pet", new PetForm(),
-                    "owner", owner.get(),
-                    "types", clinicService.findPetTypes(),
-                    "isNew", true,
-                    "validationErrors", Map.of()
-            );
-        }
-        return Map.of("error", "Owner not found");
+        Owner owner = getOwner(ownerId).orElseThrow(NotFoundException::new);
+        return Map.of("pet", new PetForm(),
+                "owner", owner,
+                "types", clinicService.findPetTypes(),
+                "isNew", true,
+                "validationErrors", Map.of()
+        );
     }
 
     /**
@@ -171,19 +167,14 @@ public class PetController {
     @Get("/{petId}/edit")
     @View("pets/createOrUpdatePetForm")
     public Map<String, Object> initUpdateForm(@PathVariable Integer ownerId, @PathVariable Integer petId) {
-        Optional<Pet> pet = clinicService.findPetById(petId);
-
-        if (pet.isPresent()) {
-            return Map.of(
-                    "pet", formMapper.toPetForm(pet.get()),
-                    "petId", petId,
-                    "owner", pet.get().getOwner(),
-                    "types", clinicService.findPetTypes(),
-                    "isNew", false,
-                    "validationErrors", Map.of()
-            );
-        }
-        return Map.of("error", "Pet not found");
+        Pet pet = clinicService.findPetById(petId).orElseThrow(NotFoundException::new);
+        return Map.of("pet", formMapper.toPetForm(pet),
+                "petId", petId,
+                "owner", pet.getOwner(),
+                "types", clinicService.findPetTypes(),
+                "isNew", false,
+                "validationErrors", Map.of()
+        );
     }
 
     /**
@@ -194,7 +185,6 @@ public class PetController {
      * @param form    the updated pet form data
      * @return redirect to owner details
      */
-    @Secured({ROLE_STAFF_, ROLE_ADMIN_})
     @Post(value = "/{petId}/edit", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> processUpdateForm(@PathVariable Integer ownerId,
                                               @PathVariable Integer petId,

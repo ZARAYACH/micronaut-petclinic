@@ -1,18 +1,17 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MediaType;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Error;
-import io.micronaut.http.annotation.Produces;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Controller for handling errors.
@@ -21,6 +20,14 @@ import java.util.Objects;
 @Controller("/error")
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class ErrorController {
+
+    private final static Logger LOG = LoggerFactory.getLogger(ErrorController.class);
+
+    /**
+     * Creates the error controller.
+     */
+    public ErrorController() {
+    }
 
     /**
      * Handle 404 Not Found errors.
@@ -68,15 +75,17 @@ public class ErrorController {
     /**
      * Handle 500 Internal Server Error.
      * @param request the original request
+     * @param throwable the exception that occurred
      * @return the error view
      */
-    @Error(status = HttpStatus.INTERNAL_SERVER_ERROR, global = true)
+    @Error(global = true)
     @View("error/error")
-    public Map<String, Object> internalServerError(HttpRequest<?> request) {
+    public Map<String, Object> internalServerError(HttpRequest<?> request, Throwable throwable) {
+        LOG.error("Error :", throwable);
         return Map.of(
                 "path", request.getPath(),
-                "message", "Internal Server Error",
-                "exception", "InternalServerError"
+                "message", HttpStatus.INTERNAL_SERVER_ERROR.getReason(),
+                "exception", HttpStatus.INTERNAL_SERVER_ERROR.getReason()
         );
     }
 }

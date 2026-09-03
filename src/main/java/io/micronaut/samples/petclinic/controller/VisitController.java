@@ -8,6 +8,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.server.exceptions.NotFoundException;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.VisitForm;
 import io.micronaut.samples.petclinic.mapper.FormMapper;
@@ -101,17 +102,12 @@ public class VisitController {
     @View("pets/createOrUpdateVisitForm")
     @Secured(SecurityRule.IS_ANONYMOUS)
     public Map<String, Object> initNewVisitForm(@PathVariable Integer ownerId, @PathVariable Integer petId) {
-        Optional<Pet> pet = clinicService.findPetById(petId);
-
-        if (pet.isPresent()) {
-            return Map.of(
-                    "visit", new VisitForm(),
-                    "pet", pet.get(),
-                    "owner", pet.get().getOwner(),
-                    "validationErrors", Map.of()
-            );
-        }
-        return Map.of("error", "Pet not found");
+        Pet pet = clinicService.findPetById(petId).orElseThrow(NotFoundException::new);
+        return Map.of("visit", new VisitForm(),
+                "pet", pet,
+                "owner", pet.getOwner(),
+                "validationErrors", Map.of()
+        );
     }
 
     /**
@@ -122,8 +118,8 @@ public class VisitController {
      * @param form    the visit form data
      * @return redirect to owner details
      */
-    @Post(value = "/new", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     @Secured(SecurityRule.IS_AUTHENTICATED)
+    @Post(value = "/new", consumes = MediaType.APPLICATION_JSON)
     public HttpResponse<?> processNewVisitForm(@PathVariable Integer ownerId,
                                                 @PathVariable Integer petId,
                                                 @Valid @Body VisitForm form) {
