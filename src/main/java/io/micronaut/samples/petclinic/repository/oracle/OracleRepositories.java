@@ -34,6 +34,22 @@ public final class OracleRepositories {
     }
 
     /**
+     * Oracle pet-care document repository bean.
+     */
+    @Requires(env = "oracle")
+    @JdbcRepository(dialect = Dialect.ORACLE)
+    public interface OraclePetCareDocumentRepository extends PetCareDocumentRepository {
+    }
+
+    /**
+     * Oracle vector-searchable pet-care chunk repository bean.
+     */
+    @Requires(env = "oracle")
+    @JdbcRepository(dialect = Dialect.ORACLE)
+    public interface OraclePetCareChunkRepository extends PetCareChunkRepository {
+    }
+
+    /**
      * Oracle pet repository bean.
      */
     @Requires(env = "oracle")
@@ -122,6 +138,11 @@ public final class OracleRepositories {
         @Query(value = "SELECT v.* FROM VISITS v WHERE v.PET_ID = :petId ORDER BY v.VISIT_DATE DESC", nativeQuery = true)
         Collection<Visit> findByPetId(Integer petId);
 
+        /**
+         * Find visits by visit date.
+         * @param date the visit date
+         * @return visits with the provided date
+         */
         @Override
         @Query(value = "SELECT v.* FROM VISITS v WHERE v.VISIT_DATE = :date ORDER BY v.PET_ID, v.id", nativeQuery = true)
         Collection<Visit> findByDate(LocalDate date);

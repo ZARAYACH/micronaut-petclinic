@@ -1,6 +1,7 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Error;
 import io.micronaut.views.View;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Controller for handling errors.
@@ -17,7 +17,7 @@ import java.util.Objects;
 @Controller("/error")
 public class ErrorController {
 
-    Logger LOG = LoggerFactory.getLogger(ErrorController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ErrorController.class);
 
     /**
      * Creates the error controller.
@@ -45,14 +45,14 @@ public class ErrorController {
      * @param throwable the exception that occurred
      * @return the error view
      */
-    @Error(global = true)
+    @Error(status = HttpStatus.INTERNAL_SERVER_ERROR, global = true)
     @View("error/error")
     public Map<String, Object> handleError(HttpRequest<?> request, Throwable throwable) {
-        LOG.error("Error", throwable);
+        LOG.error("Error :", throwable);
         return Map.of(
                 "path", request.getPath(),
-                "message", Objects.toString(throwable.getMessage(), ""),
-                "exception", throwable.getClass().getSimpleName()
+                "message", HttpStatus.INTERNAL_SERVER_ERROR.getReason(),
+                "exception", HttpStatus.INTERNAL_SERVER_ERROR.getReason()
         );
     }
 }
