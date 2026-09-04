@@ -70,7 +70,6 @@ dependencies {
     implementation(libs.micronaut.cache.caffeine)
     implementation(libs.micronaut.sourcegen.annotations)
     implementation(libs.micronaut.managment)
-    implementation(libs.langchain4j.embeddings.all.minilm.l6.v2)
 
     runtimeOnly(libs.h2)
     runtimeOnly(libs.h2gis)
@@ -166,14 +165,3 @@ fun JavaForkOptions.applyDefaultEnvironment(environment: String = "h2") {
     }
 }
 
-graalvmNative {
-    binaries {
-        all {
-            buildArgs.add("--initialize-at-run-time=ai.onnxruntime.OnnxRuntime")
-            buildArgs.add("--initialize-at-run-time=ai.onnxruntime.OrtEnvironment")
-            buildArgs.add("--initialize-at-run-time=ai.djl.huggingface.tokenizers.jni.LibUtils")
-            buildArgs.add("--initialize-at-run-time=ai.djl.huggingface.tokenizers.jni.TokenizersLibrary")
-            buildArgs.add("--initialize-at-run-time=dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel")
-        }
-    }
-}

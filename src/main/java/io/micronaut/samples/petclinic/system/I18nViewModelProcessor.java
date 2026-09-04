@@ -21,7 +21,6 @@ public class I18nViewModelProcessor implements ViewModelProcessor<Object, HttpRe
     private final MessageSource messageSource;
     private final io.micronaut.http.server.util.locale.HttpLocaleResolver httpLocaleResolver;
     private final Environment environment;
-
     /**
      * Creates the processor with message and locale resolution dependencies.
      *
