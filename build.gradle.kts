@@ -42,7 +42,6 @@ dependencies {
     implementation(libs.spring.security.crypto)
     implementation(libs.slf4j.jcl.over)
     implementation(libs.micronaut.managment)
-    implementation(libs.langchain4j.embeddings.all.minilm.l6.v2)
 
     runtimeOnly(libs.h2)
     runtimeOnly(libs.h2gis)
@@ -80,20 +79,6 @@ jte {
     generate()
 }
 
-graalvmNative {
-    binaries {
-        named("main") {
-            buildArgs.add("--enable-native-access=ALL-UNNAMED")
-            buildArgs.add("--exclude-config")
-            buildArgs.add(".*micronaut-http-netty-[^/]+\\.jar")
-            buildArgs.add("^/META-INF/native-image/io\\.micronaut\\.micronaut\\.http\\.netty/native-image\\.properties$")
-            buildArgs.add("--initialize-at-run-time=io.netty.util.internal.CleanerJava25")
-            buildArgs.add("--initialize-at-run-time=sun.security.util.Password\$ConsoleHolder")
-            buildArgs.add("--initialize-at-run-time=jdk.internal.io.JdkConsoleImpl\$1ConsoleHolder")
-        }
-    }
-}
-
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(25)
     options.compilerArgs.addAll(
@@ -112,17 +97,4 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     maxParallelForks = 1
     systemProperty("micronaut.server.port", "-1")
-}
-
-graalvmNative {
-    binaries {
-        all {
-            resources.autodetect()
-            buildArgs.add("--initialize-at-run-time=ai.onnxruntime.OnnxRuntime")
-            buildArgs.add("--initialize-at-run-time=ai.onnxruntime.OrtEnvironment")
-            buildArgs.add("--initialize-at-run-time=ai.djl.huggingface.tokenizers.jni.LibUtils")
-            buildArgs.add("--initialize-at-run-time=ai.djl.huggingface.tokenizers.jni.TokenizersLibrary")
-            buildArgs.add("--initialize-at-run-time=dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel")
-        }
-    }
 }
