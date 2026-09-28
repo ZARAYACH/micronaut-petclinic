@@ -21,6 +21,9 @@
                             <a href="/user/signUp" class="btn btn-lg btn-outline-light">
                                 <i class="fas fa-user-plus"></i> ${msg.text("welcome.signUp")}
                             </a>
+                            <a href="/oauth/login/entraid" class="btn btn-lg btn-outline-light">
+                                <i class="fas fa-right-to-bracket"></i> ${msg.text("welcome.signIn")}
+                            </a>
                         </div>
                     </div>
                     <div class="col-lg-6 text-center mt-5 mt-lg-0">

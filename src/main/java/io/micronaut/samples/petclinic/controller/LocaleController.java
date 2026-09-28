@@ -17,6 +17,7 @@ import java.time.Duration;
  * Stores the user's language preference in a cookie.
  */
 @Controller("/locale")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class LocaleController {
 
     private static final String LOCALE_COOKIE_NAME = "locale";

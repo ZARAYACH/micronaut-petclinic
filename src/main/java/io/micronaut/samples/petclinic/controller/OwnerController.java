@@ -36,6 +36,7 @@ import static io.micronaut.samples.petclinic.model.Role.Authority.ROLE_STAFF_;
  * Handles CRUD operations and searching for pet owners.
  */
 @Controller("/owners")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class OwnerController {
 
     private final ClinicService clinicService;

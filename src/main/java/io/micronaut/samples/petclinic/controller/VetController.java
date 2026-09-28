@@ -30,6 +30,7 @@ import java.util.Map;
  * Displays the list of vets with their specialities.
  */
 @Controller("/vets")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class VetController {
 
     private static final String VIEW_VET_FORM = "vets/createOrUpdateVetForm";

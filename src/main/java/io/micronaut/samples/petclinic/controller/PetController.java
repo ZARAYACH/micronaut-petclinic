@@ -35,6 +35,7 @@ import static io.micronaut.samples.petclinic.model.Role.Authority.ROLE_STAFF_;
  * Handles CRUD operations for pets within the context of their owners.
  */
 @Controller("/owners/{ownerId}/pets")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class PetController {
 
     private final ClinicService clinicService;
@@ -187,8 +188,8 @@ public class PetController {
      */
     @Post(value = "/{petId}/edit", consumes = MediaType.APPLICATION_FORM_URLENCODED)
     public HttpResponse<?> processUpdateForm(@PathVariable Integer ownerId,
-                                              @PathVariable Integer petId,
-                                              @Valid @Body PetForm form) {
+                                             @PathVariable Integer petId,
+                                             @Valid @Body PetForm form) {
         Optional<Owner> owner = getOwner(ownerId);
         if (owner.isEmpty()) {
             return HttpResponse.notFound();

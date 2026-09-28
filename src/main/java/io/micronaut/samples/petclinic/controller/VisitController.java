@@ -32,6 +32,7 @@ import java.util.Optional;
  * Handles creating visits for pets.
  */
 @Controller("/owners/{ownerId}/pets/{petId}/visits")
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class VisitController {
 
     private final ClinicService clinicService;

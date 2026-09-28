@@ -87,7 +87,7 @@ public final class H2Repositories {
     /**
      * H2 vet repository bean.
      */
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VetRepository extends VetRepository {
         /**
@@ -117,7 +117,7 @@ public final class H2Repositories {
     /**
      * H2 visit repository bean.
      */
-    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
+    @Requires(notEnv = {"mysql", "postgres", "oracle"})
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2VisitRepository extends VisitRepository {
         /**
@@ -148,7 +148,7 @@ public final class H2Repositories {
         List<Speciality> findSpecialitiesByVetId(Integer vetId);
     }
 
-    @Requires(notEnv = {"mysql", "postgres", "oracle"})
+    @Requires(property = DEFAULT_DIALECT_PROPERTY, value = DIALECT_H2)
     @JdbcRepository(dialect = Dialect.H2)
     public interface H2ClinicRepository extends ClinicRepository {
     }

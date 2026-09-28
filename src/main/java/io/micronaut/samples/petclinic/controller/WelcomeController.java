@@ -25,6 +25,7 @@ public class WelcomeController {
      * Display the welcome/home page.
      * @return the welcome view
      */
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/")
     @View("welcome")
     public Map<String, Object> welcome() {
