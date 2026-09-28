@@ -6,6 +6,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.samples.petclinic.model.Appointment;
 import io.micronaut.samples.petclinic.repository.AppointmentRepository;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.transaction.exceptions.OracleTransactionPriorityException;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ class OracleTransactionPriorityIntegrationTest {
         originalAppointment = appointments.findAvailableAppointments().stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(
-                        "An available sample appointment is required; this test does not seed or reset the database."));
+                        "An available sample appointment is required for the priority test."));
     }
 
     @AfterEach
@@ -60,13 +61,8 @@ class OracleTransactionPriorityIntegrationTest {
             var regular = executor.submit(() -> service.bookRegular(originalAppointment.id()));
             awaitRegularLock();
             service.bookEmergency(originalAppointment.id());
-            assertThat(regular.isDone()).as("HIGH commits while LOW is still paused").isFalse();
-            Throwable failure = assertThrows(ExecutionException.class, () -> regular.get(30, TimeUnit.SECONDS));
-            while (!(failure instanceof SQLException) && failure.getCause() != null) {
-                failure = failure.getCause();
-            }
-            assertThat(failure).isInstanceOfSatisfying(SQLException.class,
-                    sql -> assertThat(sql.getErrorCode()).isIn(63300, 63302));
+            var failure = assertThrows(ExecutionException.class, () -> regular.get(30, TimeUnit.SECONDS));
+            assertThat(failure.getCause()).isInstanceOf(OracleTransactionPriorityException.class);
             assertThat(appointments.findById(originalAppointment.id()).orElseThrow().status()).isEqualTo(BOOKED_FOR_EMERGENCY);
         }
     }

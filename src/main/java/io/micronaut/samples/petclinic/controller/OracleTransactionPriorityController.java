@@ -1,6 +1,7 @@
 package io.micronaut.samples.petclinic.controller;
 
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.data.exceptions.DataAccessException;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
@@ -16,15 +17,16 @@ import io.micronaut.samples.petclinic.repository.AppointmentRepository;
 import io.micronaut.samples.petclinic.service.OracleTransactionPriorityService;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.transaction.exceptions.OracleTransactionPriorityException;
+import io.micronaut.transaction.exceptions.TransactionTimedOutException;
 import io.micronaut.views.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static io.micronaut.samples.petclinic.dto.OracleBookingResult.Outcome;
 
@@ -32,6 +34,7 @@ import static io.micronaut.samples.petclinic.dto.OracleBookingResult.Outcome;
 @Controller("/oracle/transaction-priority")
 @Requires(env = "oracle")
 @ExecuteOn(TaskExecutors.BLOCKING)
+@Secured(SecurityRule.IS_ANONYMOUS)
 public class OracleTransactionPriorityController {
 
     private static final Logger LOG = LoggerFactory.getLogger(OracleTransactionPriorityController.class);
@@ -44,26 +47,18 @@ public class OracleTransactionPriorityController {
         this.appointments = appointments;
     }
 
-    /** Only Oracle error codes confirm a priority rollback, never request timing. */
-    static Outcome outcomeOf(Throwable error) {
-        Set<Throwable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
-        for (Throwable cause = error; cause != null && seen.add(cause); cause = cause.getCause()) {
-            if (cause instanceof OracleTransactionPriorityService.BookingTaken) {
-                return Outcome.TAKEN;
-            }
-            if (cause instanceof SQLException sql) {
-                Set<SQLException> sqlSeen = Collections.newSetFromMap(new IdentityHashMap<>());
-                for (; sql != null && sqlSeen.add(sql); sql = sql.getNextException()) {
-                    if (sql.getErrorCode() == 63300 || sql.getErrorCode() == 63302) {
-                        return Outcome.PRIORITY_ROLLED_BACK;
-                    }
-                    if (sql.getErrorCode() == 54 || sql.getErrorCode() == 30006 || sql.getErrorCode() == 1013) {
-                        return Outcome.TIMED_OUT;
-                    }
-                }
-            }
-        }
-        return Outcome.FAILED;
+    static Outcome outcomeOf(RuntimeException error) {
+        return switch (error) {
+            case OracleTransactionPriorityException _ -> Outcome.PRIORITY_ROLLED_BACK;
+            case OracleTransactionPriorityService.BookingTaken _ -> Outcome.TAKEN;
+            case TransactionTimedOutException _ -> Outcome.TIMED_OUT;
+            case DataAccessException data when data.getCause() instanceof SQLException sql ->
+                    switch (sql.getErrorCode()) {
+                        case 54, 30006, 1013 -> Outcome.TIMED_OUT;
+                        default -> Outcome.FAILED;
+                    };
+            default -> Outcome.FAILED;
+        };
     }
 
     @Get
@@ -75,7 +70,6 @@ public class OracleTransactionPriorityController {
     }
 
     @Post("/reset")
-    @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> reset() {
         try {
             service.resetFixture();
@@ -89,7 +83,6 @@ public class OracleTransactionPriorityController {
     }
 
     @Post("/book")
-    @Produces(MediaType.APPLICATION_JSON)
     public HttpResponse<OracleBookingResult> book(@QueryValue Integer appointmentId,
                                                   @QueryValue BookingType type) {
         Runnable transaction = switch (type) {
@@ -109,7 +102,7 @@ public class OracleTransactionPriorityController {
         } catch (RuntimeException e) {
             outcome = outcomeOf(e);
             if (outcome == Outcome.FAILED) {
-                LOG.error("Appointment booking failed", e);
+                LOG.error("Appointment booking failed for appointmentId={}", appointmentId, e);
             }
         }
         var booked = appointments.findById(appointmentId)
@@ -126,7 +119,6 @@ public class OracleTransactionPriorityController {
     }
 
     @Error(exception = HttpStatusException.class)
-    @Produces(MediaType.APPLICATION_JSON)
     public HttpResponse<Map<String, String>> labError(HttpStatusException error) {
         return HttpResponse.status(error.getStatus()).body(Map.of("message", error.getMessage()));
     }

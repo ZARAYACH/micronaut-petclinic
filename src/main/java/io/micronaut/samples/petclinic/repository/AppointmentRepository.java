@@ -15,13 +15,13 @@ import java.util.Optional;
 public interface AppointmentRepository extends CrudRepository<Appointment, Integer> {
     /**
      * Locks an appointment within the caller's transaction until commit or rollback.
+     * Lock-wait behavior is dialect-specific; Oracle waits up to ten seconds.
      *
      * @param id appointment id
      * @return the locked appointment, if it exists
      */
-    @Override
     @NonNull
-    Optional<Appointment> findById(Integer id);
+    Optional<Appointment> findByIdForUpdate(Integer id);
 
     /** Returns available appointments ordered by display order, then id. */
     List<Appointment> findAvailableAppointments();

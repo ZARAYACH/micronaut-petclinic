@@ -1,6 +1,5 @@
 package io.micronaut.samples.petclinic.repository;
 
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.samples.petclinic.model.Appointment;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -12,9 +11,8 @@ import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR
 import static io.micronaut.samples.petclinic.model.Appointment.Status.HELD_BY_REGULAR;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Uses the existing Oracle schema; each test's data changes are rolled back. */
+/** Exercises appointment queries on the active database profile, including locking-query syntax. */
 @MicronautTest
-@Requires(env = "oracle")
 class AppointmentRepositoryTest {
     @Inject AppointmentRepository appointments;
 
@@ -36,7 +34,7 @@ class AppointmentRepositoryTest {
         var original = appointments.save(new Appointment("Save regression appointment", 99));
         long count = appointments.count();
 
-        var updated = appointments.findById(original.id()).orElseThrow();
+        var updated = appointments.findByIdForUpdate(original.id()).orElseThrow();
         for (var status : new Appointment.Status[]{HELD_BY_REGULAR, BOOKED_FOR_REGULAR}) {
             updated = appointments.save(updated.withStatus(status));
             assertThat(updated).isEqualTo(original.withStatus(status));

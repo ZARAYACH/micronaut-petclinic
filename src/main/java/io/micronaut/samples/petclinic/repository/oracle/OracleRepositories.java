@@ -157,7 +157,7 @@ public final class OracleRepositories {
         @NonNull
         @Override
         @Query(value = "SELECT a.* FROM APPOINTMENTS a WHERE a.ID = :appointmentId FOR UPDATE WAIT 10", nativeQuery = true)
-        Optional<Appointment> findById(Integer appointmentId);
+        Optional<Appointment> findByIdForUpdate(Integer appointmentId);
 
         @Override
         @Query(value = "SELECT a.* FROM APPOINTMENTS a WHERE STATUS = 'AVAILABLE' ORDER BY DISPLAY_ORDER, ID", nativeQuery = true)

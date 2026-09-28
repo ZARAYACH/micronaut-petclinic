@@ -9,15 +9,17 @@ if (root) {
     let appointmentId;
     let lowPending = false;
     let highPending = false;
+    let resetPending = false;
     let lowOutcome = "NOT_STARTED";
     let highOutcome = "NOT_STARTED";
     let countdown;
 
     function render() {
-        element("start-low").disabled = lowPending || highPending || !select.value;
-        element("start-high").disabled = highPending || !select.value;
-        element("reset").disabled = lowPending || highPending;
-        select.disabled = lowPending || highPending;
+        element("start-low").disabled = resetPending || lowPending || highPending || !select.value;
+        element("start-high").disabled = resetPending || highPending || !select.value
+            || (lowPending && highOutcome !== "NOT_STARTED");
+        element("reset").disabled = resetPending || lowPending || highPending;
+        select.disabled = resetPending || lowPending || highPending;
         element("low").textContent = text("outcome." + lowOutcome);
         element("high").textContent = text("outcome." + highOutcome);
 
@@ -25,7 +27,7 @@ if (root) {
         if (lowOutcome === "FAILED" || highOutcome === "FAILED") summary = "error";
         else if (lowOutcome === "PRIORITY_ROLLED_BACK" && highOutcome === "COMMITTED") summary = "confirmed";
         else if (lowOutcome === "COMMITTED") summary = "regularWon";
-        else if (lowOutcome === "TAKEN") summary = "taken";
+        else if (lowOutcome === "TAKEN" || highOutcome === "TAKEN") summary = "taken";
         else if (lowOutcome === "TIMED_OUT" || highOutcome === "TIMED_OUT") summary = "timedOut";
         else if (highOutcome === "COMMITTED" && lowOutcome === "NOT_STARTED") summary = "emergencyWon";
         else if (highOutcome === "COMMITTED") summary = "emergencyPending";
@@ -33,7 +35,13 @@ if (root) {
     }
 
     function updateAppointments(appointments) {
-        appointments = Array.isArray(appointments) ? appointments : [];
+        appointments ??= []; // Serialization can omit an empty availability list.
+        if (!Array.isArray(appointments)) {
+            select.replaceChildren(new Option(text("error"), ""));
+            element("suggestion").textContent = "—";
+            showError(new Error(text("error")));
+            return;
+        }
         const previous = select.value;
         const previousStillAvailable = appointments.some(a => String(a.id) === previous);
         select.replaceChildren();
@@ -74,7 +82,7 @@ if (root) {
     }
 
     element("start-low").addEventListener("click", async () => {
-        if (lowPending || highPending || !select.value) return;
+        if (resetPending || lowPending || highPending || !select.value) return;
         appointmentId = select.value; // Both requests use this ID, even when the options refresh.
         element("appointment").textContent = select.selectedOptions[0].textContent;
         element("state").classList.remove("d-none");
@@ -110,7 +118,7 @@ if (root) {
     });
 
     element("start-high").addEventListener("click", async () => {
-        if (highPending || !select.value) return;
+        if (resetPending || highPending || !select.value || (lowPending && highOutcome !== "NOT_STARTED")) return;
         if (!lowPending) {
             appointmentId = select.value;
             element("appointment").textContent = select.selectedOptions[0].textContent;
@@ -119,6 +127,8 @@ if (root) {
             element("database-status").textContent = "—";
             element("suggestion").textContent = "—";
             lowOutcome = "NOT_STARTED";
+            element("countdown").textContent = "";
+            element("countdown-value").classList.add("d-none");
         }
         highPending = true;
         highOutcome = "RUNNING";
@@ -135,18 +145,20 @@ if (root) {
     });
 
     element("reset").addEventListener("click", async () => {
-        if (lowPending || highPending) return;
-        element("reset").disabled = true;
-        element("start-low").disabled = true;
+        if (resetPending || lowPending || highPending) return;
+        resetPending = true;
+        render();
         try {
             await request("/reset");
             window.location.reload();
         } catch (error) {
             showError(error);
+            resetPending = false;
             render();
         }
     });
 
+    select.addEventListener("change", render);
     render();
     window.addEventListener("pagehide", () => clearInterval(countdown));
     window.addEventListener("pageshow", event => {

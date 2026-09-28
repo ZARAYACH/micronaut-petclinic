@@ -288,9 +288,11 @@ not how long the lock is held. Both transactions have a 30-second timeout.
 The countdown is approximate; the pause is demo-only, not a production booking pattern.
 The booking request is `POST /oracle/transaction-priority/book?appointmentId=ID&type=regular|emergency`.
 
-Only `ORA-63300` / `ORA-63302` confirm priority rollback. HIGH arriving before LOW
-locks the row, or too late to displace LOW, does not demonstrate it. A timeout is
-not proof of priority rollback, and a committed booking cannot be displaced.
+Micronaut Data 5.2 translates Oracle's `ORA-63300` / `ORA-63302` errors into
+`OracleTransactionPriorityException`, which the controller maps to HTTP 409 Conflict.
+HIGH arriving before LOW locks the row, or too late to displace LOW, does not
+demonstrate it. A timeout is not proof of priority rollback, and a committed
+booking cannot be displaced.
 
 [The Oracle startup script](docker/oracle/01-init-user.sql) sets
 `PRIORITY_TXNS_MODE=ROLLBACK` and the HIGH/MEDIUM wait targets to 3 seconds.
@@ -306,6 +308,8 @@ errors are reported in the startup logs.
 
 Use one browser and a disposable database. **Reset currently makes every appointment
 available**, not just the two demo rows. The UI disables reset while its requests run.
+Wait for bookings in any other tabs or clients to finish too: reset can wait on a
+row lock and then clear the booking that just committed.
 
 #### Testing the showcase
 
@@ -313,19 +317,24 @@ With the Oracle schema and sample data already present, at least one
 appointment available, and the demo idle, run:
 
 ```bash
+MICRONAUT_ENVIRONMENTS=oracle \
+DATASOURCES_DEFAULT_SCHEMA_GENERATE=NONE \
+PETCLINIC_SAMPLE_DATA_ENABLED=false \
 ./gradlew test --tests '*OracleTransactionPriorityIntegrationTest' --rerun
 ```
 
-This test uses `application-oracle.yml` and its datasource overrides—no separate
-database user is needed. It disables schema generation and sample seeders,
-preserving existing data rather than loading it again.
+The command activates `application-oracle.yml` and disables schema generation and
+sample loading for this run. No separate database user is needed. These safeguards
+are command overrides, not test annotations; without them the default configuration
+uses `CREATE_DROP` and enables sample loading. Without the Oracle environment,
+the priority integration test is skipped.
 `--rerun` forces execution even when the sources have not changed.
 Do not restart or stop the application during the tests. Two transaction-level tests
 check a regular booking committing alone and an emergency displacing it with a real
-Oracle priority rollback. Tests override `petclinic.transaction-priority.reservation-seconds`
-to 0 for the regular booking and 5 for the priority race (above Oracle's 3-second
-HIGH wait target); the demo still defaults to 15 seconds. Together the tests take
-roughly 5 seconds, excluding startup. Each test reuses an available sample appointment
+Oracle priority rollback. Both tests set `petclinic.transaction-priority.reservation-seconds`
+to 5 (above Oracle's 3-second HIGH wait target); the demo defaults to 15 seconds.
+Together the tests take roughly 10 seconds, excluding startup.
+Each test reuses an available sample appointment
 and restores it afterward; no appointments are inserted or deleted. Visits and other
 sample data are untouched. Missing sample appointments cause a clear setup failure.
 
@@ -386,11 +395,11 @@ export MICRONAUT_ENVIRONMENTS=postgres # for PostgreSQL
 
 ## Testing
 
-The normal suite includes Oracle appointment and priority tests, which require an
-existing Oracle schema. These tests disable schema generation and sample loading;
-repository-test changes are rolled back, and the priority test restores its selected
-appointment. Other tests still inherit the default `CREATE_DROP` configuration,
-so use a disposable database when running the entire suite with Oracle enabled.
+Appointment repository tests run on the active database profile (H2 by default).
+Priority integration tests run only when the Oracle environment is active.
+The suite inherits `CREATE_DROP` and enabled sample loading, so use a disposable
+database for full-suite runs. To run only the priority tests against existing
+Oracle data, use the guarded command in "Testing the showcase" above.
 
 ```bash
 # Run all tests (Maven)
