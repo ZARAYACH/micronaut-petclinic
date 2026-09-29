@@ -19,6 +19,7 @@ import io.micronaut.samples.petclinic.repository.SpecialityRepository;
 import io.micronaut.samples.petclinic.repository.VetRepository;
 import io.micronaut.samples.petclinic.repository.VetSpecialityRepository;
 import io.micronaut.samples.petclinic.repository.VisitRepository;
+import jakarta.transaction.Transactional;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
@@ -158,6 +159,11 @@ public final class OracleRepositories {
         @Override
         @Query(value = "SELECT a.* FROM APPOINTMENTS a WHERE a.ID = :appointmentId FOR UPDATE WAIT 10", nativeQuery = true)
         Optional<Appointment> findByIdForUpdate(Integer appointmentId);
+
+        /** Attempts to lock the row immediately, failing if another transaction holds it. */
+        @Transactional
+        @Query(value = "SELECT ID FROM APPOINTMENTS WHERE ID = :appointmentId FOR UPDATE NOWAIT", nativeQuery = true)
+        Integer lockNowait(Integer appointmentId);
 
         @Override
         @Query(value = "SELECT a.* FROM APPOINTMENTS a WHERE STATUS = 'AVAILABLE' ORDER BY DISPLAY_ORDER, ID", nativeQuery = true)

@@ -1,10 +1,10 @@
 package io.micronaut.samples.petclinic.service;
 
-import com.zaxxer.hikari.HikariDataSource;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.data.exceptions.DataAccessException;
 import io.micronaut.samples.petclinic.model.Appointment;
-import io.micronaut.samples.petclinic.repository.AppointmentRepository;
+import io.micronaut.samples.petclinic.repository.oracle.OracleRepositories.OracleAppointmentRepository;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.transaction.exceptions.OracleTransactionPriorityException;
 import jakarta.inject.Inject;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -23,13 +22,13 @@ import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@MicronautTest
+@MicronautTest(transactional = false)
 @Requires(env = "oracle")
 @Property(name = "petclinic.transaction-priority.reservation-seconds", value = "5")
 class OracleTransactionPriorityIntegrationTest {
+
     @Inject OracleTransactionPriorityService service;
-    @Inject AppointmentRepository appointments;
-    @Inject DataSource dataSource;
+    @Inject OracleAppointmentRepository appointments;
 
     private Appointment originalAppointment;
 
@@ -70,21 +69,16 @@ class OracleTransactionPriorityIntegrationTest {
     /** Wait for the actual row lock so HIGH cannot accidentally arrive before LOW. */
     private void awaitRegularLock() throws Exception {
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-        try (var connection = dataSource.unwrap(HikariDataSource.class).getConnection();
-             var statement = connection.prepareStatement("SELECT ID FROM APPOINTMENTS WHERE ID = ? FOR UPDATE NOWAIT")) {
-            connection.setAutoCommit(false);
-            statement.setInt(1, originalAppointment.id());
-            while (System.nanoTime() < deadline) {
-                try (var rows = statement.executeQuery()) {
-                    assertThat(rows.next()).isTrue();
-                } catch (SQLException error) {
-                    if (error.getErrorCode() == 54) return; // LOW holds the lock.
-                    throw error;
-                } finally {
-                    connection.rollback();
+        while (System.nanoTime() < deadline) {
+            try {
+                assertThat(appointments.lockNowait(originalAppointment.id())).isEqualTo(originalAppointment.id());
+            } catch (DataAccessException error) {
+                for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+                    if (cause instanceof SQLException sql && sql.getErrorCode() == 54) return; // LOW holds the lock.
                 }
-                Thread.sleep(25);
+                throw error;
             }
+            Thread.sleep(25);
         }
         throw new AssertionError("LOW did not acquire the appointment lock within five seconds");
     }
