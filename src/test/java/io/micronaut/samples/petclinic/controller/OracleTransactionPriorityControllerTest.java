@@ -3,7 +3,6 @@ package io.micronaut.samples.petclinic.controller;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.type.Argument;
-import io.micronaut.data.exceptions.DataAccessException;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -12,14 +11,14 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.samples.petclinic.dto.OracleBookingResult;
 import io.micronaut.samples.petclinic.model.Appointment;
-import io.micronaut.samples.petclinic.repository.oracle.OracleRepositories.OracleAppointmentRepository;
+import io.micronaut.samples.petclinic.repository.AppointmentRepository;
+import io.micronaut.samples.petclinic.repository.OracleAppointmentLockRepository;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +27,7 @@ import static io.micronaut.samples.petclinic.dto.OracleBookingResult.Outcome.PRI
 import static io.micronaut.samples.petclinic.dto.OracleBookingResult.Outcome.TAKEN;
 import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR_EMERGENCY;
 import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR_REGULAR;
+import static io.micronaut.samples.petclinic.support.OracleTransactionPriorityTestSupport.awaitRegularLock;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /** End-to-end booking requests through the embedded HTTP server and a real Oracle database. */
@@ -38,7 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Property(name = "micronaut.http.client.read-timeout", value = "40s")
 class OracleTransactionPriorityControllerTest {
 
-    @Inject OracleAppointmentRepository appointments;
+    @Inject AppointmentRepository appointments;
+    @Inject OracleAppointmentLockRepository appointmentLocks;
     @Inject @Client("/") HttpClient client;
 
     private Appointment originalAppointment;
@@ -68,7 +69,7 @@ class OracleTransactionPriorityControllerTest {
     void priorityRollbackReturnsHttp409AndEmergencyReturnsHttp200() throws Exception {
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             var regular = executor.submit(() -> postBooking("regular"));
-            awaitRegularLock();
+            awaitRegularLock(appointmentLocks, originalAppointment.id());
             var emergency = postBooking("emergency");
             var rolledBack = regular.get(30, TimeUnit.SECONDS);
 
@@ -104,22 +105,5 @@ class OracleTransactionPriorityControllerTest {
         assertThat(body.appointmentId()).isEqualTo(originalAppointment.id());
         assertThat(body.outcome()).isEqualTo(outcome);
         assertThat(body.databaseStatus()).isEqualTo(databaseStatus);
-    }
-
-    /** Wait for the actual row lock so HIGH cannot accidentally arrive before LOW. */
-    private void awaitRegularLock() throws Exception {
-        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-        while (System.nanoTime() < deadline) {
-            try {
-                assertThat(appointments.lockNowait(originalAppointment.id())).isEqualTo(originalAppointment.id());
-            } catch (DataAccessException error) {
-                for (Throwable cause = error; cause != null; cause = cause.getCause()) {
-                    if (cause instanceof SQLException sql && sql.getErrorCode() == 54) return; // LOW holds the lock.
-                }
-                throw error;
-            }
-            Thread.sleep(25);
-        }
-        throw new AssertionError("LOW did not acquire the appointment lock within five seconds");
     }
 }

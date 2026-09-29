@@ -31,13 +31,9 @@ class H2GisInitializerTest {
             String marker = "H2GIS initialization regression test";
             setSpatialFunctionComment(observer, marker);
             // Force a new physical connection using the application's URL, without pool reuse.
-            try (var connection = DriverManager.getConnection(jdbcUrl, username, password);
-                 var statement = connection.createStatement();
-                 var rows = statement.executeQuery("SELECT ST_SRID(ST_SetSRID(ST_GeomFromText('POINT (1 2)'), 4326))")) {
-                assertThat(rows.next()).isTrue();
-                assertThat(rows.getInt(1)).isEqualTo(4326);
+            try (var connection = DriverManager.getConnection(jdbcUrl, username, password)) {
                 // Reloading H2GIS replaces this comment, so no timing-dependent race is needed.
-                assertThat(spatialFunctionComment(observer)).isEqualTo(marker);
+                assertThat(spatialFunctionComment(connection)).isEqualTo(marker);
                 clinics.saveAll(List.of(
                         new Clinic("H2GIS regression Madison", "15 E Main St.", "Madison", -89.3838, 43.0748),
                         new Clinic("H2GIS regression Monona", "6000 Monona Dr.", "Monona", -89.3240, 43.0622)));

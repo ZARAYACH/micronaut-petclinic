@@ -301,6 +301,9 @@ export MICRONAUT_ENVIRONMENTS=postgres # for PostgreSQL
 ./gradlew check
 ```
 
+`OracleTransactionPriorityIntegrationTest` and `OracleTransactionPriorityControllerTest` require `MICRONAUT_ENVIRONMENTS=oracle`; the default `CREATE_DROP` setting drops and recreates application tables in the `petclinic` schema.
+Use a disposable database, or preserve an already-seeded schema with `DATASOURCES_DEFAULT_SCHEMA_GENERATE=NONE PETCLINIC_SAMPLE_DATA_ENABLED=false`.
+
 ---
 
 ## Migrating from Spring Boot
