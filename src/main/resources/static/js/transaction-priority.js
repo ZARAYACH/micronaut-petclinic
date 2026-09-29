@@ -67,7 +67,9 @@ if (root) {
         const response = await fetch("/oracle/transaction-priority" + path, {
             method: "POST", headers: {Accept: "application/json"}
         });
-        const body = await response.json();
+        const body = await response.json().catch(() => {
+            throw new Error(text("error"));
+        });
         if (!response.ok && !body.outcome) throw new Error(body.message || text("error"));
         return body;
     }
