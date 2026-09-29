@@ -397,8 +397,11 @@ errors are reported in the startup logs.
 
 Use one browser and a disposable database. **Reset currently makes every appointment
 available**, not just the two demo rows. The UI disables reset while its requests run.
-Wait for bookings in any other tabs or clients to finish too: reset can wait on a
-row lock and then clear the booking that just committed.
+Wait for bookings in any other tabs or clients to finish too. Reset uses plain
+`@Transactional`, so it runs at Oracle's default HIGH priority. With priority
+rollback enabled, a reset blocked by a LOW booking can cause Oracle to roll that
+booking back after the configured 3-second HIGH wait target. Reset can also clear
+a booking that commits while it waits for the row lock.
 
 #### Testing the showcase
 

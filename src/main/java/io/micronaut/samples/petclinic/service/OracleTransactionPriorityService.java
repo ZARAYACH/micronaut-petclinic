@@ -63,7 +63,9 @@ public class OracleTransactionPriorityService {
 
     /**
      * Makes all appointments available. Use only after booking requests finish:
-     * updates can wait on row locks and reset a booking that commits during that wait.
+     * reset runs at Oracle's default HIGH priority and can trigger rollback of a
+     * blocking LOW booking when priority rollback is enabled. It can also clear
+     * a booking that commits while reset waits for its row lock.
      */
     @Transactional
     public void resetFixture() {
