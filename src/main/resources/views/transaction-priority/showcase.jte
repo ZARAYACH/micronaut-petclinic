@@ -24,7 +24,7 @@
         <section class="card mb-4">
             <div class="card-body">
                 <h2 class="h4">${msg.text("transactionPriority.controls")}</h2>
-                <p class="text-muted">${msg.text("transactionPriority.instructions")}</p>
+                <p class="text-muted">${msg.text("transactionPriority.instructions", reservationSeconds)}</p>
                 <div class="mb-3">
                     <label for="priority-appointment-select" class="form-label">${msg.text("transactionPriority.availableAppointments")}</label>
                     <select id="priority-appointment-select" class="form-select">
@@ -89,8 +89,8 @@
         <details class="card">
             <summary class="card-body fw-bold">${msg.text("transactionPriority.how")}</summary>
             <div class="card-body pt-0">
-                <p>${msg.text("transactionPriority.explanation")}</p>
-                <p class="text-muted mb-0">${msg.text("transactionPriority.limitations")}</p>
+                <p>${msg.text("transactionPriority.explanation", reservationSeconds)}</p>
+                <p class="text-muted mb-0">${msg.text("transactionPriority.limitations", reservationSeconds)}</p>
             </div>
         </details>
     </main>
