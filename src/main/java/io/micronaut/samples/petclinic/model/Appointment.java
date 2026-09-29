@@ -48,7 +48,11 @@ public record Appointment(
     public enum Status {
         /** Appointment is available for a new booking. */
         AVAILABLE,
-        /** A regular booking is holding the appointment in the demo transaction. */
+        /**
+         * Intermediate state inside LOW's transaction, never committed or visible to other sessions.
+         * It is replaced by {@link #BOOKED_FOR_REGULAR} before commit or discarded on rollback.
+         * The {@code SELECT ... FOR UPDATE} row lock blocks competing bookings.
+         */
         HELD_BY_REGULAR,
         /** A regular booking finished before an emergency could displace it. */
         BOOKED_FOR_REGULAR,

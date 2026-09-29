@@ -64,7 +64,7 @@ public class DataLoader implements ApplicationEventListener<StartupEvent> {
      * @param visitRepository repository for visits
      * @param vetSpecialityRepository repository for vet-speciality join rows
      * @param clinicRepository repository for clinic locations
-     * @param appointmentRepository optional appointment repository for the active database
+     * @param appointmentRepository appointment repository for the active database
      */
     public DataLoader(VetRepository vetRepository,
                       SpecialityRepository specialityRepository,
