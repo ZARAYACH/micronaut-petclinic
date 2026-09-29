@@ -230,6 +230,95 @@ Use the language selector in the top-right corner to switch between:
 - Spanish (Español)
 - German (Deutsch)
 
+## Project Structure
+
+```
+src/main/java/
+  └── io/micronaut/samples/petclinic/
+      ├── model/           # Micronaut Data JDBC entities (Owner, Pet, Visit, Vet)
+      ├── repository/      # Data access interfaces
+      ├── service/         # Business logic
+      ├── dto/             # Form objects
+      ├── controller/      #
+      └── system/          #
+
+src/main/resources/
+  ├── views/              # JTE templates
+  ├── static/             # CSS and images
+  ├── i18n/               # Message translations
+  └── application*.yml    # Configuration files
+```
+
+---
+
+## Configuration Files
+
+- `application.yml` - Main configuration (H2 default)
+- `application-oracle.yml` - Oracle settings
+- `application-mysql.yml` - MySQL settings
+- `application-oracle-deepsec.yml` - opt-in Oracle Deep Data Security and IAM settings
+- `application-postgres.yml` - PostgreSQL settings
+
+To use a specific database locally:
+```bash
+export MICRONAUT_ENVIRONMENTS=oracle   # for Oracle
+export MICRONAUT_ENVIRONMENTS=mysql    # for MySQL
+export MICRONAUT_ENVIRONMENTS=postgres # for PostgreSQL
+
+# Maven
+./mvnw mn:run
+
+# Gradle alternative
+./gradlew run
+```
+
+---
+
+## Key Technologies
+
+- **Micronaut 5.x** - Framework
+- **Java 25** - Programming language
+- **Micronaut Data JDBC** - Database access
+- **JTE** - HTML template engine
+- **HikariCP** - JDBC connection pooling
+- **Caffeine** - Caching
+- **Bootstrap 5** - CSS framework
+
+---
+
+## Testing
+
+```bash
+# Run all tests (Maven)
+./mvnw test
+
+# Run integration tests (Maven)
+./mvnw verify
+
+# Gradle alternatives
+./gradlew test
+./gradlew test jacocoTestReport
+./gradlew check
+```
+
+---
+
+## Migrating from Spring Boot
+
+Main differences you'll encounter:
+
+1. **Dependency Injection**: Use constructor injection, not `@Autowired`
+2. **Form Binding**: Add `@Body` annotation to form parameters in controllers
+3. **MessageSource**: Must configure manually (not auto-configured)
+4. **Templates**: Use OGNL expressions instead of SpEL
+5. **Configuration**: Use YAML format, different property names
+
+See [migration-guide.md](migration-guide.md) for detailed comparisons and examples.
+
+---
+
+## Features
+
 ### Geospatial Clinic Search
 
 The application also includes a Micronaut Data geospatial example. It stores sample clinic branches as WGS 84 `Point` values (SRID 4326) and exposes three derived repository methods through `ClinicRepository`: `findByLocationNear`, `findByLocationGeoWithin`, and `findByLocationGeoIntersects`. Micronaut Data translates those derived methods to the spatial functions/operators of the active dialect. For example, `Near` is compiled to Oracle `SDO_WITHIN_DISTANCE` when the Oracle profile is active.
@@ -337,98 +426,6 @@ Together the tests take roughly 10 seconds, excluding startup.
 Each test reuses an available sample appointment
 and restores it afterward; no appointments are inserted or deleted. Visits and other
 sample data are untouched. Missing sample appointments cause a clear setup failure.
-
-## Project Structure
-
-```
-src/main/java/
-  └── io/micronaut/samples/petclinic/
-      ├── model/           # Micronaut Data JDBC entities (Owner, Pet, Visit, Vet)
-      ├── repository/      # Data access interfaces
-      ├── service/         # Business logic
-      ├── dto/             # Form objects
-      ├── controller/      #
-      └── system/          #
-
-src/main/resources/
-  ├── views/              # JTE templates
-  ├── static/             # CSS and images
-  ├── i18n/               # Message translations
-  └── application*.yml    # Configuration files
-```
-
----
-
-## Configuration Files
-
-- `application.yml` - Main configuration (H2 default)
-- `application-oracle.yml` - Oracle settings
-- `application-mysql.yml` - MySQL settings
-- `application-postgres.yml` - PostgreSQL settings
-
-To use a specific database locally:
-```bash
-export MICRONAUT_ENVIRONMENTS=oracle   # for Oracle
-export MICRONAUT_ENVIRONMENTS=mysql    # for MySQL
-export MICRONAUT_ENVIRONMENTS=postgres # for PostgreSQL
-
-# Maven
-./mvnw mn:run
-
-# Gradle alternative
-./gradlew run
-```
-
----
-
-## Key Technologies
-
-- **Micronaut 5.x** - Framework
-- **Java 25** - Programming language
-- **Micronaut Data JDBC** - Database access
-- **JTE** - HTML template engine
-- **HikariCP** - JDBC connection pooling
-- **Caffeine** - Caching
-- **Bootstrap 5** - CSS framework
-
----
-
-## Testing
-
-Appointment repository tests run on the active database profile (H2 by default).
-Priority integration tests run only when the Oracle environment is active.
-The suite inherits `CREATE_DROP` and enabled sample loading, so use a disposable
-database for full-suite runs. To run only the priority tests against existing
-Oracle data, use the guarded command in "Testing the showcase" above.
-
-```bash
-# Run all tests (Maven)
-./mvnw test
-
-# Run integration tests (Maven)
-./mvnw verify
-
-# Gradle alternatives
-./gradlew test
-./gradlew test jacocoTestReport
-./gradlew check
-```
-
----
-
-## Migrating from Spring Boot
-
-Main differences you'll encounter:
-
-1. **Dependency Injection**: Use constructor injection, not `@Autowired`
-2. **Form Binding**: Add `@Body` annotation to form parameters in controllers
-3. **MessageSource**: Must configure manually (not auto-configured)
-4. **Templates**: Use OGNL expressions instead of SpEL
-5. **Configuration**: Use YAML format, different property names
-
-See [migration-guide.md](migration-guide.md) for detailed comparisons and examples.
-
----
 
 ## Troubleshooting
 
