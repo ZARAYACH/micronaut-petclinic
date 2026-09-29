@@ -6,7 +6,6 @@ import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.GenericRepository;
 import io.micronaut.samples.petclinic.model.Appointment;
-import jakarta.transaction.Transactional;
 
 /** Test-only probe for an appointment row held by another transaction. */
 @JdbcRepository(dialect = Dialect.ORACLE)
