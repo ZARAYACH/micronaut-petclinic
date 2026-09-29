@@ -8,6 +8,8 @@ datasources:
     connection-timeout: 30000
     maximum-pool-size: 10
     minimum-idle: 2
+    dialect-options:
+      version: 23.1
 
 # We used this image because the default version that ships with test resources doesn't support geospatial features.
 # If you're not using geospatial features the default option should be sufficient & the following section can be removed.
