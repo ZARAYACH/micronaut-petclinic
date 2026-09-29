@@ -403,33 +403,6 @@ rollback enabled, a reset blocked by a LOW booking can cause Oracle to roll that
 booking back after the configured 3-second HIGH wait target. Reset can also clear
 a booking that commits while it waits for the row lock.
 
-#### Testing the showcase
-
-With the Oracle schema and sample data already present, at least one
-appointment available, and the demo idle, run:
-
-```bash
-MICRONAUT_ENVIRONMENTS=oracle \
-DATASOURCES_DEFAULT_SCHEMA_GENERATE=NONE \
-PETCLINIC_SAMPLE_DATA_ENABLED=false \
-./gradlew test --tests '*OracleTransactionPriorityIntegrationTest' --rerun
-```
-
-The command activates `application-oracle.yml` and disables schema generation and
-sample loading for this run. No separate database user is needed. These safeguards
-are command overrides, not test annotations; without them the default configuration
-uses `CREATE_DROP` and enables sample loading. Without the Oracle environment,
-the priority integration test is skipped.
-`--rerun` forces execution even when the sources have not changed.
-Do not restart or stop the application during the tests. Two transaction-level tests
-check a regular booking committing alone and an emergency displacing it with a real
-Oracle priority rollback. Both tests set `petclinic.transaction-priority.reservation-seconds`
-to 5 (above Oracle's 3-second HIGH wait target); the demo defaults to 15 seconds.
-Together the tests take roughly 10 seconds, excluding startup.
-Each test reuses an available sample appointment
-and restores it afterward; no appointments are inserted or deleted. Visits and other
-sample data are untouched. Missing sample appointments cause a clear setup failure.
-
 ## Troubleshooting
 
 ### Application won't start with Oracle/MySQL/PostgreSQL
