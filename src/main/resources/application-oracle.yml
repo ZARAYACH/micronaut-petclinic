@@ -11,3 +11,8 @@ datasources:
     minimum-idle: 2
     dialect-options:
       version: 23.1
+
+logger:
+  levels:
+    io.micronaut.samples.petclinic: INFO
+    io.micronaut.data: INFO

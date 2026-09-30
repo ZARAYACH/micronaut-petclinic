@@ -230,45 +230,6 @@ Use the language selector in the top-right corner to switch between:
 - Spanish (Español)
 - German (Deutsch)
 
-### Geospatial Clinic Search
-
-The application also includes a Micronaut Data geospatial example. It stores sample clinic branches as WGS 84 `Point` values (SRID 4326) and exposes three derived repository methods through `ClinicRepository`: `findByLocationNear`, `findByLocationGeoWithin`, and `findByLocationGeoIntersects`. Micronaut Data translates those derived methods to the spatial functions/operators of the active dialect. For example, `Near` is compiled to Oracle `SDO_WITHIN_DISTANCE` when the Oracle profile is active.
-
-Clinic branches also include `ACCEPTING_NEW_PATIENTS` and `EMERGENCY_SERVICE` boolean fields. The clinic search page can filter spatial results by either flag, and the JSON response displays both values.
-
-Open http://localhost:8080/clinics to try the clinic search page.
-
-Use the manual form or the map tab to search clinic locations. Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding-box or drawn polygon, and `intersects` for clinics whose location intersects an open `LineString`. Using a line for `intersects` makes the example distinct from `within`, which uses a filled `Polygon`.
-
-```bash
-curl -X POST http://localhost:8080/clinics/nearby \
-  -H "Content-Type: application/json" \
-  -d '{"latitude":43.0731,"longitude":-89.4012,"radiusMeters":5000}'
-
-curl -X POST http://localhost:8080/clinics/within \
-  -H "Content-Type: application/json" \
-  -d '{"coordinates":[{"latitude":43.0000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.5500}]}'
-
-curl -X POST http://localhost:8080/clinics/intersects \
-  -H "Content-Type: application/json" \
-  -d '{"coordinates":[{"latitude":43.0753,"longitude":-89.5186},{"latitude":43.1020,"longitude":-89.3545},{"latitude":43.1836,"longitude":-89.2137}]}'
-```
----
-
-### Oracle semantic chunk retrieval
-
-The Oracle profile also includes a retrieval-only vector search example based on Micronaut Data's [vector type support](https://github.com/micronaut-projects/micronaut-data/pull/3637). It seeds a small pet-care knowledge base, stores each chunk as a `FloatVector` in an Oracle `VECTOR(384, FLOAT32)` column, and uses the derived vector-search repository method with cosine distance.
-
-Start the Oracle profile and open http://localhost:8080/knowledge. The demo uses vectors precomputed once with the all-MiniLM-L6-v2 model and checked into `src/main/resources/knowledge/pet-care-embeddings.tsv`; the runtime has no embedding model, ONNX Runtime, native tokenizer, LLM, or external API key. It returns ranked chunks with their source, topic, species, and distance. The HTTP API is:
-
-```bash
-curl -X POST http://localhost:8080/knowledge/search \
-  -H "Content-Type: application/json" \
-  -d '{"query":"What vaccinations does my puppy need?"}'
-```
-
-The vector service is intentionally an interface, making it straightforward to replace the checked-in catalog with another vector source while keeping Oracle retrieval unchanged. The sample query vectors are cataloged alongside the chunk vectors, so queries outside the demo catalog return no matches.
-
 ## Project Structure
 
 ```
@@ -294,8 +255,8 @@ src/main/resources/
 
 - `application.yml` - Main configuration (H2 default)
 - `application-oracle.yml` - Oracle settings
-- `application-oracle-deepsec.yml` - opt-in Oracle Deep Data Security and IAM settings
 - `application-mysql.yml` - MySQL settings
+- `application-oracle-deepsec.yml` - opt-in Oracle Deep Data Security and IAM settings
 - `application-postgres.yml` - PostgreSQL settings
 
 To use a specific database locally:
@@ -340,6 +301,9 @@ export MICRONAUT_ENVIRONMENTS=postgres # for PostgreSQL
 ./gradlew check
 ```
 
+`OracleTransactionPriorityIntegrationTest` and `OracleTransactionPriorityControllerTest` require `MICRONAUT_ENVIRONMENTS=oracle`; the default `CREATE_DROP` setting drops and recreates application tables in the `petclinic` schema.
+Use a disposable database, or preserve an already-seeded schema with `DATASOURCES_DEFAULT_SCHEMA_GENERATE=NONE PETCLINIC_SAMPLE_DATA_ENABLED=false`.
+
 ---
 
 ## Migrating from Spring Boot
@@ -355,6 +319,92 @@ Main differences you'll encounter:
 See [migration-guide.md](migration-guide.md) for detailed comparisons and examples.
 
 ---
+
+## Features
+
+### Geospatial Clinic Search
+
+The application also includes a Micronaut Data geospatial example. It stores sample clinic branches as WGS 84 `Point` values (SRID 4326) and exposes three derived repository methods through `ClinicRepository`: `findByLocationNear`, `findByLocationGeoWithin`, and `findByLocationGeoIntersects`. Micronaut Data translates those derived methods to the spatial functions/operators of the active dialect. For example, `Near` is compiled to Oracle `SDO_WITHIN_DISTANCE` when the Oracle profile is active.
+
+Open http://localhost:8080/clinics to try the clinic search page.
+
+Use the manual form or the map tab to search clinic locations. Use `nearby` for radius searches around a single point, `within` for clinics inside a bounding-box or drawn polygon, and `intersects` for clinics whose location intersects an open `LineString`. Using a line for `intersects` makes the example distinct from `within`, which uses a filled `Polygon`.
+
+```bash
+curl -X POST http://localhost:8080/clinics/nearby \
+  -H "Content-Type: application/json" \
+  -d '{"latitude":43.0731,"longitude":-89.4012,"radiusMeters":5000}'
+
+curl -X POST http://localhost:8080/clinics/within \
+  -H "Content-Type: application/json" \
+  -d '{"coordinates":[{"latitude":43.0000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.5500},{"latitude":43.2000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.2000},{"latitude":43.0000,"longitude":-89.5500}]}'
+
+curl -X POST http://localhost:8080/clinics/intersects \
+  -H "Content-Type: application/json" \
+  -d '{"coordinates":[{"latitude":43.0753,"longitude":-89.5186},{"latitude":43.1020,"longitude":-89.3545},{"latitude":43.1836,"longitude":-89.2137}]}'
+```
+---
+
+### Oracle semantic chunk retrieval
+
+The Oracle profile also includes a retrieval-only vector search example based on Micronaut Data's [vector type support](https://github.com/micronaut-projects/micronaut-data/pull/3637). It seeds a small pet-care knowledge base, stores each chunk as a `FloatVector` in an Oracle `VECTOR(384, FLOAT32)` column, and uses the derived vector-search repository method with cosine distance.
+
+Start the Oracle profile and open http://localhost:8080/knowledge. The demo uses vectors precomputed once with the all-MiniLM-L6-v2 model and checked into `src/main/resources/knowledge/pet-care-embeddings.tsv`; the runtime has no embedding model, ONNX Runtime, native tokenizer, LLM, or external API key. It returns ranked chunks with their source, topic, species, and distance. The HTTP API is:
+
+```bash
+curl -X POST http://localhost:8080/knowledge/search \
+  -H "Content-Type: application/json" \
+  -d '{"query":"What vaccinations does my puppy need?"}'
+```
+
+The vector service is intentionally an interface, making it straightforward to replace the checked-in catalog with another vector source while keeping Oracle retrieval unchanged. The sample query vectors are cataloged alongside the chunk vectors, so queries outside the demo catalog return no matches.
+
+### Oracle transaction priority
+
+With the Oracle profile running, open http://localhost:8080/oracle/transaction-priority.
+Sample data provides two appointments, without calendar or time-slot management.
+The page lists all available appointments in display order.
+
+1. Choose an available appointment and start **regular booking (LOW)**. It locks
+   the row and pauses for 15 seconds to simulate checkout.
+2. Start **emergency booking (HIGH)** during that pause. With the Docker settings,
+   Oracle can roll back LOW after HIGH waits about 3 seconds, letting HIGH commit.
+3. LOW reports the rollback when its pause ends and it tries to save again.
+   The booked appointment disappears from the choices; retry with the remaining one.
+   Without HIGH, LOW commits normally after its pause.
+
+Each button sends an independent request to an `@OracleTransactional` method.
+`SELECT … FOR UPDATE` acquires the lock; `save()` persists changes inside that
+transaction, without committing it. `WAIT 10` limits lock acquisition to 10 seconds,
+not how long the lock is held. Both transactions have a 30-second timeout.
+The countdown is approximate; the pause is demo-only, not a production booking pattern.
+The booking request is `POST /oracle/transaction-priority/book?appointmentId=ID&type=regular|emergency`.
+
+Micronaut Data 5.2 translates Oracle's `ORA-63300` / `ORA-63302` errors into
+`OracleTransactionPriorityException`, which the controller maps to HTTP 409 Conflict.
+HIGH arriving before LOW locks the row, or too late to displace LOW, does not
+demonstrate it. A timeout is not proof of priority rollback, and a committed
+booking cannot be displaced.
+
+[The Oracle startup script](docker/oracle/01-init-user.sql) sets
+`PRIORITY_TXNS_MODE=ROLLBACK` and the HIGH/MEDIUM wait targets to 3 seconds.
+To apply script changes to an existing container, restart it without deleting volumes:
+
+```bash
+docker compose --profile oracle restart oracle
+docker compose --profile oracle logs oracle
+```
+
+Check for `Oracle Priority Transactions enabled`; unsupported images and setup
+errors are reported in the startup logs.
+
+Use one browser and a disposable database. **Reset currently makes every appointment
+available**, not just the two demo rows. The UI disables reset while its requests run.
+Wait for bookings in any other tabs or clients to finish too. Reset uses plain
+`@Transactional`, so it runs at Oracle's default HIGH priority. With priority
+rollback enabled, a reset blocked by a LOW booking can cause Oracle to roll that
+booking back after the configured 3-second HIGH wait target. Reset can also clear
+a booking that commits while it waits for the row lock.
 
 ## Troubleshooting
 
