@@ -17,3 +17,8 @@ test-resources:
   containers:
     oracle:
       image-name: gvenzl/oracle-free:23.26.2-faststart
+
+logger:
+  levels:
+    io.micronaut.samples.petclinic: INFO
+    io.micronaut.data: INFO
