@@ -3,12 +3,7 @@ package io.micronaut.samples.petclinic.repository.postgres;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
-import io.micronaut.data.model.Sort;
-import io.micronaut.data.model.geo.Geometry;
-import io.micronaut.data.model.geo.Point;
 import io.micronaut.data.model.query.builder.sql.Dialect;
-import io.micronaut.samples.petclinic.model.Clinic;
-import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.model.Pet;
 import io.micronaut.samples.petclinic.model.Speciality;
 import io.micronaut.samples.petclinic.model.VetWithSpecialities;
@@ -64,7 +59,6 @@ public final class PostgresRepositories {
          * @param ownerIds owner ids to match
          * @return pets belonging to the supplied owners
          */
-        @Override
         @Query(value = """
                 SELECT p.* FROM "PETS" p WHERE p."OWNER_ID" IN (:ownerIds) ORDER BY p."OWNER_ID", p."NAME"
                 """, nativeQuery = true)
@@ -131,8 +125,8 @@ public final class PostgresRepositories {
          */
         @Override
         @Query(value = """
-            SELECT v.* FROM "VISITS" v WHERE v."PET_ID" = :petId ORDER BY v."VISIT_DATE" DESC
-                        """, nativeQuery = true)
+                SELECT v.* FROM "VISITS" v WHERE v."PET_ID" = :petId ORDER BY v."VISIT_DATE" DESC
+                """, nativeQuery = true)
         Collection<Visit> findByPetId(Integer petId);
 
         /**
@@ -168,35 +162,5 @@ public final class PostgresRepositories {
     @Requires(env = "postgres")
     @JdbcRepository(dialect = Dialect.POSTGRES)
     public interface PostgresClinicRepository extends ClinicRepository {
-        // workaround issue https://github.com/micronaut-projects/micronaut-data/issues/3991
-        /**
-         * PostGIS geometry columns use coordinate units (degrees for WGS 84),
-         * while the application API expresses the radius in meters. Casting
-         * both operands to geography makes ST_DWithin use meters.
-         */
-        @Query(value = """
-                SELECT
-                    c."id",
-                    c."NAME",
-                    c."ADDRESS",
-                    c."CITY",
-                    ST_AsGeoJSON(c."LOCATION") AS "LOCATION",
-                    ST_AsGeoJSON(c."SERVICE_AREA") AS "SERVICE_AREA"
-                FROM "CLINICS" c
-                WHERE ST_DWithin(
-                    c."LOCATION"::geography,
-                    ST_GeomFromText(:wkt, 4326)::geography,
-                    :distance
-                )
-                """, nativeQuery = true)
-        List<Clinic> findByLocationNearInMeters(String wkt, double distance);
-
-        @Override
-        default List<Clinic> findByLocationNear(Geometry geometry, double distance) {
-            if (!(geometry instanceof Point(double x, double y))) {
-                throw new IllegalArgumentException("PostgreSQL nearby searches require a Point");
-            }
-            return findByLocationNearInMeters("POINT (" + x + " " + y + ")", distance);
-        }
     }
 }

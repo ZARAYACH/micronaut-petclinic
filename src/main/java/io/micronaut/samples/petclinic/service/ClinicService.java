@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -457,7 +458,7 @@ public class ClinicService {
 
         Set<Integer> matchingIds = availabilityMatches.stream()
                 .map(Clinic::id)
-                .filter(id -> id != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         return clinics.stream()
                 .filter(clinic -> clinic.id() != null && matchingIds.contains(clinic.id()))

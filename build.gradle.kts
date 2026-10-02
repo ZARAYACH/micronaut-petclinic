@@ -51,6 +51,14 @@ micronaut {
     testRuntime("junit5")
     testResources {
         enabled = true
+        inferClasspath = false
+        additionalModules.addAll(
+            listOf(
+                "jdbc-mysql",
+                "jdbc-postgresql",
+                "jdbc-oracle-free",
+            )
+        )
         clientTimeout.set(testResourcesClientTimeoutSeconds)
     }
 }
@@ -59,6 +67,13 @@ dependencies {
     implementation(platform(libs.micronaut.platform.parent))
     annotationProcessor(platform(libs.micronaut.platform.parent))
     testAnnotationProcessor(platform(libs.micronaut.platform.parent))
+
+    // Database readiness checks run inside the Test Resources server and
+    // therefore need the JDBC drivers on that server's classpath.
+    testResourcesService(libs.mysql.connector.j)
+    testResourcesService(libs.postgresql)
+    testResourcesService(libs.ojdbc11)
+
     //TODO: Remove once the ojdbc-provider-azure is released with the transitive azure core dependency v1.59.1
     constraints {
         implementation(libs.azure.core) {
