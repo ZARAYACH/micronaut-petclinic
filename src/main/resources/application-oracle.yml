@@ -17,6 +17,8 @@ test-resources:
   containers:
     oracle:
       image-name: gvenzl/oracle-free:23.26.2-faststart
+      copy-to-container:
+        - "docker/oracle/01-init-user.sql": /container-entrypoint-initdb.d/01-init-user.sql
 
 logger:
   levels:
