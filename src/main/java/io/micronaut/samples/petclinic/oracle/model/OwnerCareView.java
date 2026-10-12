@@ -100,7 +100,6 @@ public record OwnerCareView(
      * @param description visit description
      */
     @JsonSubView(entity = Visit.class, operations = JsonView.Operation.UPDATE)
-    @Serdeable
     public record VisitCareSubView(
             @Id Integer id,
             @MappedProperty("VISIT_DATE") @NotNull LocalDateTime date,

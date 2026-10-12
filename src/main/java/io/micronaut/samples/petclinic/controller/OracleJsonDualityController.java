@@ -17,11 +17,13 @@ import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller("/owners/{ownerId}/care-record")
 @Requires(env = "oracle")
@@ -40,15 +42,32 @@ class OracleJsonDualityController {
         return service.findById(ownerId);
     }
 
-    @Error(exception = OptimisticLockException.class)
-    public HttpResponse<Map<String, String>> staleDocument(OptimisticLockException error, @PathVariable String ownerId) {
-        return HttpResponse.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "This owner #" + ownerId + " record changed after it was loaded. Reload it before saving."));
-    }
-
     @Put(consumes = MediaType.APPLICATION_JSON)
     public OwnerCareView updateDocument(@PathVariable @NonNull Integer ownerId,
                                         @NotNull @Valid @Body OwnerCareView document) {
-        return service.update(ownerId, document);
+        if (!ownerId.equals(document.id())) {
+            throw new IllegalArgumentException("The document _id must match the owner in the URL.");
+        }
+        return service.update(document);
+    }
+
+    @Error(exception = OptimisticLockException.class)
+    public HttpResponse<Map<String, String>> staleDocument(OptimisticLockException error) {
+        return HttpResponse.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", "This owner record changed after it was loaded. Reload it before saving."));
+    }
+
+    @Error(exception = ConstraintViolationException.class)
+    public HttpResponse<Map<String, String>> invalidFields(ConstraintViolationException error) {
+        String message = error.getConstraintViolations().stream()
+                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .sorted()
+                .collect(Collectors.joining("; "));
+        return HttpResponse.badRequest(Map.of("message", message));
+    }
+
+    @Error(exception = IllegalArgumentException.class)
+    public HttpResponse<Map<String, String>> invalidDocument(IllegalArgumentException error) {
+        return HttpResponse.badRequest(Map.of("message", error.getMessage()));
     }
 }

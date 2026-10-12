@@ -4,7 +4,6 @@
 @import java.util.Locale
 
 @param Owner owner
-@param boolean showCareRecord
 @param io.micronaut.samples.petclinic.system.I18nViewModelProcessor.Msg msg
 @param io.micronaut.http.HttpRequest<?> request
 @param java.util.Locale locale
@@ -35,23 +34,22 @@
 
         <ul class="nav nav-tabs mb-4" role="tablist" aria-label="${msg.text("owner.details")}">
             <li class="nav-item" role="presentation">
-                <a class="nav-link ${showCareRecord ? "" : "active"}"
-                   href="/owners/${owner.id()}" role="tab">
+                <a id="owner-details-tab" class="nav-link active"
+                   href="#owner-details-panel" role="tab">
                     ${msg.text("owner.details")}
                 </a>
             </li>
-            @if(showCareRecord)
+            @if(activeNames != null && activeNames.contains("oracle"))
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link active"
-                       href="/owners/${owner.id()}?tab=care-record" role="tab">
+                    <a id="care-record-tab" class="nav-link"
+                       href="#care-record-page" role="tab">
                         <i class="fas fa-code me-2"></i>${msg.text("nav.ownerCareRecord")}
                     </a>
                 </li>
             @endif
         </ul>
 
-        @if(!showCareRecord)
-        <div class="row g-4">
+        <div id="owner-details-panel" class="row g-4">
             <div class="col-lg-4">
                 <div class="detail-card animate-fade-in-up">
                     <div class="card-header">
@@ -169,16 +167,15 @@
                 </div>
             </div>
         </div>
-        @endif
-
-        @if(showCareRecord)
+        @if(activeNames != null && activeNames.contains("oracle"))
+            <div id="care-record-panel" hidden>
             <div class="mb-4">
                 <h2 class="h3 mb-1">${msg.text("jsonDuality.title")}</h2>
                 <p class="text-muted mb-0">${msg.text("jsonDuality.subtitle")}</p>
             </div>
             <div id="care-record-page" data-document-url="/owners/${owner.id()}/care-record"
-                 data-loading-label="${msg.text("jsonDuality.loading")}" data-load-error-label="${msg.text("jsonDuality.loadError")}" 
-                 data-save-label="${msg.text("jsonDuality.saveSuccess")}" data-save-error-label="${msg.text("jsonDuality.saveError")}" 
+                 data-loading-label="${msg.text("jsonDuality.loading")}" data-load-error-label="${msg.text("jsonDuality.loadError")}"
+                 data-save-label="${msg.text("jsonDuality.saveSuccess")}" data-save-error-label="${msg.text("jsonDuality.saveError")}"
                  data-conflict-label="${msg.text("jsonDuality.conflict")}" data-invalid-label="${msg.text("jsonDuality.invalid")}">
                 <div class="row g-4">
                     <div class="col-lg-4">
@@ -187,10 +184,10 @@
                             <div class="card-body">
                                 <p>${msg.text("jsonDuality.explanation")}</p>
                                 <ul class="mb-0">
-                                    <li><code>@JsonView</code> maps the owner document.</li>
-                                    <li><code>@JsonSubView</code> maps the nested pets and visits.</li>
-                                    <li><code>@Relation</code> declares their nested collections.</li>
-                                    <li>The Oracle repository reads and updates the generated view.</li>
+                                    <li><code>@JsonView</code> ${msg.text("jsonDuality.ownerMapping")}</li>
+                                    <li><code>@JsonSubView</code> ${msg.text("jsonDuality.nestedMapping")}</li>
+                                    <li><code>@Relation</code> ${msg.text("jsonDuality.collectionMapping")}</li>
+                                    <li>${msg.text("jsonDuality.repositoryMapping")}</li>
                                 </ul>
                             </div>
                         </div>
@@ -204,6 +201,7 @@
                             </div>
                             <div class="card-body">
                                 <p class="text-muted">${msg.text("jsonDuality.editInstructions")}</p>
+                                <div id="document-status" class="mt-3" role="status" aria-live="polite" hidden></div>
                                 <textarea id="owner-document" class="form-control font-monospace" rows="25"
                                           spellcheck="false" aria-label="${msg.text("jsonDuality.document")}"></textarea>
                                 <div class="d-flex flex-wrap gap-2 mt-3">
@@ -214,19 +212,29 @@
                                         <i class="fas fa-floppy-disk me-2"></i>${msg.text("jsonDuality.save")}
                                     </button>
                                 </div>
-                                <div id="document-status" class="mt-3" role="status" aria-live="polite" hidden></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            </div>
 
             <script>
                 (() => {
                     const page = document.getElementById("care-record-page");
+                    const detailsPanel = document.getElementById("owner-details-panel");
+                    const carePanel = document.getElementById("care-record-panel");
+                    const detailsTab = document.getElementById("owner-details-tab");
+                    const careTab = document.getElementById("care-record-tab");
                     const editor = document.getElementById("owner-document");
                     const status = document.getElementById("document-status");
                     const documentUrl = page.dataset.documentUrl;
+                    const showPanel = (careRecord) => {
+                        detailsPanel.hidden = careRecord;
+                        carePanel.hidden = !careRecord;
+                        detailsTab.classList.toggle("active", !careRecord);
+                        careTab.classList.toggle("active", careRecord);
+                    };
                     const setStatus = (message, style = "info") => {
                         const hasMessage = Boolean(message);
                         status.hidden = !hasMessage;
@@ -245,6 +253,14 @@
                         }
                     };
                     document.getElementById("reload-document").addEventListener("click", loadDocument);
+                    detailsTab.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        showPanel(false);
+                    });
+                    careTab.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        showPanel(true);
+                    });
                     document.getElementById("save-document").addEventListener("click", async () => {
                         let document;
                         try {
@@ -274,6 +290,7 @@
                             setStatus(error.message || page.dataset.saveErrorLabel, "danger");
                         }
                     });
+                    showPanel(new URLSearchParams(window.location.search).get("tab") === "care-record");
                     loadDocument();
                 })();
             </script>

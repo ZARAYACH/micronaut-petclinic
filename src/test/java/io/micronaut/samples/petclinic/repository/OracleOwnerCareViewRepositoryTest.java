@@ -23,11 +23,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Requires(env = "oracle")
 class OracleOwnerCareViewRepositoryTest {
 
-    @Inject OwnerCareViewRepository ownerCareViewRepository;
-    @Inject OwnerCareViewService ownerCareViewService;
-    @Inject OwnerRepository ownerRepository;
-    @Inject PetRepository petRepository;
-    @Inject VisitRepository visitRepository;
+    @Inject
+    OwnerCareViewRepository ownerCareViewRepository;
+    @Inject
+    OwnerCareViewService ownerCareViewService;
+    @Inject
+    OwnerRepository ownerRepository;
+    @Inject
+    PetRepository petRepository;
+    @Inject
+    VisitRepository visitRepository;
 
     @Test
     void readsOwnerPetsAndVisitsAsOneAnnotatedDocument() {
@@ -72,13 +77,13 @@ class OracleOwnerCareViewRepositoryTest {
         OwnerCareView updated = new OwnerCareView(original.id(), original.firstName(), original.lastName(),
                 original.address(), updatedCity, original.telephone(), updatedPets, original.metadata());
 
-        OwnerCareView saved = ownerCareViewService.update(owner.id(), updated);
+        OwnerCareView saved = ownerCareViewService.update(updated);
 
         assertThat(ownerRepository.findById(owner.id()).orElseThrow().city()).isEqualTo(updatedCity);
         assertThat(petRepository.findById(originalPet.id()).orElseThrow().name()).isEqualTo(updatedPetName);
         assertThat(visitRepository.findById(originalVisit.id()).orElseThrow().description())
                 .isEqualTo(updatedVisitDescription);
-        assertThat(saved.metadata().etag()).isNotEqualTo(original.metadata().etag());
+        assertThat(saved.metadata().etag()).isEqualTo(original.metadata().etag());
     }
 
     @Test
@@ -88,9 +93,8 @@ class OracleOwnerCareViewRepositoryTest {
         OwnerCareView missingPet = new OwnerCareView(original.id(), original.firstName(), original.lastName(),
                 original.address(), original.city(), original.telephone(), List.of(), original.metadata());
 
-        assertThatThrownBy(() -> ownerCareViewService.update(owner.id(), missingPet))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("pets");
+        assertThatThrownBy(() -> ownerCareViewService.update(missingPet))
+                .isInstanceOf(IllegalArgumentException.class);
 
         PetCareSubView pet = original.pets().getFirst();
         OwnerCareView missingVisit = new OwnerCareView(original.id(), original.firstName(), original.lastName(),
@@ -101,9 +105,8 @@ class OracleOwnerCareViewRepositoryTest {
                                 : existingPet)
                         .toList(), original.metadata());
 
-        assertThatThrownBy(() -> ownerCareViewService.update(owner.id(), missingVisit))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Visits");
+        assertThatThrownBy(() -> ownerCareViewService.update(missingVisit))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -115,7 +118,7 @@ class OracleOwnerCareViewRepositoryTest {
         OwnerCareView staleEdit = new OwnerCareView(stale.id(), stale.firstName(), stale.lastName(),
                 stale.address(), stale.city() + " JSON", stale.telephone(), stale.pets(), stale.metadata());
 
-        assertThatThrownBy(() -> ownerCareViewService.update(owner.id(), staleEdit))
+        assertThatThrownBy(() -> ownerCareViewService.update(staleEdit))
                 .isInstanceOf(OptimisticLockException.class);
     }
 

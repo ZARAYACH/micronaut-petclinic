@@ -1,6 +1,5 @@
 package io.micronaut.samples.petclinic.controller;
 
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -16,7 +15,6 @@ import io.micronaut.samples.petclinic.dto.OwnerForm;
 import io.micronaut.samples.petclinic.mapper.FormMapper;
 import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.service.ClinicService;
-import io.micronaut.samples.petclinic.service.OwnerCareViewService;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.views.View;
@@ -40,21 +38,16 @@ public class OwnerController {
 
     private final ClinicService clinicService;
     private final FormMapper formMapper;
-    private final @Nullable OwnerCareViewService ownerCareViewService;
 
     /**
      * Creates the controller with its service and mapper dependencies.
      *
      * @param clinicService the facade used for owner operations
      * @param formMapper the mapper used to convert owner forms
-     * @param ownerCareViewService Oracle JSON duality view service when the Oracle profile is active
      */
-    public OwnerController(ClinicService clinicService,
-                           FormMapper formMapper,
-                           @Nullable OwnerCareViewService ownerCareViewService) {
+    public OwnerController(ClinicService clinicService, FormMapper formMapper) {
         this.clinicService = clinicService;
         this.formMapper = formMapper;
-        this.ownerCareViewService = ownerCareViewService;
     }
 
     /**
@@ -136,11 +129,9 @@ public class OwnerController {
      */
     @Get("/{ownerId}")
     @View("owners/ownerDetails")
-    public Map<String, Object> showOwner(@PathVariable Integer ownerId,
-                                        @QueryValue(defaultValue = "details") String tab) {
+    public Map<String, Object> showOwner(@PathVariable Integer ownerId) {
         Owner owner = clinicService.findOwnerById(ownerId).orElseThrow(NotFoundException::new);
-        boolean showCareRecord = ownerCareViewService != null && "care-record".equals(tab);
-        return Map.of("owner", owner, "showCareRecord", showCareRecord);
+        return Map.of("owner", owner);
     }
 
     /**
