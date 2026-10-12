@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model;
+package io.micronaut.samples.petclinic.oracle.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Nullable;
@@ -7,9 +7,15 @@ import io.micronaut.data.annotation.JsonSubView;
 import io.micronaut.data.annotation.JsonView;
 import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.data.annotation.Relation;
+import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.Visit;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.time.LocalDateTime;
@@ -18,7 +24,8 @@ import static io.micronaut.data.annotation.Relation.Kind.ONE_TO_MANY;
 
 /**
  * Oracle JSON document representation of an owner and their pet-care history.
- * Micronaut Data generates the Oracle duality view from this mapping.
+ * Micronaut Data generates the Oracle duality view from this mapping. Kept in
+ * its own package so non-Oracle schema generation can exclude it.
  *
  * @param id owner identifier exposed as the JSON document's {@code _id}
  * @param firstName owner's first name
@@ -32,6 +39,7 @@ import static io.micronaut.data.annotation.Relation.Kind.ONE_TO_MANY;
 @JsonView(value = "OWNER_CARE_DV", entity = Owner.class, operations = JsonView.Operation.UPDATE)
 public record OwnerCareView(
         @Id
+        @NonNull
         @MappedProperty("ID")
         @JsonProperty("_id")
         Integer id,
@@ -49,12 +57,15 @@ public record OwnerCareView(
         String city,
 
         @Nullable
+        @Pattern(regexp = "[0-9]{1,10}", message = "The telephone number must contain up to 10 digits.")
         String telephone,
 
         @Relation(ONE_TO_MANY)
         List<@Valid PetCareSubView> pets,
 
         @JsonProperty("_metadata")
+        @NotNull(message = "The document must include its _metadata.etag value.")
+        @Valid
         DualityMetadata metadata
 ) {
     public OwnerCareView {
@@ -73,7 +84,7 @@ public record OwnerCareView(
     public record PetCareSubView(
             @Id Integer id,
             @NotBlank String name,
-            @MappedProperty("BIRTH_DATE") LocalDateTime birthDate,
+            @MappedProperty("BIRTH_DATE") @NotNull LocalDateTime birthDate,
             @Relation(ONE_TO_MANY) List<@Valid VisitCareSubView> visits
     ) {
         public PetCareSubView {
@@ -92,13 +103,14 @@ public record OwnerCareView(
     @Serdeable
     public record VisitCareSubView(
             @Id Integer id,
-            @MappedProperty("VISIT_DATE") LocalDateTime date,
+            @MappedProperty("VISIT_DATE") @NotNull LocalDateTime date,
             @NotBlank String description
     ) {
     }
 
     /** Oracle duality view metadata used for optimistic concurrency control. */
     @Serdeable
-    public record DualityMetadata(String etag, String asof) {
+    public record DualityMetadata(@NotBlank(message = "The document must include its _metadata.etag value.") String etag,
+                                  String asof) {
     }
 }

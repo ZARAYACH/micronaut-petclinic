@@ -12,7 +12,7 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.samples.petclinic.model.Owner;
-import io.micronaut.samples.petclinic.model.OwnerCareView;
+import io.micronaut.samples.petclinic.oracle.model.OwnerCareView;
 import io.micronaut.samples.petclinic.repository.OwnerRepository;
 import io.micronaut.samples.petclinic.service.OwnerCareViewService;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -58,19 +58,19 @@ class OracleJsonDualityControllerTest {
     }
 
     @Test
-    void ownerDetailsPageIncludesOracleDualityTabForThatOwner() {
+    void ownerDetailsPageIncludesCareRecordTabForThatOwner() {
         HttpResponse<String> details = client.toBlocking().exchange(
                 HttpRequest.GET("/owners/" + originalDocument.id()), String.class);
-        assertThat(details.body()).contains("?tab=json-duality");
-        assertThat(details.body()).doesNotContain("id=\"json-duality-page\"");
+        assertThat(details.body()).contains("?tab=care-record");
+        assertThat(details.body()).doesNotContain("id=\"care-record-page\"");
 
         HttpResponse<String> response = client.toBlocking().exchange(
-                HttpRequest.GET("/owners/" + originalDocument.id() + "?tab=json-duality"), String.class);
+                HttpRequest.GET("/owners/" + originalDocument.id() + "?tab=care-record"), String.class);
 
         assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
         assertThat(response.body()).contains("Owner care document");
         assertThat(response.body()).contains("data-document-url=\"/owners/" + originalDocument.id()
-                + "/json-duality\"");
+                + "/care-record\"");
     }
 
     @Test
@@ -122,7 +122,7 @@ class OracleJsonDualityControllerTest {
     @Test
     void getDocumentReturnsNotFoundForUnknownOwner() {
         assertThatThrownBy(() -> client.toBlocking().exchange(
-                HttpRequest.GET("/owners/999999/json-duality")
+                HttpRequest.GET("/owners/999999/care-record")
                         .accept(MediaType.APPLICATION_JSON_TYPE), Map.class))
                 .isInstanceOfSatisfying(HttpClientResponseException.class, exception -> {
                     assertThat(exception.getStatus().getCode()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
@@ -131,7 +131,7 @@ class OracleJsonDualityControllerTest {
     }
 
     private String documentUrl() {
-        return "/owners/" + originalDocument.id() + "/json-duality";
+        return "/owners/" + originalDocument.id() + "/care-record";
     }
 
     private HttpResponse<Map> putDocument(OwnerCareView document) {

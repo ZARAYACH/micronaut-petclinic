@@ -4,7 +4,7 @@
 @import java.util.Locale
 
 @param Owner owner
-@param String activeTab
+@param boolean showCareRecord
 @param io.micronaut.samples.petclinic.system.I18nViewModelProcessor.Msg msg
 @param io.micronaut.http.HttpRequest<?> request
 @param java.util.Locale locale
@@ -35,22 +35,22 @@
 
         <ul class="nav nav-tabs mb-4" role="tablist" aria-label="${msg.text("owner.details")}">
             <li class="nav-item" role="presentation">
-                <a class="nav-link ${activeNames != null && activeNames.contains("oracle") && "json-duality".equals(activeTab) ? "" : "active"}"
+                <a class="nav-link ${showCareRecord ? "" : "active"}"
                    href="/owners/${owner.id()}" role="tab">
                     ${msg.text("owner.details")}
                 </a>
             </li>
-            @if(activeNames != null && activeNames.contains("oracle"))
+            @if(showCareRecord)
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link ${"json-duality".equals(activeTab) ? "active" : ""}"
-                       href="/owners/${owner.id()}?tab=json-duality" role="tab">
-                        <i class="fas fa-code me-2"></i>${msg.text("nav.jsonDuality")}
+                    <a class="nav-link active"
+                       href="/owners/${owner.id()}?tab=care-record" role="tab">
+                        <i class="fas fa-code me-2"></i>${msg.text("nav.ownerCareRecord")}
                     </a>
                 </li>
             @endif
         </ul>
 
-        @if(!(activeNames != null && activeNames.contains("oracle") && "json-duality".equals(activeTab)))
+        @if(!showCareRecord)
         <div class="row g-4">
             <div class="col-lg-4">
                 <div class="detail-card animate-fade-in-up">
@@ -171,12 +171,12 @@
         </div>
         @endif
 
-        @if(activeNames != null && activeNames.contains("oracle") && "json-duality".equals(activeTab))
+        @if(showCareRecord)
             <div class="mb-4">
                 <h2 class="h3 mb-1">${msg.text("jsonDuality.title")}</h2>
                 <p class="text-muted mb-0">${msg.text("jsonDuality.subtitle")}</p>
             </div>
-            <div id="json-duality-page" data-document-url="/owners/${owner.id()}/json-duality"
+            <div id="care-record-page" data-document-url="/owners/${owner.id()}/care-record"
                  data-loading-label="${msg.text("jsonDuality.loading")}" data-load-error-label="${msg.text("jsonDuality.loadError")}" 
                  data-save-label="${msg.text("jsonDuality.saveSuccess")}" data-save-error-label="${msg.text("jsonDuality.saveError")}" 
                  data-conflict-label="${msg.text("jsonDuality.conflict")}" data-invalid-label="${msg.text("jsonDuality.invalid")}">
@@ -223,7 +223,7 @@
 
             <script>
                 (() => {
-                    const page = document.getElementById("json-duality-page");
+                    const page = document.getElementById("care-record-page");
                     const editor = document.getElementById("owner-document");
                     const status = document.getElementById("document-status");
                     const documentUrl = page.dataset.documentUrl;
