@@ -410,9 +410,9 @@ a booking that commits while it waits for the row lock.
 ### Oracle JSON duality showcase
 
 In the `oracle` environment, open an owner and select the **Owner Care Record** tab
-(for example, http://localhost:8080/owners/1?tab=care-record) to view that
-owner, their pets, and visit history together as one document. Edit existing
-owner, pet, or visit details and save; the changes also appear in Petclinic's
+(for example, http://localhost:8080/owners/1?tab=owner-care-record to open it
+directly). View that owner, their pets, and visit history together as one JSON document. 
+Edit existing owner, pet, or visit details and save; the changes also appear in Petclinic's
 regular forms. If the record changed since it was loaded, saving reports a
 conflict so you can reload the latest version. Adding or removing pets and
 visits is not supported in this showcase.
