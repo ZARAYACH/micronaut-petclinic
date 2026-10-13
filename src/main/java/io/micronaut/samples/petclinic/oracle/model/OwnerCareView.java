@@ -17,8 +17,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.jspecify.annotations.NonNull;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.time.LocalDateTime;
 
 import static io.micronaut.data.annotation.Relation.Kind.ONE_TO_MANY;
 
@@ -84,7 +84,7 @@ public record OwnerCareView(
     public record PetCareSubView(
             @Id Integer id,
             @NotBlank String name,
-            @MappedProperty("BIRTH_DATE") @NotNull LocalDateTime birthDate,
+            @MappedProperty("BIRTH_DATE") @NotNull LocalDate birthDate,
             @Relation(ONE_TO_MANY) List<@Valid VisitCareSubView> visits
     ) {
         public PetCareSubView {
@@ -102,14 +102,15 @@ public record OwnerCareView(
     @JsonSubView(entity = Visit.class, operations = JsonView.Operation.UPDATE)
     public record VisitCareSubView(
             @Id Integer id,
-            @MappedProperty("VISIT_DATE") @NotNull LocalDateTime date,
+            @MappedProperty("VISIT_DATE") @NotNull LocalDate date,
             @NotBlank String description
     ) {
     }
 
     /** Oracle duality view metadata used for optimistic concurrency control. */
     @Serdeable
-    public record DualityMetadata(@NotBlank(message = "The document must include its _metadata.etag value.") String etag,
-                                  String asof) {
+    public record DualityMetadata(
+            @NotBlank(message = "The document must include its _metadata.etag value.") String etag,
+            String asof) {
     }
 }
