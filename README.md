@@ -59,8 +59,6 @@ docker-compose --profile oracle up
 ```
 
 > **Note:** The Oracle profile uses the full Oracle AI Database 26ai Free image so it can configure TCPS. Set `ORACLE_IMAGE` if you need a different compatible image for your platform.
-
-
 ### Oracle Deep Data Security showcase
 
 The repository also includes an opt-in Oracle Deep Data Security integration. It connects Micronaut Data JDBC through the Micronaut Security OJDBC extension, propagating the authenticated end-user access token to Oracle. Oracle maps Entra app roles to data roles and applies `DATA GRANT` policies at the row and column boundary.
