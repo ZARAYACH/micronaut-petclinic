@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @MicronautTest(transactional = false)
 @Requires(env = "oracle")
 @Property(name = "micronaut.http.client.exception-on-error-status", value = "false")
-class OracleJsonDualityControllerTest {
+class OwnerCareRecordControllerTest {
 
     @Inject @Client("/") HttpClient client;
     @Inject OwnerRepository ownerRepository;
@@ -125,7 +125,22 @@ class OracleJsonDualityControllerTest {
         HttpResponse<Map> response = client.toBlocking().exchange(
                 HttpRequest.GET("/owners/999999999/care-record")
                         .accept(MediaType.APPLICATION_JSON_TYPE), Argument.of(Map.class), Argument.of(Map.class));
-        assertThat(response.code()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.getCode());
+        assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
+    }
+
+    @Test
+    void putDocumentReturnsNotFoundForUnknownOwner() {
+        OwnerCareView missing = new OwnerCareView(999999999, originalDocument.firstName(),
+                originalDocument.lastName(), originalDocument.address(), originalDocument.city(),
+                originalDocument.telephone(), originalDocument.pets(), originalDocument.metadata());
+
+        HttpResponse<Map> response = client.toBlocking().exchange(
+                HttpRequest.PUT("/owners/999999999/care-record", missing)
+                        .contentType(MediaType.APPLICATION_JSON_TYPE)
+                        .accept(MediaType.APPLICATION_JSON_TYPE),
+                Argument.of(Map.class), Argument.of(Map.class));
+
+        assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
     }
 
     @Test

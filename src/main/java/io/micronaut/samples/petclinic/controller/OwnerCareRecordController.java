@@ -11,6 +11,7 @@ import io.micronaut.http.annotation.Error;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Put;
+import io.micronaut.http.server.exceptions.NotFoundException;
 import io.micronaut.samples.petclinic.oracle.model.OwnerCareView;
 import io.micronaut.samples.petclinic.service.OwnerCareViewService;
 import io.micronaut.scheduling.TaskExecutors;
@@ -29,11 +30,11 @@ import java.util.stream.Collectors;
 @Requires(env = "oracle")
 @ExecuteOn(TaskExecutors.BLOCKING)
 @Secured(SecurityRule.IS_ANONYMOUS)
-class OracleJsonDualityController {
+class OwnerCareRecordController {
 
     private final OwnerCareViewService service;
 
-    public OracleJsonDualityController(OwnerCareViewService service) {
+    public OwnerCareRecordController(OwnerCareViewService service) {
         this.service = service;
     }
 
@@ -69,5 +70,10 @@ class OracleJsonDualityController {
     @Error(exception = IllegalArgumentException.class)
     public HttpResponse<Map<String, String>> invalidDocument(IllegalArgumentException error) {
         return HttpResponse.badRequest(Map.of("message", error.getMessage()));
+    }
+
+    @Error(exception = NotFoundException.class)
+    public HttpResponse<Map<String, String>> notFound(NotFoundException error) {
+        return HttpResponse.notFound(Map.of("message", error.getMessage()));
     }
 }
