@@ -9,7 +9,7 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.samples.petclinic.dto.ClinicCoordinatesRequest;
 import io.micronaut.samples.petclinic.dto.ClinicDto;
 import io.micronaut.samples.petclinic.dto.ClinicNearbyRequest;
-import io.micronaut.samples.petclinic.model.Clinic;
+import io.micronaut.samples.petclinic.model.shared.Clinic;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;

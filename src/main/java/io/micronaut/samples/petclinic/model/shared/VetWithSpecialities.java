@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model;
+package io.micronaut.samples.petclinic.model.shared;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.Nullable;

@@ -1,7 +1,7 @@
 package io.micronaut.samples.petclinic.repository;
 
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.samples.petclinic.model.Appointment;
+import io.micronaut.samples.petclinic.model.shared.Appointment;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;

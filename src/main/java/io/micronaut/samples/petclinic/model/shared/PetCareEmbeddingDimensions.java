@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model;
+package io.micronaut.samples.petclinic.model.shared;
 
 /**
  * Shared dimension for the precomputed pet-care vectors and Oracle VECTOR column.

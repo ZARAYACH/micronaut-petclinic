@@ -2,7 +2,7 @@ package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.annotation.Value;
-import io.micronaut.samples.petclinic.model.Appointment;
+import io.micronaut.samples.petclinic.model.shared.Appointment;
 import io.micronaut.samples.petclinic.repository.AppointmentRepository;
 import io.micronaut.transaction.annotation.OracleTransactional;
 import jakarta.inject.Singleton;
@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 
 import java.time.Duration;
 
-import static io.micronaut.samples.petclinic.model.Appointment.Status.*;
+import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.*;
 
 /**
  * Demonstrates Oracle transaction priority with separate regular (LOW) and emergency (HIGH) requests.

@@ -36,9 +36,9 @@ datasources:
     driver-class-name: org.h2.Driver
     schema-generate: CREATE_DROP
     dialect: H2
-    # Exclude Oracle-only JSON duality view mappings from H2 schema generation.
+    # Exclude Other profiles specific entities.
     packages:
-      - io.micronaut.samples.petclinic.model
+      - io.micronaut.samples.petclinic.model.shared
     maximum-pool-size: 2
     minimum-idle: 1
 

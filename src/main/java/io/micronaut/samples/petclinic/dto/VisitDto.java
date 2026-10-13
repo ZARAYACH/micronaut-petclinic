@@ -1,6 +1,6 @@
 package io.micronaut.samples.petclinic.dto;
 
-import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.model.shared.Visit;
 import io.micronaut.serde.annotation.Serdeable;
 import org.jspecify.annotations.NonNull;
 

@@ -67,7 +67,10 @@ datasources:
     url: 'jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=${DEEPSEC_DB_HOST:localhost})(PORT=${DEEPSEC_DB_PORT:2484}))(SECURITY=(TLS_SERVER_DN_MATCH=TRUE)(TLS_SERVER_CERT_DN="${DEEPSEC_DB_TLS_SERVER_CERT_DN:CN=localhost}")(TOKEN_AUTH=AZURE_SERVICE_PRINCIPAL)(AZURE_DB_APP_ID_URI=${DB_APP_ID_URI})(TENANT_ID=${PETCLINIC_TENANT_ID}))(CONNECT_DATA=(SERVICE_NAME=${DEEPSEC_DB_SERVICE:FREEPDB1})))'
     dialect: ORACLE
     driver-class-name: oracle.jdbc.OracleDriver
-
+    # Exclude Other profiles specific entities.
+    packages:
+      - io.micronaut.samples.petclinic.model.shared
+      - io.micronaut.samples.petclinic.model.oracle
 petclinic:
   # DeepSec schema/data are initialized by the Compose SQL migration before
   # the terminal-launched application starts.

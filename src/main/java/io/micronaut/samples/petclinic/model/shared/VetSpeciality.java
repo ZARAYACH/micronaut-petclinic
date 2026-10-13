@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model;
+package io.micronaut.samples.petclinic.model.shared;
 
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;

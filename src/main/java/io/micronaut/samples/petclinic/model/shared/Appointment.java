@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model;
+package io.micronaut.samples.petclinic.model.shared;
 
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
@@ -9,7 +9,7 @@ import io.micronaut.sourcegen.annotations.Wither;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import static io.micronaut.samples.petclinic.model.Appointment.Status.AVAILABLE;
+import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.AVAILABLE;
 
 /**
  * A small appointment resource used by the Oracle transaction-priority showcase.

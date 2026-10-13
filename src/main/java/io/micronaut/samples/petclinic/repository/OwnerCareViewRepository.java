@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.samples.petclinic.oracle.model.OwnerCareView;
+import io.micronaut.samples.petclinic.model.oracle.OwnerCareView;
 
 /**
  * Micronaut Data repository for the generated Oracle owner-care duality view.

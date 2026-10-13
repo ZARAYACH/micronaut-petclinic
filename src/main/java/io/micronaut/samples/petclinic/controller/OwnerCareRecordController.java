@@ -12,7 +12,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.http.server.exceptions.NotFoundException;
-import io.micronaut.samples.petclinic.oracle.model.OwnerCareView;
+import io.micronaut.samples.petclinic.model.oracle.OwnerCareView;
 import io.micronaut.samples.petclinic.service.OwnerCareViewService;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;

@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model;
+package io.micronaut.samples.petclinic.model.shared;
 
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
@@ -9,15 +9,15 @@ import io.micronaut.sourcegen.annotations.Wither;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Entity representing a veterinarian speciality (e.g., surgery, dentistry).
+ * Entity representing a type of pet (e.g., dog, cat, bird).
  *
- * @param id the database identifier, or {@code null} for a new speciality
- * @param name the display name of the speciality
+ * @param id the database identifier, or {@code null} for a new pet type
+ * @param name the display name of the pet type
  */
-@MappedEntity("SPECIALTIES")
+@MappedEntity("TYPES")
 @Serdeable
 @Wither
-public record Speciality(
+public record PetType(
         @Id
         @GeneratedValue
         Integer id,
@@ -25,29 +25,29 @@ public record Speciality(
         @MappedProperty("NAME")
         @NotBlank
         String name
-) implements NamedEntity, SpecialityWither {
+) implements NamedEntity, PetTypeWither {
 
     /**
-     * Creates an empty speciality for framework binding.
+     * Creates an empty pet type for framework binding.
      */
-    public Speciality() {
+    public PetType() {
         this(null, null);
     }
 
     /**
-     * Creates a new speciality without an id.
+     * Creates a new pet type without an id.
      *
-     * @param name the display name of the speciality
+     * @param name the display name of the pet type
      */
-    public Speciality(String name) {
+    public PetType(String name) {
         this(null, name);
     }
 
     /**
-     * Compares specialities by entity identity.
+     * Compares pet types by entity identity.
      *
      * @param other the object being compared
-     * @return {@code true} when the other object represents the same speciality
+     * @return {@code true} when the other object represents the same pet type
      */
     @Override
     public boolean equals(Object other) {
@@ -57,7 +57,7 @@ public record Speciality(
     /**
      * Returns the entity-identity hash code.
      *
-     * @return the hash code based on the speciality id
+     * @return the hash code based on the pet type id
      */
     @Override
     public int hashCode() {
@@ -65,9 +65,9 @@ public record Speciality(
     }
 
     /**
-     * Returns the speciality display name.
+     * Returns the pet type display name.
      *
-     * @return the speciality name
+     * @return the pet type name
      */
     @Override
     public String toString() {

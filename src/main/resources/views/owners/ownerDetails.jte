@@ -1,6 +1,6 @@
-@import io.micronaut.samples.petclinic.model.Owner
-@import io.micronaut.samples.petclinic.model.Pet
-@import io.micronaut.samples.petclinic.model.Visit
+@import io.micronaut.samples.petclinic.model.shared.Owner
+@import io.micronaut.samples.petclinic.model.shared.Pet
+@import io.micronaut.samples.petclinic.model.shared.Visit
 @import java.util.Locale
 
 @param Owner owner

@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.samples.petclinic.dto.OwnerData;
-import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.shared.Owner;
 import io.micronaut.samples.petclinic.repository.oracle.DeepSecOwnerRepository;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.scheduling.TaskExecutors;

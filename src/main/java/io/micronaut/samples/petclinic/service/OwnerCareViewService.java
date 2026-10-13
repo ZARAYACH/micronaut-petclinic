@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.exceptions.DataAccessException;
 import io.micronaut.data.exceptions.OptimisticLockException;
 import io.micronaut.http.server.exceptions.NotFoundException;
-import io.micronaut.samples.petclinic.oracle.model.OwnerCareView;
+import io.micronaut.samples.petclinic.model.oracle.OwnerCareView;
 import io.micronaut.samples.petclinic.repository.OwnerCareViewRepository;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;

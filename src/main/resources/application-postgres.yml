@@ -6,6 +6,6 @@ datasources:
     password: petclinic
     driver-class-name: org.postgresql.Driver
     dialect: POSTGRES
-    # Include shared entities only; exclude Oracle-only JSON duality views.
+    # Exclude Other profiles specific entities.
     packages:
-      - io.micronaut.samples.petclinic.model
+      - io.micronaut.samples.petclinic.model.shared

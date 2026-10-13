@@ -10,7 +10,7 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.samples.petclinic.dto.PetCareSearchRequest;
 import io.micronaut.samples.petclinic.dto.PetCareSearchResult;
-import io.micronaut.samples.petclinic.model.PetCareEmbeddingDimensions;
+import io.micronaut.samples.petclinic.model.shared.PetCareEmbeddingDimensions;
 import io.micronaut.samples.petclinic.service.PetCareKnowledgeService;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;

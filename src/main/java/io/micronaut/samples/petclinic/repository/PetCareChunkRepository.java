@@ -5,7 +5,7 @@ import io.micronaut.data.model.vector.search.Score;
 import io.micronaut.data.model.vector.search.ScoringFunction;
 import io.micronaut.data.model.vector.search.SearchResults;
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.samples.petclinic.model.PetCareChunk;
+import io.micronaut.samples.petclinic.model.shared.PetCareChunk;
 
 /**
  * Repository for vector-searchable pet-care chunks.

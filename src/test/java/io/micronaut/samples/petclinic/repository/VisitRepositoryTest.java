@@ -1,7 +1,7 @@
 package io.micronaut.samples.petclinic.repository;
 
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.model.shared.Visit;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,7 @@ package io.micronaut.samples.petclinic.system;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.annotation.Value;
-import io.micronaut.samples.petclinic.model.Clinic;
+import io.micronaut.samples.petclinic.model.shared.Clinic;
 import io.micronaut.samples.petclinic.repository.ClinicRepository;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;

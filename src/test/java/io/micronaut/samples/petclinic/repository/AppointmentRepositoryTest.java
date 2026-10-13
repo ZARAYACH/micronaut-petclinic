@@ -1,14 +1,14 @@
 package io.micronaut.samples.petclinic.repository;
 
-import io.micronaut.samples.petclinic.model.Appointment;
+import io.micronaut.samples.petclinic.model.shared.Appointment;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-import static io.micronaut.samples.petclinic.model.Appointment.Status.AVAILABLE;
-import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR_EMERGENCY;
-import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR_REGULAR;
-import static io.micronaut.samples.petclinic.model.Appointment.Status.HELD_BY_REGULAR;
+import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.AVAILABLE;
+import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.BOOKED_FOR_EMERGENCY;
+import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.BOOKED_FOR_REGULAR;
+import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.HELD_BY_REGULAR;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /** Exercises appointment queries on the active database profile, including locking-query syntax. */

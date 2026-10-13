@@ -4,7 +4,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
-import io.micronaut.samples.petclinic.model.Vet;
+import io.micronaut.samples.petclinic.model.shared.Vet;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;

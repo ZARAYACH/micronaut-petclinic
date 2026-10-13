@@ -1,7 +1,7 @@
 package io.micronaut.samples.petclinic.dto;
 
 import io.micronaut.core.annotation.Introspected;
-import io.micronaut.samples.petclinic.model.Clinic;
+import io.micronaut.samples.petclinic.model.shared.Clinic;
 import io.micronaut.serde.annotation.Serdeable;
 
 import java.util.List;

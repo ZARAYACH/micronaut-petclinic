@@ -3,7 +3,7 @@ package io.micronaut.samples.petclinic.repository;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.model.Sort;
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.samples.petclinic.model.Visit;
+import io.micronaut.samples.petclinic.model.shared.Visit;
 import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
