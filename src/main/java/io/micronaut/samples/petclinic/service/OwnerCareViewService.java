@@ -42,7 +42,8 @@ public class OwnerCareViewService {
      */
     public OwnerCareView update(OwnerCareView updated) {
         try {
-            return repository.update(updated);
+            repository.update(updated);
+            return findById(updated.id());
         } catch (OptimisticLockException e) {
             throw e;
         } catch (DataAccessException e) {

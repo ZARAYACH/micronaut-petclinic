@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -128,11 +129,11 @@ class OracleJsonDualityControllerTest {
     }
 
     @Test
-    void secondSaveUsingReturnedMetadataIsRejectedWhenEtagIsStale() {
+    void secondSaveUsingReturnedMetadataIsOK() {
         HttpResponse<OwnerCareView> first = client.toBlocking().exchange(
                 HttpRequest.PUT(documentUrl(), withCity(originalDocument, "First save")), OwnerCareView.class);
-        HttpResponse<Map> second = putDocument(withCity(first.body(), "Second save"));
-        assertThat(second.code()).isEqualTo(HttpStatus.CONFLICT.getCode());
+        HttpResponse<Map> second = putDocument(withCity(Objects.requireNonNull(first.body()), "Second save"));
+        assertThat(second.code()).isEqualTo(HttpStatus.OK.getCode());
     }
 
     @Test

@@ -83,7 +83,7 @@ class OracleOwnerCareViewRepositoryTest {
         assertThat(petRepository.findById(originalPet.id()).orElseThrow().name()).isEqualTo(updatedPetName);
         assertThat(visitRepository.findById(originalVisit.id()).orElseThrow().description())
                 .isEqualTo(updatedVisitDescription);
-        assertThat(saved.metadata().etag()).isEqualTo(original.metadata().etag());
+        assertThat(saved.metadata().etag()).isNotEqualTo(original.metadata().etag());
     }
 
     @Test
