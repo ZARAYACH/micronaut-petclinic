@@ -409,7 +409,7 @@ a booking that commits while it waits for the row lock.
 
 ### Clinic service offering upsert
 
-The application also demonstrates Micronaut Data's `@Upsert` feature. Relationship-based conflict properties are supported in 5.2.2; the local `5.2.3-SNAPSHOT` build is used for the pending geometry serialization fix when a fetched relationship includes a clinic's spatial data.
+The application also demonstrates Micronaut Data's `@Upsert` feature.
 
 Each clinic has its own service catalog at `/clinics/{clinicId}/services`. From the clinic search results, click **Services**, or open the first sample clinic directly at http://localhost:8080/clinics/1/services.
 
