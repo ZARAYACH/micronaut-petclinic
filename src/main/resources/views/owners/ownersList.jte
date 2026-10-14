@@ -1,5 +1,5 @@
-@import io.micronaut.samples.petclinic.model.shared.Owner
-@import io.micronaut.samples.petclinic.model.shared.Pet
+@import io.micronaut.samples.petclinic.model.Owner
+@import io.micronaut.samples.petclinic.model.Pet
 @import java.util.Collection
 
 @param Collection<Owner> owners

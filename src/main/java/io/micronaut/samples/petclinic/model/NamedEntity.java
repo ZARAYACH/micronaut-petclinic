@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model.shared;
+package io.micronaut.samples.petclinic.model;
 
 /**
  * Shared contract for entities with a name.

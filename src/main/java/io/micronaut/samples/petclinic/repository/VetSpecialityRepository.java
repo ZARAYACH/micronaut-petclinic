@@ -1,8 +1,8 @@
 package io.micronaut.samples.petclinic.repository;
 
 import io.micronaut.data.repository.GenericRepository;
-import io.micronaut.samples.petclinic.model.shared.Speciality;
-import io.micronaut.samples.petclinic.model.shared.VetSpeciality;
+import io.micronaut.samples.petclinic.model.Speciality;
+import io.micronaut.samples.petclinic.model.VetSpeciality;
 import java.util.List;
 
 /**

@@ -13,7 +13,7 @@ import io.micronaut.http.server.exceptions.NotFoundException;
 import io.micronaut.http.uri.UriBuilder;
 import io.micronaut.samples.petclinic.dto.OwnerForm;
 import io.micronaut.samples.petclinic.mapper.FormMapper;
-import io.micronaut.samples.petclinic.model.shared.Owner;
+import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.samples.petclinic.service.ClinicService;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;

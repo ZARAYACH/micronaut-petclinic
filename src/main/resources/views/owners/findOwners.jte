@@ -1,4 +1,4 @@
-@import io.micronaut.samples.petclinic.model.shared.Owner
+@import io.micronaut.samples.petclinic.model.Owner
 
 @param Owner owner
 @param boolean notFound

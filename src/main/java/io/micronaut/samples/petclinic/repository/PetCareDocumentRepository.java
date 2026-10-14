@@ -1,7 +1,7 @@
 package io.micronaut.samples.petclinic.repository;
 
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.samples.petclinic.model.shared.PetCareDocument;
+import io.micronaut.samples.petclinic.model.PetCareDocument;
 
 /**
  * Repository for pet-care source documents.

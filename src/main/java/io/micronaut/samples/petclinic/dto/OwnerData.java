@@ -1,6 +1,6 @@
 package io.micronaut.samples.petclinic.dto;
 
-import io.micronaut.samples.petclinic.model.shared.Owner;
+import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.serde.annotation.Serdeable;
 
 import java.util.List;

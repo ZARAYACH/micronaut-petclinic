@@ -1,4 +1,4 @@
-package io.micronaut.samples.petclinic.model.oracle;
+package io.micronaut.samples.petclinic.oracle.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Nullable;
@@ -7,9 +7,9 @@ import io.micronaut.data.annotation.JsonSubView;
 import io.micronaut.data.annotation.JsonView;
 import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.data.annotation.Relation;
-import io.micronaut.samples.petclinic.model.shared.Owner;
-import io.micronaut.samples.petclinic.model.shared.Pet;
-import io.micronaut.samples.petclinic.model.shared.Visit;
+import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.Visit;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

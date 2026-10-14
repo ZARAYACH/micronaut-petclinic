@@ -2,7 +2,7 @@ package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.samples.petclinic.model.shared.Appointment;
+import io.micronaut.samples.petclinic.model.Appointment;
 import io.micronaut.samples.petclinic.repository.AppointmentRepository;
 import io.micronaut.samples.petclinic.repository.OracleAppointmentLockRepository;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -16,8 +16,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.BOOKED_FOR_EMERGENCY;
-import static io.micronaut.samples.petclinic.model.shared.Appointment.Status.BOOKED_FOR_REGULAR;
+import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR_EMERGENCY;
+import static io.micronaut.samples.petclinic.model.Appointment.Status.BOOKED_FOR_REGULAR;
 import static io.micronaut.samples.petclinic.support.OracleTransactionPriorityTestSupport.awaitRegularLock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

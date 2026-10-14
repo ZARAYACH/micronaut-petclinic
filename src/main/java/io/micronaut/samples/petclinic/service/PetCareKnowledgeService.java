@@ -5,7 +5,7 @@ import io.micronaut.data.model.vector.search.Score;
 import io.micronaut.data.model.vector.search.ScoringFunction;
 import io.micronaut.data.model.vector.search.SearchResults;
 import io.micronaut.samples.petclinic.dto.PetCareSearchResult;
-import io.micronaut.samples.petclinic.model.shared.PetCareChunk;
+import io.micronaut.samples.petclinic.model.PetCareChunk;
 import io.micronaut.samples.petclinic.repository.PetCareChunkRepository;
 import jakarta.inject.Singleton;
 import org.jspecify.annotations.NonNull;

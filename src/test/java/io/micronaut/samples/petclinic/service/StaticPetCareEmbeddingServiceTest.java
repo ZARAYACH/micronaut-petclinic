@@ -1,7 +1,7 @@
 package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.data.model.vector.FloatVector;
-import io.micronaut.samples.petclinic.model.shared.PetCareEmbeddingDimensions;
+import io.micronaut.samples.petclinic.model.PetCareEmbeddingDimensions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

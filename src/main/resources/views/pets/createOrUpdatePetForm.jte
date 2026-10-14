@@ -1,6 +1,6 @@
 @import io.micronaut.samples.petclinic.dto.PetForm
-@import io.micronaut.samples.petclinic.model.shared.Owner
-@import io.micronaut.samples.petclinic.model.shared.PetType
+@import io.micronaut.samples.petclinic.model.Owner
+@import io.micronaut.samples.petclinic.model.PetType
 @import java.util.Collection
 
 @param PetForm pet

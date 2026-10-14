@@ -4,7 +4,7 @@ import io.micronaut.data.annotation.Query;
 import io.micronaut.data.annotation.Join;
 import static io.micronaut.data.annotation.Join.Type.LEFT_FETCH;
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.samples.petclinic.model.shared.Pet;
+import io.micronaut.samples.petclinic.model.Pet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

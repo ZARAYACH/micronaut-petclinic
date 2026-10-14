@@ -2,7 +2,7 @@
 @param io.micronaut.http.HttpRequest<?> request
 @param java.util.Locale locale
 @param java.util.Set<String> activeNames
-@param java.util.List<io.micronaut.samples.petclinic.model.shared.Appointment> appointments
+@param java.util.List<io.micronaut.samples.petclinic.model.Appointment> appointments
 @param int reservationSeconds
 
 @template.layout(content = @`

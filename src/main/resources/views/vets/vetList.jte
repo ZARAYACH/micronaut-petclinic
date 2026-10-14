@@ -1,4 +1,4 @@
-@param java.util.List<io.micronaut.samples.petclinic.model.shared.Vet> vets
+@param java.util.List<io.micronaut.samples.petclinic.model.Vet> vets
 @param io.micronaut.samples.petclinic.system.I18nViewModelProcessor.Msg msg
 @param io.micronaut.http.HttpRequest<?> request
 @param java.util.Locale locale
@@ -65,7 +65,7 @@
             </div>
         @else
             <div class="row g-4">
-                @for (io.micronaut.samples.petclinic.model.shared.Vet vet : vets)
+                @for (io.micronaut.samples.petclinic.model.Vet vet : vets)
                     <div class="col-md-6 col-lg-4">
                         <div class="vet-card animate-fade-in-up">
                             <div class="vet-card-header">
@@ -78,7 +78,7 @@
 
                                 @if (vet.getSpecialities() != null && !vet.getSpecialities().isEmpty())
                                     <div class="mt-3">
-                                        @for (io.micronaut.samples.petclinic.model.shared.Speciality s : vet.getSpecialities())
+                                        @for (io.micronaut.samples.petclinic.model.Speciality s : vet.getSpecialities())
                                             <span class="speciality-badge">${s.name()}</span>
                                         @endfor
                                     </div>

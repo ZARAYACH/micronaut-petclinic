@@ -5,9 +5,9 @@ import io.micronaut.context.annotation.Mapper.Mapping;
 import io.micronaut.samples.petclinic.dto.OwnerForm;
 import io.micronaut.samples.petclinic.dto.PetForm;
 import io.micronaut.samples.petclinic.dto.VisitForm;
-import io.micronaut.samples.petclinic.model.shared.Owner;
-import io.micronaut.samples.petclinic.model.shared.Pet;
-import io.micronaut.samples.petclinic.model.shared.Visit;
+import io.micronaut.samples.petclinic.model.Owner;
+import io.micronaut.samples.petclinic.model.Pet;
+import io.micronaut.samples.petclinic.model.Visit;
 import jakarta.inject.Singleton;
 
 import java.time.Duration;

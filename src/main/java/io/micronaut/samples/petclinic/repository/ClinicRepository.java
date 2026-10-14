@@ -2,7 +2,7 @@ package io.micronaut.samples.petclinic.repository;
 
 import io.micronaut.data.model.geo.Geometry;
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.samples.petclinic.model.shared.Clinic;
+import io.micronaut.samples.petclinic.model.Clinic;
 
 import java.util.List;
 

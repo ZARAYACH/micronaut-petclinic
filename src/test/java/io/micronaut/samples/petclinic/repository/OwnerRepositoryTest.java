@@ -1,6 +1,6 @@
 package io.micronaut.samples.petclinic.repository;
 
-import io.micronaut.samples.petclinic.model.shared.Owner;
+import io.micronaut.samples.petclinic.model.Owner;
 import io.micronaut.data.model.Sort;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;

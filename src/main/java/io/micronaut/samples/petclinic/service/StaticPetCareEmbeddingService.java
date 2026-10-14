@@ -2,7 +2,7 @@ package io.micronaut.samples.petclinic.service;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.data.model.vector.FloatVector;
-import io.micronaut.samples.petclinic.model.shared.PetCareEmbeddingDimensions;
+import io.micronaut.samples.petclinic.model.PetCareEmbeddingDimensions;
 import jakarta.inject.Singleton;
 
 import java.io.BufferedReader;
