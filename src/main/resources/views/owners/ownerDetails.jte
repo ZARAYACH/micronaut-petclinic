@@ -298,7 +298,7 @@
                     careTab.addEventListener("click", (event) => {
                         event.preventDefault();
                         showPanel(true);
-                        updateTabUrl("owner-care-record");
+                        updateTabUrl("care-record");
                         void loadDocument();
                     });
                     document.getElementById("save-document").addEventListener("click", async () => {
@@ -332,10 +332,9 @@
                         }
                     });
                     const selectedTab = new URLSearchParams(window.location.search).get("tab");
-                    const showCareRecord = selectedTab === "owner-care-record" || selectedTab === "care-record";
+                    const showCareRecord = selectedTab === "care-record";
                     showPanel(showCareRecord);
                     if (showCareRecord) {
-                        if (selectedTab !== "owner-care-record") updateTabUrl("owner-care-record");
                         void loadDocument();
                     }
                 })();
