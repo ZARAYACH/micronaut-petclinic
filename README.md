@@ -230,7 +230,6 @@ Use the language selector in the top-right corner to switch between:
 - Spanish (Español)
 - German (Deutsch)
 
-
 ## Project Structure
 
 ```
@@ -406,6 +405,17 @@ Wait for bookings in any other tabs or clients to finish too. Reset uses plain
 rollback enabled, a reset blocked by a LOW booking can cause Oracle to roll that
 booking back after the configured 3-second HIGH wait target. Reset can also clear
 a booking that commits while it waits for the row lock.
+
+### Oracle JSON duality showcase
+
+In the `oracle` environment, open an owner and select the **Owner Care Record** tab
+(for example, http://localhost:8080/owners/1?tab=care-record to open it
+directly). The owner document API is available at `/owners/{ownerId}/care-record`.
+View that owner, their pets, and visit history together as one JSON document.
+Edit existing owner, pet, or visit details and save; the changes also appear in Petclinic's
+regular forms. If the record changed since it was loaded, saving reports a
+conflict so you can reload the latest version. Adding or removing pets and
+visits is not supported in this showcase.
 
 ### Clinic service offering upsert
 

@@ -28,6 +28,7 @@ micronaut-security-ojdbc-extensions = { module = "io.micronaut.security:micronau
 micronaut-security-oauth2 = { module = "io.micronaut.security:micronaut-security-oauth2" }
 micronaut-security-processor = { module = "io.micronaut.security:micronaut-security-processor" }
 micronaut-serde-jackson = { module = "io.micronaut.serde:micronaut-serde-jackson" }
+micronaut-serde-oracle-jdbc-json = { module = "io.micronaut.serde:micronaut-serde-oracle-jdbc-json" }
 micronaut-views-jte = { module = "io.micronaut.views:micronaut-views-jte" }
 micronaut-data-jdbc = { module = "io.micronaut.data:micronaut-data-jdbc", version.ref = "micronaut-data" }
 micronaut-jdbc-hikari = { module = "io.micronaut.sql:micronaut-jdbc-hikari" }
