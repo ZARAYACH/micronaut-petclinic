@@ -11,3 +11,6 @@ datasources:
     dialect: H2
     maximum-pool-size: 2
     minimum-idle: 1
+    # Exclude Oracle-only JSON duality view mappings from H2 schema generation.
+    packages:
+      - io.micronaut.samples.petclinic.model
