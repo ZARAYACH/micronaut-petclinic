@@ -1,5 +1,6 @@
 package io.micronaut.samples.petclinic.controller;
 
+import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -25,6 +26,9 @@ class OwnerControllerTest {
 
     @Inject
     ClinicServiceFixtures clinicServiceFixtures;
+
+    @Inject
+    ApplicationContext context;
 
     @Test
     void shouldShowFindOwnersForm() {
@@ -64,7 +68,11 @@ class OwnerControllerTest {
         assertThat(response.body()).contains("George");
         assertThat(response.body()).contains("Franklin");
 
-        assertThat(response.body()).doesNotContain("id=\"care-record-tab\"");
+        if (context.getEnvironment().getActiveNames().contains("oracle")) {
+            assertThat(response.body()).contains("id=\"care-record-tab\"");
+        } else {
+            assertThat(response.body()).doesNotContain("id=\"care-record-tab\"");
+        }
     }
 
     @Test
