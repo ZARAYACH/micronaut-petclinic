@@ -3,7 +3,11 @@ datasources:
   default:
     db-type: postgres
     schema-generate: CREATE_DROP
-    dialect: POSTGRES
+    dialect: POSTGRES   packages:
+      - io.micronaut.samples.petclinic.model
+    packages:
+      # Include shared entities only; exclude Oracle-only JSON duality views.
+      - io.micronaut.samples.petclinic.model
 
 # We used this image because the default version that ships with test resources doesn't support geospatial features.
 # If you're not using geospatial features the default option should be sufficient & the following section can be removed.

@@ -11,6 +11,7 @@ import io.micronaut.samples.petclinic.model.VetWithSpecialities;
 import io.micronaut.samples.petclinic.model.Visit;
 import io.micronaut.samples.petclinic.repository.AppointmentRepository;
 import io.micronaut.samples.petclinic.repository.ClinicRepository;
+import io.micronaut.samples.petclinic.repository.ClinicServiceOfferingRepository;
 import io.micronaut.samples.petclinic.repository.OwnerRepository;
 import io.micronaut.samples.petclinic.repository.PetCareChunkRepository;
 import io.micronaut.samples.petclinic.repository.PetCareDocumentRepository;
@@ -48,6 +49,14 @@ public final class OracleRepositories {
     @Requires(env = {"oracle", "oracle-deepsec"})
     @JdbcRepository(dialect = Dialect.ORACLE)
     public interface OracleClinicRepository extends ClinicRepository {
+    }
+
+    /**
+     * Oracle clinic service offering repository bean.
+     */
+    @Requires(env = "oracle")
+    @JdbcRepository(dialect = Dialect.ORACLE)
+    public interface OracleClinicServiceOfferingRepository extends ClinicServiceOfferingRepository {
     }
 
     /**
